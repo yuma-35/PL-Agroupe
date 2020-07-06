@@ -672,7 +672,7 @@ public class Othello extends JPanel implements MouseListener {
 			rankBar.setBounds(150, 200, 400, 50);
 			rankBar.setValue(Client.myPlayer.rankPoint);
 			this.add(rankBar);
-			rankLabel.setText("ランク" + Client.myPlayer.rank);
+			rankLabel.setText("ランク" + Client.myPlayer.playerRank);
 			rankLabel.setBounds(250, 130, 200, 50);
 			this.add(rankLabel);
 			rankLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -720,7 +720,7 @@ public class Othello extends JPanel implements MouseListener {
 
 				int now = Client.myPlayer.rankPoint;
 				int xnow = Client.myPlayer.rankPoint;
-				int rankbox = Client.myPlayer.rank;
+				int rankbox = Client.myPlayer.playerRank;
 				boolean sendflag = true;
 
 				public void run() {
@@ -730,7 +730,7 @@ public class Othello extends JPanel implements MouseListener {
 							if (xaddpoint <= 0) {
 								if (xnow == 0) {
 									xnow = 100;
-									Client.myPlayer.rank--;
+									Client.myPlayer.playerRank--;
 								}
 								xnow--;
 								xaddpoint++;
@@ -738,7 +738,7 @@ public class Othello extends JPanel implements MouseListener {
 								xnow++;
 								if (xnow == 100) {
 									xnow = 0;
-									Client.myPlayer.rank++;
+									Client.myPlayer.playerRank++;
 
 								}
 
@@ -792,9 +792,9 @@ public class Othello extends JPanel implements MouseListener {
 		int getpoint(int endset) {
 			int i;
 			if (endset == 0 || endset == 2 || endset == 4) {
-				i = 80 - (Client.myPlayer.rank * 5) + (enemyPlayer.rank - Client.myPlayer.rank) * 3;
+				i = 80 - (Client.myPlayer.playerRank * 5) + (enemyPlayer.playerRank - Client.myPlayer.playerRank) * 3;
 			} else {
-				i = -1 * (20 + (Client.myPlayer.rank * 5) + (Client.myPlayer.rank - enemyPlayer.rank) * 3);
+				i = -1 * (20 + (Client.myPlayer.playerRank * 5) + (Client.myPlayer.playerRank - enemyPlayer.playerRank) * 3);
 			}
 			return i;
 		}

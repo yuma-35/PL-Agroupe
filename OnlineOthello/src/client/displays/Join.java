@@ -81,7 +81,7 @@ public class Join extends JDialog {
 		//参加ボタン
 		public class toStart implements ActionListener{
 		    public  void actionPerformed(ActionEvent e) {
-		    if(password.getText()==amatch.pass) {
+		    if(password.getText()==amatch.password) {
 		    	disp.ChangeDisp(disp.othello);
 		    	disp.othello.startOthello(amatch.rule, 1);
 		    }else {
