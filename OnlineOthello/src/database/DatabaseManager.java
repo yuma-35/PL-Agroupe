@@ -11,7 +11,7 @@ import model.Player;
 
 public class DatabaseManager {
 	private Connection connection = null;
-
+// コメント
 	public DatabaseManager() {
 		try {
 			connection = DriverManager.getConnection(
