@@ -23,14 +23,14 @@ public class ChangeKoma extends JPanel {
 	String str = "コマの着せ替え";
 
 	//ファイル名を取得
-	File Bfile = new File("image\\コマ\\Black");
+	File Bfile = new File("image/コマ/Black");
 	File Bfiles[] = Bfile.listFiles();
-	File Wfile = new File("image\\コマ\\White");
+	File Wfile = new File("image/コマ/White");
 	File Wfiles[] = Wfile.listFiles();
 
 	//変更を保存するファイル
-	File fb= new File("Save data\\black.txt");
-	File fw= new File("Save data\\white.txt");
+	File fb= new File("save-data/black.txt");
+	File fw= new File("save-data/white.txt");
 
 	//JRadioButton
 	 JRadioButton radio1;

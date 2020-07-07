@@ -1,28 +1,19 @@
 package client.displays;
 
-import java.awt.image.RescaleOp;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.applet.Applet;
 import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.Dialog.ModalityType;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.border.LineBorder;
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.IconifyAction;
-
-import org.omg.CORBA.PRIVATE_MEMBER;
-
-import model.Client;
-import model.Player;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -31,13 +22,12 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseEvent;
+import javax.swing.border.LineBorder;
 
-
+import model.Client;
+import model.Player;
 
 //turn変わるたびにおける場所検索のメソッド起動
 //aラベルに条件付けして自動で変わるようにする
@@ -509,7 +499,7 @@ public class Othello extends JPanel implements MouseListener {
 				// send(9,9)
 			}
 			/*
-			 * 
+			 *
 			 * Point message=new Point(0,0); //read(message)ここで相手の操作を待つ
 			 * if(message.x==9&&!pas){ // パスなので何もしない }else if(message.x==9&&pas){
 			 * //終局したので自分のコマの数を数えて送る break; }else if(message.x==10){
@@ -654,18 +644,18 @@ public class Othello extends JPanel implements MouseListener {
 			this.setLayout(null);
 			friendRequestButton.setBounds(250, 300, 200, 50);
 			friendRequestButton.setHorizontalAlignment(JLabel.CENTER);
-			friendRequestButton.setFont(new Font("MS　ゴシック",Font.BOLD,20));
+			friendRequestButton.setFont(new Font("MS　ゴシック", Font.BOLD, 20));
 			friendRequestButton.setForeground(Color.WHITE);
-		    friendRequestButton.setBackground(new Color(51, 102, 255));
-		    friendRequestButton.addActionListener(new friendRequest());
+			friendRequestButton.setBackground(new Color(51, 102, 255));
+			friendRequestButton.addActionListener(new friendRequest());
 			this.add(friendRequestButton);
-			if(enemyPlayer.frflag==1) {
-			friendRequestButton.setEnabled(false);
+			if (enemyPlayer.frflag == 1) {
+				friendRequestButton.setEnabled(false);
 			}
 			class Back implements ActionListener {
 				public void actionPerformed(ActionEvent e) {
 					timer.cancel();
-					timer=null;
+					timer = null;
 					dispose();
 				}
 			}
@@ -682,7 +672,7 @@ public class Othello extends JPanel implements MouseListener {
 			rankBar.setBounds(150, 200, 400, 50);
 			rankBar.setValue(Client.myPlayer.rankPoint);
 			this.add(rankBar);
-			rankLabel.setText("ランク" + Client.myPlayer.rank);
+			rankLabel.setText("ランク" + Client.myPlayer.playerRank);
 			rankLabel.setBounds(250, 130, 200, 50);
 			this.add(rankLabel);
 			rankLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -698,7 +688,7 @@ public class Othello extends JPanel implements MouseListener {
 			this.add(resultLabel);
 			enemyResultLabel.setFont(new Font("MS ゴシック", Font.BOLD, 30));
 			enemyResultLabel.setBounds(250, 250, 200, 50);
-			enemyResultLabel.setText("対戦相手:"+enemyPlayer.id);
+			enemyResultLabel.setText("対戦相手:" + enemyPlayer.id);
 			enemyResultLabel.setHorizontalAlignment(JLabel.CENTER);
 			this.add(enemyResultLabel);
 			backButton.setFont(new Font("MS ゴシック", Font.BOLD, 30));
@@ -722,90 +712,89 @@ public class Othello extends JPanel implements MouseListener {
 				resultLabel.setText("勝利");
 				endcaseLabel.setText("相手が切断しました");
 			}
-             timer=new Timer();
-             rankBar.setValue(Client.myPlayer.rankPoint);
+			timer = new Timer();
+			rankBar.setValue(Client.myPlayer.rankPoint);
 			timer.schedule(new TimerTask() {
-					 int xaddpoint=getpoint(end);
-					int  addpoint = getpoint(end);
-				
-			
+				int xaddpoint = getpoint(end);
+				int addpoint = getpoint(end);
+
 				int now = Client.myPlayer.rankPoint;
-				int xnow= Client.myPlayer.rankPoint;
-				int rankbox=Client.myPlayer.rank;
-				boolean sendflag=true;
+				int xnow = Client.myPlayer.rankPoint;
+				int rankbox = Client.myPlayer.playerRank;
+				boolean sendflag = true;
+
 				public void run() {
-				
-					 if(sendflag) {
-						 while(xaddpoint!=0) {
-							 if (xaddpoint <= 0) {
-										if(xnow==0) {
-											xnow=100;
-											Client.myPlayer.rank--;
-										}
-										xnow--;
-										xaddpoint++;		
-								} else {
-									xnow++;
-										if(xnow==100) {
-											xnow=0;
-											Client.myPlayer.rank++;
-											
-										}
-										
-										rankBar.setValue(xnow);
-										xaddpoint--;	
-									
-						 }
-						  
-						Client.myPlayer.rankPoint=xnow;
-						//send
-						sendflag=false;
+
+					if (sendflag) {
+						while (xaddpoint != 0) {
+							if (xaddpoint <= 0) {
+								if (xnow == 0) {
+									xnow = 100;
+									Client.myPlayer.playerRank--;
+								}
+								xnow--;
+								xaddpoint++;
+							} else {
+								xnow++;
+								if (xnow == 100) {
+									xnow = 0;
+									Client.myPlayer.playerRank++;
+
+								}
+
+								rankBar.setValue(xnow);
+								xaddpoint--;
+
+							}
+
+							Client.myPlayer.rankPoint = xnow;
+							//send
+							sendflag = false;
+						}
+
 					}
-						
-					 } 
-						 
+
 					if (addpoint <= 0) {
 						if (addpoint != 0) {
-							
-							if(now==0) {
-								now=100;
+
+							if (now == 0) {
+								now = 100;
 								rankbox--;
-								rankLabel.setText("ランク"+rankbox);
+								rankLabel.setText("ランク" + rankbox);
 								rankChangeLabel.setText("ランクダウン");
 							}
 							now--;
 							rankBar.setValue(now);
-							addpoint++;		
-							
-						} 
+							addpoint++;
+
+						}
 					} else {
 						if (addpoint != 0) {
 							now++;
-							if(now==100) {
-								now=0;
+							if (now == 100) {
+								now = 0;
 								rankBar.setValue(now);
 								rankbox++;
-								rankLabel.setText("ランク"+rankbox);
+								rankLabel.setText("ランク" + rankbox);
 								rankChangeLabel.setText("ランクアップ!");
 							}
 							rankBar.setValue(now);
 							addpoint--;
-							
+
 						}
 					}
-					
-					
+
 				}
-				}, 0, 10);
-			
+			}, 0, 10);
+
 		}
 
 		int getpoint(int endset) {
 			int i;
-			if(endset==0||endset==2||endset==4) {
-				i=80-(Client.myPlayer.rank*5)+(enemyPlayer.rank-Client.myPlayer.rank)*3;
-			}else{
-				i=-1*(20+(Client.myPlayer.rank*5)+(Client.myPlayer.rank-enemyPlayer.rank)*3);
+			if (endset == 0 || endset == 2 || endset == 4) {
+				i = 80 - (Client.myPlayer.playerRank * 5) + (enemyPlayer.playerRank - Client.myPlayer.playerRank) * 3;
+			} else {
+				i = -1 * (20 + (Client.myPlayer.playerRank * 5) + (Client.myPlayer.playerRank - enemyPlayer.playerRank) * 3);
 			}
 			return i;
 		}

@@ -32,8 +32,8 @@ public class Music extends JDialog {
 	Disp disp;
 
 	//変更を保存するファイル
-	static File fB = new File("Save data\\BGM.txt");
-	static File fS = new File("Save data\\SE.txt");
+	static File fB = new File("save-data/BGM.txt");
+	static File fS = new File("save-data/SE.txt");
 
 	//ボタン
 	JButton toMain = new JButton("戻る");
@@ -144,7 +144,7 @@ public class Music extends JDialog {
 	public static void bgm() {
 		AudioInputStream ais = null;
 		try {
-			ais = AudioSystem.getAudioInputStream(new File("BGM,SE\\Alarm01.wav"));
+			ais = AudioSystem.getAudioInputStream(new File("BGM,SE/Alarm01.wav"));
 			AudioFormat af = ais.getFormat();
 			DataLine.Info info = new DataLine.Info(Clip.class, af);
 			Clip clip = (Clip) AudioSystem.getLine(info);

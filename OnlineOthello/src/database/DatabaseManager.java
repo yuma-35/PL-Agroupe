@@ -37,7 +37,7 @@ public class DatabaseManager {
 	}
 
 	public void insertPlayer(Player player) throws SQLException {
-		String sql = "INSERT INTO players(id, password, question, answer, win, lose, draw, conceed, `rank`, point, status) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+		String sql = "INSERT INTO players(id, password, question, answer, win, lose, draw, conceed, player_rank, rank_point, status) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		PreparedStatement pstmt = connection.prepareStatement(sql);
 		pstmt.setString(1, player.id);
 		pstmt.setString(2, player.password);

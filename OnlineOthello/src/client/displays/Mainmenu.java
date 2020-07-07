@@ -172,7 +172,7 @@ public class Mainmenu extends JPanel {
 		// lobiPanel.setPreferredSize(new Dimension(480,80*MatchNumber));
 		/*
 		 * for(int i=0;i<MatchNumber;i++){ MatchPanel.add(new Match(i,read));
-		 * 
+		 *
 		 * }
 		 */
 	}
@@ -205,7 +205,7 @@ public class Mainmenu extends JPanel {
 		this.recordLoseLabel.setText(Client.myPlayer.lose + "敗");
 		this.recordDrawLabel.setText(Client.myPlayer.draw + "引き分け");
 		this.recordConceedLabel.setText(Client.myPlayer.conceed + "投了");
-		this.rankLabel.setText("ランク" + Client.myPlayer.rank);
+		this.rankLabel.setText("ランク" + Client.myPlayer.playerRank);
 		this.rankpointLabel.setText("あと" + (100-Client.myPlayer.rankPoint) + "pt");
 		reloadFriendlist();
 		reloadMatch();
@@ -259,7 +259,7 @@ public class Mainmenu extends JPanel {
         Match matchbox;
 		class Battle implements ActionListener{
 			public void actionPerformed(ActionEvent e) {
-				if(matchbox.pass!=null) {
+				if(matchbox.password!=null) {
 				joinbox = new Join(Disp.disp, ModalityType.APPLICATION_MODAL,matchbox);
 				joinbox.setLocation(440, 220);
 				joinbox.setVisible(true);
@@ -269,7 +269,7 @@ public class Mainmenu extends JPanel {
 				}
 			}
 		}
-		
+
 		public MatchPanel(int index, Match match) {
 			this.setLayout(null);
 			this.setBounds(0, 80 * index, 480, 80);
@@ -291,14 +291,14 @@ public class Mainmenu extends JPanel {
 			} else if (match.t_limit == 1) {
 				limitLabel.setText("ランク±3以内");
 			} else if (match.t_limit == 2) {
-				limitLabel.setText("ランク" + match.rank + "以上");
+				limitLabel.setText("ランク" + match.playerRank + "以上");
 			} else if (match.t_limit == 3) {
 				limitLabel.setText("フレンド限定");
 			}
 
 			matchRankLabel.setBounds(120, 0, 200, 30);
 			matchRankLabel.setFont(new Font("MS ゴシック", Font.BOLD, 20));
-			matchRankLabel.setText("ランク" + match.rank);
+			matchRankLabel.setText("ランク" + match.playerRank);
 			this.add(matchRankLabel);
 
 			ruleLabel.setBounds(220, 0, 200, 30);
@@ -315,7 +315,7 @@ public class Mainmenu extends JPanel {
 			battleButton.setFont(b);
 			battleButton.addActionListener(new Battle());
 			this.add(battleButton);
-			if (match.pass != null) {
+			if (match.password != null) {
 				pasIcon.setBounds(330, 0, 30, 30);
 				this.add(pasIcon);
 			}
@@ -339,7 +339,7 @@ public class Mainmenu extends JPanel {
 					frbox.setLocation(440, 220);
 					frbox.setVisible(true);
 				} else if (statusBox == 2 || statusBox == 3) {// 参加
-					if (friendMatchBox.pass != null) {
+					if (friendMatchBox.password != null) {
 						joinbox = new Join(Disp.disp, ModalityType.APPLICATION_MODAL, friendMatchBox);
 						joinbox.setLocation(440, 220);
 						joinbox.setVisible(true);
@@ -405,7 +405,7 @@ public class Mainmenu extends JPanel {
 
 		public class friendRemoveB implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
-				rbox = new RemoveCheck(Disp.disp, ModalityType.APPLICATION_MODAL, friendMatchBox.id);
+				rbox = new RemoveCheck(Disp.disp, ModalityType.APPLICATION_MODAL, friendMatchBox.playerId);
 				rbox.setLocation(440, 220);
 				rbox.setVisible(true);
 			}

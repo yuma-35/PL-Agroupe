@@ -1,6 +1,7 @@
 package model;
 
-public class Friend {
+public class GameRecord {
 	String playerId;
 	String opponentId;
+	int result;
 }
