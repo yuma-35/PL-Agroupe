@@ -1,5 +1,7 @@
 package server;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -8,8 +10,11 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
+
 import database.DatabaseManager;
 import model.Player;
+import model.SendIcon;
 
 class OthelloServer {
 	private static OthelloServer instance;
@@ -78,11 +83,11 @@ class OthelloServer {
 		OutputStream os = client.socket1.getOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(os);
 
-		if(db.isAlreadyExists(player.id)) {
+		if (db.isAlreadyExists(player.id)) {
 			oos.writeObject("failed");
-		}else {
-		db.insertPlayer(player);
-		oos.writeObject("success");
+		} else {
+			db.insertPlayer(player);
+			oos.writeObject("success");
 		}
 	}
 
@@ -94,16 +99,60 @@ class OthelloServer {
 		OutputStream os = client.socket1.getOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(os);
 
-		if(!db.isAlreadyExists(id)) {
+		if (!db.isAlreadyExists(id)) {
 			oos.writeObject("failed");
 			return;
 		}
-		if(!db.isValidPassword(id, hashedPassword)) {
+		if (!db.isValidPassword(id, hashedPassword)) {
 			oos.writeObject("failed");
 			return;
 		}
 		db.setStatusToLogIn(id);
 		oos.writeObject("success");
 
+	}
+
+	//ひとこと編集
+	public void addCComment(Object data, ClientThread client) throws IOException, SQLException {
+		ArrayList<String> commentData = (ArrayList<String>) data;
+
+		String id = commentData.get(0);
+		String comment = commentData.get(1);
+
+		OutputStream os = client.socket1.getOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(os);
+
+		if (db.addComment(id, comment)) {
+			oos.writeObject("success");
+		} else {
+			//db.insertPlayer(player);
+			oos.writeObject("failed");
+		}
+	}
+
+	//アイコン編集
+	public void addIIcon(Object data, ClientThread client) throws IOException, SQLException {
+		ArrayList<SendIcon> iconData = (ArrayList<SendIcon>) data;
+
+		SendIcon sendIcon = iconData.get(0);
+		BufferedImage img = ImageIO.read(sendIcon.image);
+
+		//イメージ保存
+		try {
+			File f = new File("サーバ画像/" + sendIcon.iconName);
+			ImageIO.write(img, "PNG", f);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		OutputStream os = client.socket1.getOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(os);
+
+		if (db.addIcon(sendIcon.id, sendIcon.iconName)) {
+			oos.writeObject("success");
+		} else {
+			//db.insertPlayer(player);
+			oos.writeObject("failed");
+		}
 	}
 }

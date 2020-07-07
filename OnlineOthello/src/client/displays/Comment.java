@@ -13,11 +13,17 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+
+import client.OthelloClient;
+import model.Client;
 
 public class Comment extends JPanel {
 
@@ -33,6 +39,7 @@ public class Comment extends JPanel {
 	//テキスト
 	JLabel name = new JLabel("ひとこと編集");
 	JLabel name2 = new JLabel("ひとこと");
+	JLabel error = new JLabel("");
 
 	//テキストエリア
 	JTextArea textarea = new JTextArea();
@@ -67,6 +74,10 @@ public class Comment extends JPanel {
 		name2.setForeground(Color.WHITE);
 		name2.setBounds(350, 150, 100, 100);
 		this.add(name2);
+		error.setFont(new Font("MS ゴシック", Font.BOLD, 15));
+		error.setForeground(Color.RED);
+		error.setBounds(170, 500, 300, 50);
+		this.add(error);
 
 		//テキストエリア
 		getText();
@@ -105,9 +116,30 @@ public class Comment extends JPanel {
 				bw.write(str);
 				bw.close();
 
-				Disp.ChangeDisp(Disp.account);
 			} catch (IOException e1) {
 				System.out.println(e1);
+			}
+
+			//サーバへデータ送信
+			try {
+				ArrayList<String> data = new ArrayList<String>();
+				//Client.myPlayer.id = "peach";  //実験用
+				data.add(Client.myPlayer.id);
+				data.add(str);
+				OthelloClient.send("addCComment", data);
+				InputStream is = OthelloClient.socket1.getInputStream();
+				ObjectInputStream ois = new ObjectInputStream(is);
+				String message = (String) ois.readObject();
+				if(message.equals("failed")) {
+					error.setText("エラーが発生しました");
+					return;
+				}
+				if(message.equals("success")) {
+					Disp.ChangeDisp(Disp.mainmenu);
+				}
+			} catch (IOException | ClassNotFoundException e1) {
+				// TODO 自動生成された catch ブロック
+				e1.printStackTrace();
 			}
 		}
 	}

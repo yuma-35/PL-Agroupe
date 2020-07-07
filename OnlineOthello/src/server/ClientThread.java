@@ -55,5 +55,13 @@ public class ClientThread extends Thread {
 			server.logIn(data, this);
 			return;
 		}
+		if (operation.equals("addCComment")) {
+			server.addCComment(data, this);
+			return;
+		}
+		if (operation.equals("addIIcon")) {
+			server.addIIcon(data, this);
+			return;
+		}
 	}
 }

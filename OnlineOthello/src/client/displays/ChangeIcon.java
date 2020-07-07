@@ -12,6 +12,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -19,6 +22,10 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+
+import client.OthelloClient;
+import model.Client;
+import model.SendIcon;
 
 public class ChangeIcon extends JPanel {
 	String str = "アイコンの変更";
@@ -45,6 +52,7 @@ public class ChangeIcon extends JPanel {
 
 	//ラベル
 	JLabel name = new JLabel();
+	JLabel error = new JLabel();
 
 	JPanel p = new JPanel();
 	int j = 0;
@@ -62,6 +70,10 @@ public class ChangeIcon extends JPanel {
 		name.setForeground(Color.WHITE);
 		name.setBounds(200, 70, 300, 100);
 		this.add(name);
+		error.setFont(new Font("MS ゴシック", Font.BOLD, 15));
+		error.setForeground(Color.RED);
+		error.setBounds(170, 500, 300, 50);
+		this.add(error);
 
 		//ボタン
 		ButtonTest();
@@ -166,17 +178,24 @@ public class ChangeIcon extends JPanel {
 
 			//ファイルのパス名
 			String str = null;
+			//ファイル名
+			String str2 = null;
 
 			if (status1 == true) {
 				str = files[0].getPath();
+				str2 = files[0].getName();
 			} else if (status2 == true) {
 				str = files[1].getPath();
+				str2 = files[1].getName();
 			} else if (status3 == true) {
 				str = files[2].getPath();
+				str2 = files[2].getName();
 			} else if (status4 == true) {
 				str = files[3].getPath();
+				str2 = files[3].getName();
 			} else if (status5 == true) {
 				str = files[4].getPath();
+				str2 = files[4].getName();
 			}
 
 			//ファイルに書き込む
@@ -186,9 +205,31 @@ public class ChangeIcon extends JPanel {
 				bw.write(str);
 				bw.close();
 
-				Disp.ChangeDisp(Disp.account);
+				Disp.ChangeDisp(Disp.mainmenu);
 			} catch (IOException e1) {
 				System.out.println(e1);
+			}
+
+			//サーバへデータ送信
+			try {
+				Client.myPlayer.id = "peach";  //実験用
+				SendIcon send = new SendIcon(Client.myPlayer.id,str2,new File(str));
+				ArrayList<SendIcon> data = new ArrayList<SendIcon>();
+				data.add(send);
+				OthelloClient.send("addIIcon", data);
+				InputStream is = OthelloClient.socket1.getInputStream();
+				ObjectInputStream ois = new ObjectInputStream(is);
+				String message = (String) ois.readObject();
+				if(message.equals("failed")) {
+					error.setText("エラーが発生しました");
+					return;
+				}
+				if(message.equals("success")) {
+					Disp.ChangeDisp(Disp.mainmenu);
+				}
+			} catch (IOException | ClassNotFoundException e1) {
+				// TODO 自動生成された catch ブロック
+				e1.printStackTrace();
 			}
 		}
 	}
