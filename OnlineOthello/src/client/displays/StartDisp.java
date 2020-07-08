@@ -2,6 +2,8 @@ package client.displays;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -19,6 +21,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import client.OthelloClient;
+import model.Client;
 
 public class StartDisp extends JPanel {
 	JButton toForget;
@@ -50,7 +53,7 @@ public class StartDisp extends JPanel {
 		IDin = new JTextField();
 		IDin.setBounds(400, 270, 200, 30);
 
-		pasLabel.setBounds(325, 305, 100, 20);
+		pasLabel.setBounds(335, 305, 100, 20);
 		pasin = new JTextField();
 		pasin.setBounds(400, 300, 200, 30);
 
@@ -120,8 +123,10 @@ public class StartDisp extends JPanel {
 				if (message.equals("failed")) {
 					errors.setText("ログインできませんでした");
 				} else if (message.equals("success")) {
+					Client.myPlayer.id=IDin.getText();
 					Disp.mainmenu.reloadMainmenu();
 					Disp.ChangeDisp(Disp.mainmenu);
+					
 				}
 
 				//Disp.myPlayer=サーバから来たオブジェクト
@@ -133,7 +138,14 @@ public class StartDisp extends JPanel {
 			}
 		}
 	}
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		Graphics2D g2d = (Graphics2D) g;
+		g2d.setColor(Color.lightGray);
+		g2d.fillRect(370, 270, 60, 30);
+		g2d.fillRect(330, 300,80, 30);
 
+	}
 	public class toMakeAccountB implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 

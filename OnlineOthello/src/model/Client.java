@@ -8,6 +8,7 @@ import client.displays.Disp;
 public class Client {
 	public static Player myPlayer = new Player();
 
+
 	static public class toSoundB implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 

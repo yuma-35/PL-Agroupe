@@ -8,16 +8,20 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+
+
 import database.DatabaseManager;
+import model.Match;
 import model.Player;
 
 class OthelloServer {
 	private static OthelloServer instance;
 	public ServerSocket ss;
-	private ArrayList<ClientThread> clientList;
+	public ArrayList<ClientThread> clientList;
+	public ArrayList<Match> matchList=new ArrayList<Match>();
 	public static DatabaseManager db;
 	public int port = 4231;
-
+    public ArrayList<OthelloRoom> roomList =new ArrayList<OthelloRoom>();
 	public static void main(String[] args) {
 		OthelloServer socketServer = OthelloServer.getInstance();
 		socketServer.start();
@@ -105,5 +109,41 @@ class OthelloServer {
 		db.setStatusToLogIn(id);
 		oos.writeObject("success");
 
+	}
+	public void makeMatch(Object data,ClientThread client)throws IOException,SQLException{
+		Match newMatch=(Match) data;
+		matchList.add(newMatch);
+		db.addMatch(newMatch);
+		OthelloRoom newRoom=new OthelloRoom();
+		newRoom.BlackSocket1=client.socket1;
+		newRoom.BlackSocket2=client.socket2;
+		roomList.add(newRoom);
+	}
+	public void deleteMatch(Object data,ClientThread client)throws IOException,SQLException{
+		String deleteID=(String)data;
+		int i=0;
+		do {
+			if(roomList.get(i).hostID!=deleteID ) {
+				roomList.remove(i);
+			}
+			i++;
+		}while(i<roomList.size()) ;
+		
+		i=0;
+		do {
+			if(matchList.get(i).playerId!=deleteID ) {
+				matchList.remove(i);
+			}
+			i++;
+		}while(i<matchList.size()) ;
+		return;
+		}
+		//db.deleteMatch(deleteID);
+	
+	public void reloadMatchRequest(Object data,ClientThread client) throws IOException {
+		OutputStream os = client.socket1.getOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(os);
+		oos.writeObject(matchList);
+		return;
 	}
 }
