@@ -144,7 +144,7 @@ public class Question extends JPanel {
 				}
 
 				if(message.equals("success")) {
-					Disp.mainmenu.reloadMainmenu_2(id);
+					Disp.mainmenu.reloadMainmenu();
 					Disp.ChangeDisp(Disp.mainmenu);
 				}
 

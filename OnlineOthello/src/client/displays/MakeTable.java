@@ -208,7 +208,7 @@ public class MakeTable extends JPanel {
 			}
 
 			if (status3) {
-				newMatch.t_limit = combo.getSelectedIndex();
+				newMatch.t_limit = combo.getSelectedIndex()+1;
 			} else {
 				newMatch.t_limit = 0;
 			}

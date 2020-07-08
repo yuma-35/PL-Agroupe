@@ -94,7 +94,7 @@ public class DatabaseManager {
 	public boolean addIcon(String playerId, String iconName)  throws SQLException {
 		//今のアイコン画像をファイルから削除
 
-		String sql0 = "SELECT icon_image  FROM players WHERE id = ?";
+		/*String sql0 = "SELECT icon_image  FROM players WHERE id = ?";
 		PreparedStatement statement = connection.prepareStatement(sql0);
 		statement.setString(1, playerId);
 		ResultSet result = statement.executeQuery();
@@ -109,7 +109,7 @@ public class DatabaseManager {
             System.out.println("ファイルを削除しました。");
         } else {
             System.out.println("ファイルが存在しません。");
-        }
+        }*/
 
 		String sql = "update players SET icon_image = ? where id = ?";
 		PreparedStatement pstmt = connection.prepareStatement(sql);

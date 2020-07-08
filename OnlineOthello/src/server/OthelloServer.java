@@ -161,6 +161,7 @@ class OthelloServer {
 			//db.insertPlayer(player);
 			oos.writeObject("failed");
 		}
+		}
 
 	public void forget(Object i, ClientThread client) throws IOException, SQLException{
 		String id = (String)i;

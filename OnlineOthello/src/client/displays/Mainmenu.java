@@ -263,7 +263,8 @@ public class Mainmenu extends JPanel {
 		JLabel matchRankLabel = new JLabel("ランク8");
 		JButton battleButton = new JButton("参加");
 		JLabel limitLabel = new JLabel("ランク8以上");
-		JLabel pasIcon = new JLabel(new ImageIcon("C:\\Users\\優磨\\Desktop\\oseroimg\\key.png"));
+		JLabel pasIcon = new JLabel(new ImageIcon("image/SystemImage/rock.png"));
+		//
 		JTextArea commentArea = new JTextArea();
 		Match matchbox;
 
@@ -274,6 +275,12 @@ public class Mainmenu extends JPanel {
 					joinbox.setLocation(440, 220);
 					joinbox.setVisible(true);
 				} else {
+					try {
+						OthelloClient.send("battleMake", matchbox.playerId);
+					} catch (IOException e1) {
+						// TODO 自動生成された catch ブロック
+						e1.printStackTrace();
+					}
 					Disp.ChangeDisp(Disp.othello);
 					Disp.disp.othello.startOthello(matchbox.rule, 1);
 				}
@@ -287,6 +294,7 @@ public class Mainmenu extends JPanel {
 			matchbox = match;
 			enemyIDLabel.setBounds(0, 0, 200, 30);
 			enemyIDLabel.setFont(new Font("MS ゴシック", Font.BOLD, 20));
+			
 			this.add(enemyIDLabel);
 			limitLabel.setBounds(220, 35, 200, 30);
 			limitLabel.setFont(new Font("MS ゴシック", Font.BOLD, 20));
@@ -295,7 +303,7 @@ public class Mainmenu extends JPanel {
 			commentArea.setEditable(false);
 			commentArea.setLineWrap(true);
 			commentArea.setText(match.comment);
-			enemyIDLabel.setText(match.playerId);
+			enemyIDLabel.setText("ID: "+match.playerId);
 			this.add(commentArea);
 			if (match.t_limit == 0) {
 				limitLabel.setText("");
@@ -326,8 +334,9 @@ public class Mainmenu extends JPanel {
 			battleButton.setFont(b);
 			battleButton.addActionListener(new Battle());
 			this.add(battleButton);
+			pasIcon.setBackground(Color.yellow);
 			if (match.password != null) {
-				pasIcon.setBounds(330, 0, 30, 30);
+				pasIcon.setBounds(330, 5, 30, 30);
 				this.add(pasIcon);
 			}
 		}

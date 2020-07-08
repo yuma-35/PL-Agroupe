@@ -32,11 +32,12 @@ public class StartDisp extends JPanel {
 	JTextField IDin;
 	JTextField pasin;
 	JButton login;
-
+	JLabel logoLabel=new JLabel(new ImageIcon("image/SystemImage/ろご.png"));
 	StartDisp() {
 		setSize(1000, 600);
 		this.setLayout(null);
-		
+		logoLabel.setBounds(300, 50, 400, 200);
+		this.add(logoLabel);
 		Font a = new Font("MS ゴシック", Font.BOLD, 14);
 		JLabel logoLabel=new JLabel(new ImageIcon("image/SystemImage/ろご.png"));
 		toForget = new JButton("パスワードを忘れた方");
