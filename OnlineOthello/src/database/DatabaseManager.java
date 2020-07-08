@@ -1,5 +1,6 @@
 package database;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -76,6 +77,47 @@ public class DatabaseManager {
 		pstmt.setInt(1, LogInStatus.ONLINE.code);
 		pstmt.setString(2, playerId);
 		pstmt.executeUpdate();
+	}
+
+	//ひとこと編集
+	public boolean addComment(String playerId, String hitokoto)  throws SQLException {
+		String sql = "update players SET comment = ? where id = ?";
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setString(1, hitokoto);
+		pstmt.setString(2, playerId);
+		pstmt.executeUpdate();
+
+		return true;
+	}
+
+	//アイコン編集
+	public boolean addIcon(String playerId, String iconName)  throws SQLException {
+		//今のアイコン画像をファイルから削除
+
+		String sql0 = "SELECT icon_image  FROM players WHERE id = ?";
+		PreparedStatement statement = connection.prepareStatement(sql0);
+		statement.setString(1, playerId);
+		ResultSet result = statement.executeQuery();
+		result.next();
+		String name0 = result.getString("icon_image");
+
+		String name = "サーバ画像/" + name0;
+		File d = new File(name);
+		if (d.exists()) {
+            //削除実行
+            d.delete();
+            System.out.println("ファイルを削除しました。");
+        } else {
+            System.out.println("ファイルが存在しません。");
+        }
+
+		String sql = "update players SET icon_image = ? where id = ?";
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setString(1, iconName);
+		pstmt.setString(2, playerId);
+		pstmt.executeUpdate();
+
+		return true;
 	}
 
 	public String getQuestion(String playerId) throws SQLException{
@@ -165,5 +207,6 @@ public void deleteMatch(String deleteID) throws SQLException {
 	pstmt.setString(1, deleteID);
 	pstmt.executeUpdate();
 }
+
 
 }
