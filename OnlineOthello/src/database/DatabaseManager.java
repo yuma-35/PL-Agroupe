@@ -15,7 +15,7 @@ public class DatabaseManager {
 	public DatabaseManager() {
 		try {
 			connection = DriverManager.getConnection(
-					"jdbc:mysql://localhost/othello",
+					"jdbc:mysql://localhost/othello?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
 					"root",
 					"");
 		} catch (SQLException e) {
@@ -73,5 +73,73 @@ public class DatabaseManager {
 		pstmt.setInt(1, LogInStatus.ONLINE.code);
 		pstmt.setString(2, playerId);
 		pstmt.executeUpdate();
+	}
+
+	public String getQuestion(String playerId) throws SQLException{
+		String sql = "select id, question from players where id = ?";
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setString(1, playerId);
+		ResultSet rs = pstmt.executeQuery();
+		rs.next();
+		String dbQuestion = rs.getString("question");
+		return dbQuestion;
+	}
+
+	public boolean isValidAnswer(String playerId, String answer)throws SQLException {
+		String sql = "select id, answer from players where id=?";
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setString(1, playerId);
+		ResultSet rs = pstmt.executeQuery();
+		rs.next();
+		String dbAnswer = rs.getString("answer");
+		if (answer.equals(dbAnswer)) {
+			return true;
+		}else {
+			return false;
+		}
+	}
+
+	public void setPassword(String playerId, String password)throws SQLException {
+		String sql = "update players SET password = ? where id = ?";
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setString(1, password);
+		pstmt.setString(2, playerId);
+		pstmt.executeUpdate();
+	}
+
+
+	public Player getPlayer(String playerId, String otherId)throws SQLException{
+		String sql = "select id, win, lose, draw, conceed, icon_image, player_rank, comment from players where id = ?";
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setString(1, otherId);
+		ResultSet rs = pstmt.executeQuery();
+		rs.next();
+		Player player = new Player();
+		player.id = rs.getString("id");
+		player.win = rs.getInt("win");
+		player.lose = rs.getInt("lose");
+		player.draw = rs.getInt("draw");
+		player.conceed = rs.getInt("conceed");
+		player.iconImage = rs.getString("icon_image");
+		player.playerRank = rs.getInt("player_rank");
+		player.comment = rs.getString("comment");
+
+		String sql_2 = "select player_id, opponent_id from friends where player_id = ?";
+		PreparedStatement pstmt_2 = connection.prepareStatement(sql_2);
+		pstmt_2.setString(1, playerId);
+		ResultSet rs_2 = pstmt_2.executeQuery();
+
+		String sql_3 = "select recieve_player_id, send_player_id from friend_requests where recieve_player_id = ?";
+		PreparedStatement pstmt_3 = connection.prepareStatement(sql_3);
+		pstmt_3.setString(1, playerId);
+		ResultSet rs_3 = pstmt_3.executeQuery();
+
+		if(rs_2.next() || rs_3.next()) {
+			player.frflag = 1;
+		}else {
+			player.frflag = 0;
+		}
+
+		return player;
 	}
 }

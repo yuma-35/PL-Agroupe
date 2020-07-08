@@ -55,5 +55,17 @@ public class ClientThread extends Thread {
 			server.logIn(data, this);
 			return;
 		}
+		if(operation.equals("forget")){
+			server.forget(data, this);
+			return;
+		}
+		if(operation.equals("newPassword")){
+			server.newPassword(data, this);
+			return;
+		}
+		if(operation.equals("getProfile")){
+			server.getProfile(data, this);
+			return;
+		}
 	}
 }

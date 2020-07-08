@@ -106,4 +106,53 @@ class OthelloServer {
 		oos.writeObject("success");
 
 	}
+
+	public void forget(Object i, ClientThread client) throws IOException, SQLException{
+		String id = (String)i;
+		OutputStream os = client.socket1.getOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(os);
+		if(!db.isAlreadyExists(id)) {
+			oos.writeObject("failed");
+			return;
+		}
+
+		String question = db.getQuestion(id);
+		oos.writeObject("success");
+		oos.writeObject(question);
+	}
+
+	public void newPassword(Object data, ClientThread client)throws IOException, SQLException{
+
+		ArrayList<String> pw_data = (ArrayList<String>) data;
+		String id = pw_data.get(0);
+		String hashedPassword = pw_data.get(1);
+		String answer = pw_data.get(2);
+		OutputStream os = client.socket1.getOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(os);
+
+		if(!db.isValidAnswer(id, answer)) {
+			oos.writeObject("failed");
+		}else{
+			db.setPassword(id,hashedPassword);
+			oos.writeObject("success");
+		}
+	}
+
+	public void getProfile(Object data, ClientThread client) throws IOException, SQLException{
+		ArrayList<String> idData = (ArrayList<String>) data;
+		String myId = idData.get(0);
+		String otherId = idData.get(1);
+		OutputStream os = client.socket1.getOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(os);
+
+		if(!db.isAlreadyExists(otherId)) {
+			oos.writeObject("failed");
+			return;
+		}
+
+		Player player = db.getPlayer(myId, otherId);
+		oos.writeObject("success");
+		oos.writeObject(player);
+	}
+
 }
