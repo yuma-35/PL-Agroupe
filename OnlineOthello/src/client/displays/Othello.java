@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Timer;
@@ -580,7 +581,15 @@ public class Othello extends JPanel implements MouseListener {
 				chatIn.setText("");
 				chatArea.setText(chatBuild.toString());
 			}
-			gameEnd(2);
+			try {
+				gameEnd(2);
+			} catch (ClassNotFoundException e1) {
+				// TODO 自動生成された catch ブロック
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO 自動生成された catch ブロック
+				e1.printStackTrace();
+			}
 		}
 	}
 
@@ -608,7 +617,7 @@ public class Othello extends JPanel implements MouseListener {
 		potential.add(new Point(3, 4));
 	}
 
-	void gameEnd(int endcase) {// 0勝利、1敗北,2相手の投了,3自分の投了,4相手の切断
+	void gameEnd(int endcase) throws ClassNotFoundException, IOException {// 0勝利、1敗北,2相手の投了,3自分の投了,4相手の切断
 		rsbox = new Result(Disp.disp, ModalityType.APPLICATION_MODAL, endcase);
 		rsbox.setLocationRelativeTo(null);
 		rsbox.setVisible(true);

@@ -65,6 +65,16 @@ public class ClientThread extends Thread {
 		}
 		if(operation.equals("getProfile")){
 			server.getProfile(data, this);
+		if(operation.equals("makeMatch")) {
+			server.makeMatch(data, this);
+			return;
+		}
+		if(operation.equals("deleteMatch")) {
+			server.deleteMatch(data,this);
+			return;
+		}
+		if(operation.equals("reloadMatch")) {
+			server.reloadMatchRequest(data,this);
 			return;
 		}
 	}
