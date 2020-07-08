@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -110,7 +111,15 @@ public class Gamerecords extends JPanel {
 	//戻るボタン
 	public class toStartM implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			Disp.mainmenu.reloadMainmenu();
+			try {
+				Disp.mainmenu.reloadMainmenu();
+			} catch (ClassNotFoundException e1) {
+				// TODO 自動生成された catch ブロック
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO 自動生成された catch ブロック
+				e1.printStackTrace();
+			}
 			Disp.ChangeDisp(Disp.mainmenu);
 		}
 	}

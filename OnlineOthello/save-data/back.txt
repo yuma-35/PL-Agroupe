@@ -1,1 +1,1 @@
-image/背景/気球.jpg
+image\背景\はいけい.png

@@ -55,5 +55,17 @@ public class ClientThread extends Thread {
 			server.logIn(data, this);
 			return;
 		}
+		if(operation.equals("makeMatch")) {
+			server.makeMatch(data, this);
+			return;
+		}
+		if(operation.equals("deleteMatch")) {
+			server.deleteMatch(data,this);
+			return;
+		}
+		if(operation.equals("reloadMatch")) {
+			server.reloadMatchRequest(data,this);
+			return;
+		}
 	}
 }

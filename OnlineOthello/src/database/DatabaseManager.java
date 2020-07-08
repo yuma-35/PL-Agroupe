@@ -6,7 +6,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+
+
 import enums.LogInStatus;
+import model.Match;
 import model.Player;
 
 public class DatabaseManager {
@@ -15,7 +18,7 @@ public class DatabaseManager {
 	public DatabaseManager() {
 		try {
 			connection = DriverManager.getConnection(
-					"jdbc:mysql://localhost/othello",
+					"jdbc:mysql://localhost/othello?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC",
 					"root",
 					"");
 		} catch (SQLException e) {
@@ -74,4 +77,23 @@ public class DatabaseManager {
 		pstmt.setString(2, playerId);
 		pstmt.executeUpdate();
 	}
+	
+	public void addMatch(Match newMatch) throws SQLException {
+		String sql="INSERT INTO matches(player_id,rule,password,player_rank,t_limit,comment) values(?, ?, ?, ?, ?, ?)";
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setString(1,newMatch.playerId);
+		pstmt.setInt(2,newMatch.rule);
+		pstmt.setString(3,newMatch.password);
+		pstmt.setInt(4, newMatch.playerRank);
+		pstmt.setInt(5, newMatch.t_limit);
+		pstmt.setString(6, newMatch.comment);
+		pstmt.executeUpdate();
+		}
+	
+public void deleteMatch(String deleteID) throws SQLException {
+	String sql="DELETE FROM matches where Player_id= ?";
+	PreparedStatement pstmt = connection.prepareStatement(sql);
+	pstmt.setString(1, deleteID);
+	pstmt.executeUpdate();
+}
 }

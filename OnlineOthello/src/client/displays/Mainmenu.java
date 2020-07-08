@@ -14,6 +14,9 @@ import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -30,6 +33,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 
+import client.OthelloClient;
 import model.Client;
 import model.Match;
 import model.Player;
@@ -166,15 +170,19 @@ public class Mainmenu extends JPanel {
 
 	}
 
-	void reloadMatch() {
-		// int MatchNumber=read
+	void reloadMatch() throws IOException, ClassNotFoundException {
+		lobiPanel.removeAll();
+		OthelloClient.send("reloadMatch", 0);
+		InputStream is = OthelloClient.socket1.getInputStream();
+		ObjectInputStream ois = new ObjectInputStream(is);
+		ArrayList<Match> matches = (ArrayList<Match>) ois.readObject();
+		if(matches.size()!=0) {
+		lobiPanel.setPreferredSize(new Dimension(470, 80 * matches.size()));
+		for (int i = 0; i < matches.size(); i++) {
+			lobiPanel.add(new MatchPanel(i,matches.get(i)));
+		}
+		}
 
-		// lobiPanel.setPreferredSize(new Dimension(480,80*MatchNumber));
-		/*
-		 * for(int i=0;i<MatchNumber;i++){ MatchPanel.add(new Match(i,read));
-		 *
-		 * }
-		 */
 	}
 
 	public class toStartS implements ActionListener {
@@ -200,13 +208,14 @@ public class Mainmenu extends JPanel {
 
 	}
 
-	void reloadMainmenu() {
+	void reloadMainmenu() throws ClassNotFoundException, IOException {
+		this.idLabel.setText("ID: "+Client.myPlayer.id);
 		this.recordWinLabel.setText(Client.myPlayer.win + "勝");
 		this.recordLoseLabel.setText(Client.myPlayer.lose + "敗");
 		this.recordDrawLabel.setText(Client.myPlayer.draw + "引き分け");
 		this.recordConceedLabel.setText(Client.myPlayer.conceed + "投了");
 		this.rankLabel.setText("ランク" + Client.myPlayer.playerRank);
-		this.rankpointLabel.setText("あと" + (100-Client.myPlayer.rankPoint) + "pt");
+		this.rankpointLabel.setText("あと" + (100 - Client.myPlayer.rankPoint) + "pt");
 		reloadFriendlist();
 		reloadMatch();
 	}
@@ -256,16 +265,17 @@ public class Mainmenu extends JPanel {
 		JLabel limitLabel = new JLabel("ランク8以上");
 		JLabel pasIcon = new JLabel(new ImageIcon("C:\\Users\\優磨\\Desktop\\oseroimg\\key.png"));
 		JTextArea commentArea = new JTextArea();
-        Match matchbox;
-		class Battle implements ActionListener{
+		Match matchbox;
+
+		class Battle implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
-				if(matchbox.password!=null) {
-				joinbox = new Join(Disp.disp, ModalityType.APPLICATION_MODAL,matchbox);
-				joinbox.setLocation(440, 220);
-				joinbox.setVisible(true);
-				}else {
+				if (matchbox.password != null) {
+					joinbox = new Join(Disp.disp, ModalityType.APPLICATION_MODAL, matchbox);
+					joinbox.setLocation(440, 220);
+					joinbox.setVisible(true);
+				} else {
 					Disp.ChangeDisp(Disp.othello);
-				Disp.disp.othello.startOthello(matchbox.rule,1);
+					Disp.disp.othello.startOthello(matchbox.rule, 1);
 				}
 			}
 		}
@@ -274,7 +284,7 @@ public class Mainmenu extends JPanel {
 			this.setLayout(null);
 			this.setBounds(0, 80 * index, 480, 80);
 			this.setBorder(new LineBorder(Color.GRAY, 2, true));
-			matchbox=match;
+			matchbox = match;
 			enemyIDLabel.setBounds(0, 0, 200, 30);
 			enemyIDLabel.setFont(new Font("MS ゴシック", Font.BOLD, 20));
 			this.add(enemyIDLabel);
@@ -285,6 +295,7 @@ public class Mainmenu extends JPanel {
 			commentArea.setEditable(false);
 			commentArea.setLineWrap(true);
 			commentArea.setText(match.comment);
+			enemyIDLabel.setText(match.playerId);
 			this.add(commentArea);
 			if (match.t_limit == 0) {
 				limitLabel.setText("");
