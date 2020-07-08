@@ -26,5 +26,6 @@ public class RecieveThread extends Thread {
 		String operation = (String) ois.readObject();
 		// データを読み込む
 		Object data = ois.readObject();
+		
 	}
 }

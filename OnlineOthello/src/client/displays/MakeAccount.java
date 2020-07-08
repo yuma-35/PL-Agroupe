@@ -151,6 +151,7 @@ public class MakeAccount extends JPanel {
 					return;
 				}
 				if(message.equals("success")) {
+					Disp.mainmenu.reloadMainmenu();
 					Disp.ChangeDisp(Disp.mainmenu);
 				}
 

@@ -6,7 +6,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 import javax.swing.UIManager;
-
+import model.Match;
 import client.displays.Disp;
 
 public class OthelloClient {
