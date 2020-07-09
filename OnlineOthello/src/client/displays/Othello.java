@@ -11,6 +11,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Timer;
@@ -27,6 +29,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.LineBorder;
 
+import client.OthelloClient;
 import model.Client;
 import model.Player;
 
@@ -35,12 +38,13 @@ import model.Player;
 
 public class Othello extends JPanel implements MouseListener {
 	Result rsbox;
-	boolean myTurn = true;
-	Player enemyPlayer = new Player();
-	int bw;// 黒なら0で先手 白なら1で後手 2ならあいてるけど置けない3なら置ける 境界なら8
+	public boolean myTurn = true;
+	public Player enemyPlayer = new Player();
+	public int bw;// 黒なら0で先手 白なら1で後手 2ならあいてるけど置けない3なら置ける 境界なら8
 	int bwE;
 	boolean flipFlag = false;// flip用
 	boolean enableFlag = false;
+	public boolean passEndListenner;
 	Timer timer = new Timer();
 	ArrayList<Point> potential = new ArrayList<Point>();
 	JLabel[][] BoardLabels = new JLabel[8][8];
@@ -52,7 +56,7 @@ public class Othello extends JPanel implements MouseListener {
 	ImageIcon blackIcon = new ImageIcon();
 	ImageIcon whiteIcon = new ImageIcon();
 	ImageIcon enable = new ImageIcon("image\\SystemImage\\enable.png");
-	StringBuilder chatBuild = new StringBuilder();
+	public StringBuilder chatBuild = new StringBuilder();
 	JLabel myLabel = new JLabel("自分");
 	JLabel enemyLabel = new JLabel("相手");
 	JLabel myIDLabel = new JLabel("yuma123");
@@ -75,8 +79,8 @@ public class Othello extends JPanel implements MouseListener {
 	JButton enemyItem3Button = new JButton(new ImageIcon("image\\SystemImage\\bomb.jpg"));
 	JButton enemyItem4Button = new JButton(new ImageIcon("image\\SystemImage\\bomb.jpg"));
 	JButton enemyItem5Button = new JButton(new ImageIcon("image\\SystemImage\\bomb.jpg"));
-	JLabel pasLabel = new JLabel("");
-	JTextArea chatArea = new JTextArea();
+	public JLabel pasLabel = new JLabel("");
+	public JTextArea chatArea = new JTextArea();
 	JTextArea chatIn = new JTextArea();
 	JButton sendchatButton = new JButton("送信");
 
@@ -113,6 +117,7 @@ public class Othello extends JPanel implements MouseListener {
 		conceedButton.addActionListener(new conceed());
 
 		turnLabel.setFont(a);
+		turnLabel.setHorizontalAlignment(JLabel.CENTER);
 		turnLabel.setBounds(400, 490, 200, 50);
 		this.add(turnLabel);
 
@@ -128,7 +133,8 @@ public class Othello extends JPanel implements MouseListener {
 		tekiKomaLabel.setBounds(500, 30, 200, 50);
 		tekiKomaLabel.setFont(a);
 		this.add(tekiKomaLabel);
-		pasLabel.setBounds(420, 530, 200, 30);
+		pasLabel.setBounds(400, 530, 200, 30);
+		pasLabel.setHorizontalAlignment(JLabel.CENTER);
 		pasLabel.setFont(a);
 		this.add(pasLabel);
 		myLabel.setBounds(30, 50, 200, 50);
@@ -222,8 +228,20 @@ public class Othello extends JPanel implements MouseListener {
 		}
 	}
 
-	public void startOthello(int rule, int setBW) {
-		// enemyPlayer=相手のプレイヤクラス;
+	public void getEnemy(String iDString) throws IOException, ClassNotFoundException {
+		ArrayList<String> pk = new ArrayList<String>();
+		pk.add(Client.myPlayer.id);
+		pk.add(iDString);
+		OthelloClient.send("getProfile", pk);
+		InputStream is2 = OthelloClient.socket1.getInputStream();
+		ObjectInputStream ois2 = new ObjectInputStream(is2);
+		ois2.readObject();
+		enemyPlayer = (Player) ois2.readObject();
+	}
+
+	public void startOthello(int rule, int setBW, String enemyID) throws IOException, ClassNotFoundException {
+		getEnemy(enemyID);
+
 		// a相手のアイコン表示
 
 		BoardBackLabel.setIcon(new ImageIcon(Disp.changeboard.getBoard()));
@@ -289,7 +307,7 @@ public class Othello extends JPanel implements MouseListener {
 		chatBuild.append("      <<対局が開始しました>>" + "\n");
 		chatArea.setText(chatBuild.toString());
 		myIDLabel.setText(Client.myPlayer.id);
-		// enemyIDLabel.setText(this.enemyPlayer.id);
+		enemyIDLabel.setText(this.enemyPlayer.id);
 		boardRepaint();
 
 	}
@@ -312,6 +330,8 @@ public class Othello extends JPanel implements MouseListener {
 					pasFlag = false;
 					if (myTurn) {
 						BoardLabels[s - 1][t - 1].setIcon(enable);
+					} else {
+						BoardLabels[s - 1][t - 1].setIcon(null);
 					}
 				} else {
 					BoardLabels[s - 1][t - 1].setIcon(null);
@@ -387,6 +407,40 @@ public class Othello extends JPanel implements MouseListener {
 		potential = new ArrayList<Point>(new HashSet<>(potential));
 	}
 
+	public int countEnd() {// a勝ったら0 負けたら１ 引き分け5
+		int black = 0;
+		int white = 0;
+		for (int s = 1; s < 9; s++) {// a初期盤面セット
+			for (int t = 1; t < 9; t++) {
+				if (BoardInformation[s][t] == 0) {
+					black++;
+				} else if (BoardInformation[s][t] == 1) {
+					white++;
+				}
+			}
+		}
+		System.out.println(black + " " + white + " " + bw);
+		if (black == white) {
+			return 5;
+		} else if (black > white) {
+			if (bw == 0) {
+				return 0;
+			} else {
+				return 1;
+			}
+		} else if (white > black) {
+			if (bw == 1) {
+				return 0;
+			} else {
+				return 1;
+			}
+		}else {
+			System.out.print("エラー");
+			return 0;
+		}
+		
+	}
+
 	public void flipserch(int distX, int distY, int xx, int yy, int mode, boolean turn) {
 		// mode==1 ひっくり返す用 mode==0 置けるか判定
 		if (xx + distX < 9 && xx + distX > 0 && yy + distY < 9 && yy + distY > 0) {
@@ -448,31 +502,41 @@ public class Othello extends JPanel implements MouseListener {
 		if (myTurn) {
 			int x = 1 + (int) e.getPoint().x / 50;
 			int y = 1 + (int) e.getPoint().y / 50;
-			action(x, y);
+			try {
+				if (BoardInformation[x][y] == 3) {
+					action(x, y);
+				}
+			} catch (IOException e1) {
+				// TODO 自動生成された catch ブロック
+				e1.printStackTrace();
+			} catch (ClassNotFoundException e1) {
+				// TODO 自動生成された catch ブロック
+				e1.printStackTrace();
+			}
 		}
 	}
 
-	void Item1() {
+	public void Item1() {
 		// potentialとboardinformationをいじる
 	}
 
-	void Item2() {
+	public void Item2() {
 
 	}
 
-	void Item3() {
+	public void Item3() {
 
 	}
 
-	void Item4() {
+	public void Item4() {
 
 	}
 
-	void Item5() {
+	public void Item5() {
 
 	}
 
-	void action(int x, int y) {
+	public void action(int x, int y) throws IOException, ClassNotFoundException {
 		if (x == 11 && y == 11) {
 			Item1();
 		} else if (x == 12 && y == 12) {
@@ -483,37 +547,18 @@ public class Othello extends JPanel implements MouseListener {
 			Item4();
 		} else if (x == 15 && y == 15) {
 			Item5();
+		} else if (x == 10 && y == 10) {
+			Point pointmessage = new Point(x, y);
+			OthelloClient.send("SendAction", pointmessage);
+			gameEnd(3);
+			return;
 		} else if (BoardInformation[x][y] == 3) {
 			flip(x, y);
-
 		}
-
+		Point pointmessage = new Point(x, y);
 		myTurn = false;
 		boardRepaint();
-		// send(x,y)
-	}
-
-	void waitEnemy() {
-		boolean pas = false;
-		do {
-			if (pas) {
-				// send(9,9)
-			}
-			/*
-			 *
-			 * Point message=new Point(0,0); //read(message)ここで相手の操作を待つ
-			 * if(message.x==9&&!pas){ // パスなので何もしない }else if(message.x==9&&pas){
-			 * //終局したので自分のコマの数を数えて送る break; }else if(message.x==10){
-			 * //相手が投了したという意味なので終局処理に入る }else if(message.x==11) { Item1(); }else
-			 * if(message.x==12) { Item2(); }else if(message.x==13) { Item3(); }else
-			 * if(message.x==14) { Item4(); }else if(message.x==15) { Item5(); }else{
-			 * flip(message.x,message.y); }
-			 */
-			pas = true;
-		} while (boardRepaint());
-
-		myTurn = true;
-		boardRepaint();
+		OthelloClient.send("SendAction", pointmessage);
 	}
 
 	public void paintComponent(Graphics g) {
@@ -522,7 +567,8 @@ public class Othello extends JPanel implements MouseListener {
 		g2d.setColor(Color.LIGHT_GRAY);
 		g2d.fillRect(20, 40, 230, 500);
 		g2d.fillRect(750, 40, 220, 500);
-
+		g2d.fillRect(400, 490, 200, 70);
+	
 	}
 
 	public class Item1 implements ActionListener {
@@ -538,7 +584,15 @@ public class Othello extends JPanel implements MouseListener {
 		public void actionPerformed(ActionEvent e) {
 			if (myTurn) {
 				myItem2Button.setEnabled(false);
-				action(12, 12);
+				try {
+					action(12, 12);
+				} catch (IOException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				}
 			}
 		}
 	}
@@ -547,7 +601,15 @@ public class Othello extends JPanel implements MouseListener {
 		public void actionPerformed(ActionEvent e) {
 			if (myTurn) {
 				myItem3Button.setEnabled(false);
-				action(13, 13);
+				try {
+					action(13, 13);
+				} catch (IOException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				}
 			}
 		}
 	}
@@ -556,7 +618,15 @@ public class Othello extends JPanel implements MouseListener {
 		public void actionPerformed(ActionEvent e) {
 			if (myTurn) {
 				myItem4Button.setEnabled(false);
-				action(14, 14);
+				try {
+					action(14, 14);
+				} catch (IOException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				}
 
 			}
 		}
@@ -566,7 +636,15 @@ public class Othello extends JPanel implements MouseListener {
 		public void actionPerformed(ActionEvent e) {
 			if (myTurn) {
 				myItem5Button.setEnabled(false);
-				action(15, 15);
+				try {
+					action(15, 15);
+				} catch (IOException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				}
 
 			}
 		}
@@ -574,29 +652,33 @@ public class Othello extends JPanel implements MouseListener {
 
 	public class sendchat implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			// if(成功)→textareaに文字列追加&入力欄リセット
-			// o失敗→テキストエリアにエラーメッセージ
+			try {
+				OthelloClient.send("SendChat", chatIn.getText());
+			} catch (IOException e1) {
+				// TODO 自動生成された catch ブロック
+				e1.printStackTrace();
+			}
 			if (chatIn.getText() != "") {
 				chatBuild.append(Client.myPlayer.id + "：" + chatIn.getText() + "\n");
 				chatIn.setText("");
 				chatArea.setText(chatBuild.toString());
 			}
-			try {
-				gameEnd(2);
-			} catch (ClassNotFoundException e1) {
-				// TODO 自動生成された catch ブロック
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				// TODO 自動生成された catch ブロック
-				e1.printStackTrace();
-			}
+
 		}
 	}
 
 	public class conceed implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 
-			action(10, 10);
+			try {
+				action(10, 10);
+			} catch (IOException e1) {
+				// TODO 自動生成された catch ブロック
+				e1.printStackTrace();
+			} catch (ClassNotFoundException e1) {
+				// TODO 自動生成された catch ブロック
+				e1.printStackTrace();
+			}
 
 		}
 	}
@@ -617,7 +699,7 @@ public class Othello extends JPanel implements MouseListener {
 		potential.add(new Point(3, 4));
 	}
 
-	void gameEnd(int endcase) throws ClassNotFoundException, IOException {// 0勝利、1敗北,2相手の投了,3自分の投了,4相手の切断
+	public void gameEnd(int endcase) throws ClassNotFoundException, IOException {// 0勝利、1敗北,2相手の投了,3自分の投了,4相手の切断5,引き分け
 		rsbox = new Result(Disp.disp, ModalityType.APPLICATION_MODAL, endcase);
 		rsbox.setLocationRelativeTo(null);
 		rsbox.setVisible(true);
@@ -668,13 +750,7 @@ public class Othello extends JPanel implements MouseListener {
 					dispose();
 				}
 			}
-			/*
-			 * class square extends JPanel { public square() { this.setBounds(150, 350, 400,
-			 * 100);// TODO 自動生成されたコンストラクター・スタブ } public void paintComponent(Graphics g) {
-			 * super.paintComponent(g); Graphics2D g2d = (Graphics2D) g; g2d.fillRect(0, 0,
-			 * 400, 100); }
-			 */
-			// square rankmater=new
+
 			rankChangeLabel.setBounds(250, 160, 200, 50);
 			rankChangeLabel.setHorizontalAlignment(JLabel.CENTER);
 			this.add(rankChangeLabel);
@@ -696,7 +772,7 @@ public class Othello extends JPanel implements MouseListener {
 			endcaseLabel.setHorizontalAlignment(JLabel.CENTER);
 			this.add(resultLabel);
 			enemyResultLabel.setFont(new Font("MS ゴシック", Font.BOLD, 30));
-			enemyResultLabel.setBounds(250, 250, 200, 50);
+			enemyResultLabel.setBounds(100, 250, 500, 50);
 			enemyResultLabel.setText("対戦相手:" + enemyPlayer.id);
 			enemyResultLabel.setHorizontalAlignment(JLabel.CENTER);
 			this.add(enemyResultLabel);
@@ -708,18 +784,26 @@ public class Othello extends JPanel implements MouseListener {
 			this.add(backButton);
 			if (end == 0) {
 				resultLabel.setText("勝利");
+				Client.myPlayer.win++;
 			} else if (end == 1) {
 				resultLabel.setText("敗北");
+				Client.myPlayer.lose++;
 			} else if (end == 2) {
 				resultLabel.setText("勝利");
 				this.add(endcaseLabel);
 				endcaseLabel.setText("相手が投了しました");
+				Client.myPlayer.win++;
 			} else if (end == 3) {
 				resultLabel.setText("敗北");
 				endcaseLabel.setText("投了しました");
+				Client.myPlayer.conceed++;
 			} else if (end == 4) {
 				resultLabel.setText("勝利");
 				endcaseLabel.setText("相手が切断しました");
+				Client.myPlayer.win++;
+			} else if (end == 5) {
+				resultLabel.setText("引き分け");
+				Client.myPlayer.draw++;
 			}
 			timer = new Timer();
 			rankBar.setValue(Client.myPlayer.rankPoint);
@@ -736,14 +820,16 @@ public class Othello extends JPanel implements MouseListener {
 
 					if (sendflag) {
 						while (xaddpoint != 0) {
-							if (xaddpoint <= 0) {
+							if (xaddpoint <= 0
+									&& !(Client.myPlayer.rankPoint == 0 && Client.myPlayer.playerRank == 0)) {
 								if (xnow == 0) {
 									xnow = 100;
 									Client.myPlayer.playerRank--;
 								}
 								xnow--;
 								xaddpoint++;
-							} else {
+							} else if (xaddpoint > 0
+									&& !(Client.myPlayer.rankPoint == 10 && Client.myPlayer.playerRank == 100)) {
 								xnow++;
 								if (xnow == 100) {
 									xnow = 0;
@@ -757,13 +843,25 @@ public class Othello extends JPanel implements MouseListener {
 							}
 
 							Client.myPlayer.rankPoint = xnow;
-							//send
+							try {
+								OthelloClient.send("updatePlayer", Client.myPlayer);
+								ArrayList<String> gameRecordPackage = new ArrayList<String>();
+								gameRecordPackage.add(Client.myPlayer.id);
+								gameRecordPackage.add(enemyPlayer.id);
+								gameRecordPackage.add(String.valueOf(endcase));
+								OthelloClient.send("MakeGameRecord", gameRecordPackage);
+								// a対局記録作る
+							} catch (IOException e) {
+								// TODO 自動生成された catch ブロック
+								e.printStackTrace();
+							}
+
 							sendflag = false;
 						}
 
 					}
 
-					if (addpoint <= 0) {
+					if (addpoint <= 0 && !(rankbox == 0 && now == 0)) {
 						if (addpoint != 0) {
 
 							if (now == 0) {
@@ -777,7 +875,7 @@ public class Othello extends JPanel implements MouseListener {
 							addpoint++;
 
 						}
-					} else {
+					} else if (addpoint > 0 && !(rankbox == 10 && now == 100)) {
 						if (addpoint != 0) {
 							now++;
 							if (now == 100) {
@@ -802,8 +900,11 @@ public class Othello extends JPanel implements MouseListener {
 			int i;
 			if (endset == 0 || endset == 2 || endset == 4) {
 				i = 80 - (Client.myPlayer.playerRank * 5) + (enemyPlayer.playerRank - Client.myPlayer.playerRank) * 3;
+			} else if (endset == 1 || endset == 3) {
+				i = -1 * (20 + (Client.myPlayer.playerRank * 5)
+						+ (Client.myPlayer.playerRank - enemyPlayer.playerRank) * 3);
 			} else {
-				i = -1 * (20 + (Client.myPlayer.playerRank * 5) + (Client.myPlayer.playerRank - enemyPlayer.playerRank) * 3);
+				i = 0;
 			}
 			return i;
 		}

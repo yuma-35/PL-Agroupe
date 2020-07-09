@@ -6,8 +6,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-
+import java.util.ArrayList;
 
 import enums.LogInStatus;
 import model.Match;
@@ -154,7 +153,7 @@ public class DatabaseManager {
 
 
 	public Player getPlayer(String playerId, String otherId)throws SQLException{
-		String sql = "select id, win, lose, draw, conceed, icon_image, player_rank, comment from players where id = ?";
+		String sql = "select id, win, lose, draw, conceed, icon_image, player_rank, comment,rank_point from players where id = ?";
 		PreparedStatement pstmt = connection.prepareStatement(sql);
 		pstmt.setString(1, otherId);
 		ResultSet rs = pstmt.executeQuery();
@@ -168,6 +167,7 @@ public class DatabaseManager {
 		player.iconImage = rs.getString("icon_image");
 		player.playerRank = rs.getInt("player_rank");
 		player.comment = rs.getString("comment");
+		player.rankPoint=rs.getInt("rank_point");
 
 		String sql_2 = "select player_id, opponent_id from friends where player_id = ?";
 		PreparedStatement pstmt_2 = connection.prepareStatement(sql_2);
@@ -184,22 +184,13 @@ public class DatabaseManager {
 		}else {
 			player.frflag = 0;
 		}
-
+		
+		
 		return player;
 	}
 
 	
-	public void addMatch(Match newMatch) throws SQLException {
-		String sql="INSERT INTO matches(player_id,rule,password,player_rank,t_limit,comment) values(?, ?, ?, ?, ?, ?)";
-		PreparedStatement pstmt = connection.prepareStatement(sql);
-		pstmt.setString(1,newMatch.playerId);
-		pstmt.setInt(2,newMatch.rule);
-		pstmt.setString(3,newMatch.password);
-		pstmt.setInt(4, newMatch.playerRank);
-		pstmt.setInt(5, newMatch.t_limit);
-		pstmt.setString(6, newMatch.comment);
-		pstmt.executeUpdate();
-		}
+	
 	
 public void deleteMatch(String deleteID) throws SQLException {
 	String sql="DELETE FROM matches where Player_id= ?";
@@ -207,6 +198,45 @@ public void deleteMatch(String deleteID) throws SQLException {
 	pstmt.setString(1, deleteID);
 	pstmt.executeUpdate();
 }
+
+public void updatePlayerDB(Player updatePlayer) throws SQLException {
+	// TODO 自動生成されたメソッド・スタブ
+	String sql = "update players SET win = ?,lose = ?,draw = ?,conceed = ?,player_rank = ?,rank_point = ?,status = ? where id = ?";
+	PreparedStatement pstmt = connection.prepareStatement(sql);
+	pstmt.setInt(1, updatePlayer.win);
+	pstmt.setInt(2, updatePlayer.lose);
+	pstmt.setInt(3, updatePlayer.draw);
+	pstmt.setInt(4, updatePlayer.conceed);
+	pstmt.setInt(5, updatePlayer.playerRank);
+	pstmt.setInt(6, updatePlayer.rankPoint);
+	pstmt.setInt(7, 1);
+	pstmt.setString(8, updatePlayer.id);
+	pstmt.executeUpdate();
+
+}
+
+public void makeGameRecordDB(ArrayList<String> endSet) throws SQLException {
+	// TODO 自動生成されたメソッド・スタブ
+	String sql="INSERT INTO game_records(player_id,opponent_id,result) values(?, ?, ?)";
+	PreparedStatement pstmt = connection.prepareStatement(sql);
+	String myID=endSet.get(0);
+	String enemyID=endSet.get(1);
+	int endcase=Integer.parseInt(endSet.get(2));
+	pstmt.setString(1, myID);
+	pstmt.setString(2, enemyID);
+	if(endcase==0||endcase==2||endcase==4) {
+	pstmt.setInt(3, 1);
+	}else if(endcase==1) {
+		pstmt.setInt(3, 2);
+	}else if(endcase==3) {
+		pstmt.setInt(3, 4);
+	}else if(endcase==5) {
+		pstmt.setInt(3, 3);
+	}
+	
+}
+
+
 
 
 }
