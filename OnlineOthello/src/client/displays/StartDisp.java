@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import client.OthelloClient;
 import model.Client;
+import model.Player;
 
 public class StartDisp extends JPanel {
 	JButton toForget;
@@ -32,14 +33,15 @@ public class StartDisp extends JPanel {
 	JTextField IDin;
 	JTextField pasin;
 	JButton login;
-	JLabel logoLabel=new JLabel(new ImageIcon("image/SystemImage/ろご.png"));
+	JLabel logoLabel = new JLabel(new ImageIcon("image/SystemImage/ろご.png"));
+
 	StartDisp() {
 		setSize(1000, 600);
 		this.setLayout(null);
 		logoLabel.setBounds(300, 50, 400, 200);
 		this.add(logoLabel);
 		Font a = new Font("MS ゴシック", Font.BOLD, 14);
-		JLabel logoLabel=new JLabel(new ImageIcon("image/SystemImage/ろご.png"));
+
 		toForget = new JButton("パスワードを忘れた方");
 		toMakeAccount = new JButton("アカウント作成");
 		iDLabel = new JLabel("ID");
@@ -97,9 +99,9 @@ public class StartDisp extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 			try {
 
-				//if(失敗){サブモーダルで失敗表示}
+				// if(失敗){サブモーダルで失敗表示}
 
-				//else
+				// else
 				String id = IDin.getText();
 				String password = pasin.getText();
 
@@ -124,13 +126,13 @@ public class StartDisp extends JPanel {
 				if (message.equals("failed")) {
 					errors.setText("ログインできませんでした");
 				} else if (message.equals("success")) {
-					Client.myPlayer.id=IDin.getText();
+					Disp.mainmenu.reloadMyPlayer(IDin.getText());
 					Disp.mainmenu.reloadMainmenu();
 					Disp.ChangeDisp(Disp.mainmenu);
-					
+
 				}
 
-				//Disp.myPlayer=サーバから来たオブジェクト
+				// Disp.myPlayer=サーバから来たオブジェクト
 			} catch (IOException err) {
 				err.printStackTrace();
 			} catch (ClassNotFoundException e1) {
@@ -139,18 +141,20 @@ public class StartDisp extends JPanel {
 			}
 		}
 	}
+
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setColor(Color.lightGray);
 		g2d.fillRect(370, 270, 60, 30);
-		g2d.fillRect(330, 300,80, 30);
+		g2d.fillRect(330, 300, 80, 30);
 
 	}
+
 	public class toMakeAccountB implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 
-			//OthelloClient.send("makeAccount", object);
+			// OthelloClient.send("makeAccount", object);
 			Disp.ChangeDisp(Disp.makeaccount);
 		}
 	}

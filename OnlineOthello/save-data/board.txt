@@ -1,1 +1,1 @@
-image/盤面/900900.png
+image\盤面\machi.jpg

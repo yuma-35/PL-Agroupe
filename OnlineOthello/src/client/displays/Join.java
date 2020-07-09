@@ -4,12 +4,17 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
+import client.OthelloClient;
 import model.*;
 
 public class Join extends JDialog {
@@ -28,13 +33,14 @@ public class Join extends JDialog {
 		JLabel name3 = new JLabel("パスワード");
 
 	//テキスト入力部
-		JPasswordField password = new JPasswordField();
+		JTextField password = new JTextField();
 
 	//返すパスワード
 		String pass;
 
 		//モーダル表示
 		Join(Disp disp, ModalityType mt,Match match){
+			
 			super(disp,mt);
 			this.disp = disp;
             amatch=match;
@@ -81,9 +87,28 @@ public class Join extends JDialog {
 		//参加ボタン
 		public class toStart implements ActionListener{
 		    public  void actionPerformed(ActionEvent e) {
-		    if(password.getText()==amatch.password) {
+		    	System.out.println(password.getText());
+		    if(password.getText().equals(amatch.password)) {
+		    	try {
+		    		ArrayList<String> sendPack =new ArrayList<String>();
+		    		sendPack.add(amatch.playerId);
+		    		sendPack.add(Client.myPlayer.id);
+					OthelloClient.send("BattleEnter", sendPack);
+				} catch (IOException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				}
+		    	dispose();
 		    	disp.ChangeDisp(disp.othello);
-		    	disp.othello.startOthello(amatch.rule, 1);
+		    	try {
+					disp.othello.startOthello(amatch.rule, 1,amatch.playerId);
+				} catch (IOException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				}
 		    }else {
 		    wrongJLabel.setVisible(true);
 		    	
@@ -92,13 +117,6 @@ public class Join extends JDialog {
 
 		     }
 		 }
-
-
-	
-		//パスワードを返す
-		/*	public String getPassword() {
-				return pass;
-			}*/
 
 
 }

@@ -49,7 +49,7 @@ public class MakeTable extends JPanel {
 	JRadioButton radio5;
 
 	// 選択肢
-	String[] select = { "±3以内", "自分より強い人のみ", "フレンド限定" };
+	String[] select = { "ランク±1以内", "自分のランク以上", "フレンド限定" };
 	JComboBox combo = new JComboBox(select);
 
 	MakeTable() {
@@ -213,13 +213,6 @@ public class MakeTable extends JPanel {
 				newMatch.t_limit = 0;
 			}
 
-			/*
-			 * if (status3 == true) { if (combo.getSelectedIndex() == 0) {
-			 * System.out.print("3"); } else if (combo.getSelectedIndex() == 1) {
-			 * System.out.print("4"); }
-			 * 
-			 * }
-			 */
 			try {
 				OthelloClient.send("makeMatch",newMatch);
 			} catch (IOException e1) {
