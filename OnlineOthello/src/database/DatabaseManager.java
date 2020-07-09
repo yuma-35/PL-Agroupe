@@ -219,6 +219,7 @@ public class DatabaseManager {
 		pstmt.executeUpdate();
 	}
 
+
 	public void insertFriend(String playerId, String otherId) throws SQLException {
 		String sql = "DELETE FROM friend_requests where recieve_player_id = ? AND send_player_id = ?";
 		PreparedStatement pstmt = connection.prepareStatement(sql);
@@ -259,12 +260,7 @@ public class DatabaseManager {
 	
 	
 	
-public void deleteMatch(String deleteID) throws SQLException {
-	String sql="DELETE FROM matches where Player_id= ?";
-	PreparedStatement pstmt = connection.prepareStatement(sql);
-	pstmt.setString(1, deleteID);
-	pstmt.executeUpdate();
-}
+
 
 public void updatePlayerDB(Player updatePlayer) throws SQLException {
 	// TODO 自動生成されたメソッド・スタブ
