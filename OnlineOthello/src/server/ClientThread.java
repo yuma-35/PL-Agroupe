@@ -82,7 +82,10 @@ public class ClientThread extends Thread {
 		if (operation.equals("addIIcon")) {
 			server.addIIcon(data, this);
 		}
+
+
 		if (operation.equals("forget")) {
+
 			server.forget(data, this);
 			return;
 		}
@@ -90,7 +93,10 @@ public class ClientThread extends Thread {
 			server.newPassword(data, this);
 			return;
 		}
+
+
 		if (operation.equals("getProfile")) {
+
 			server.getProfile(data, this);
 		}
 		if(operation.equals("makeMatch")) {
@@ -164,6 +170,32 @@ public class ClientThread extends Thread {
 			server.makeGameRecord(data,this);
 			return;
 		}
-		
+
+		if(operation.equals("friend_add")) {
+			server.friend_add(data,this);
+
+			return;
+		}
+		if(operation.equals("friend_refuse")) {
+			server.friend_refuse(data,this);
+
+			return;
+		}
+		if(operation.equals("getFriendrequest")) {
+			server.getFriendrequest(data,this);
+
+			return;
+		}
+		if(operation.equals("friendrequest")) {
+			server.friendrequest(data,this);
+
+			return;
+		}
+		if(operation.equals("delfriend")) {
+			server.delfriend(data,this);
+
+			return;
+		}
+
 	}
 }

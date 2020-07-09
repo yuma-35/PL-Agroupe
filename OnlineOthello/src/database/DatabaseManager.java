@@ -1,6 +1,5 @@
 package database;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -169,24 +168,92 @@ public class DatabaseManager {
 		player.comment = rs.getString("comment");
 		player.rankPoint=rs.getInt("rank_point");
 
-		String sql_2 = "select player_id, opponent_id from friends where player_id = ?";
+		String sql_2 = "select player_id, opponent_id from friends where player_id = ? AND opponent_id = ?";
 		PreparedStatement pstmt_2 = connection.prepareStatement(sql_2);
 		pstmt_2.setString(1, playerId);
+		pstmt_2.setString(2, otherId);
 		ResultSet rs_2 = pstmt_2.executeQuery();
+		PreparedStatement pstmt_2_2 = connection.prepareStatement(sql_2);
+		pstmt_2_2.setString(1, otherId);
+		pstmt_2_2.setString(2, playerId);
+		ResultSet rs_2_2 = pstmt_2_2.executeQuery();
 
-		String sql_3 = "select recieve_player_id, send_player_id from friend_requests where recieve_player_id = ?";
+		String sql_3 = "select send_player_id, recieve_player_id from friend_requests where send_player_id = ? AND recieve_player_id = ?";
 		PreparedStatement pstmt_3 = connection.prepareStatement(sql_3);
 		pstmt_3.setString(1, playerId);
+		pstmt_3.setString(2, otherId);
 		ResultSet rs_3 = pstmt_3.executeQuery();
 
-		if(rs_2.next() || rs_3.next()) {
-			player.frflag = 1;
-		}else {
+		if(rs_2.next() == false){
 			player.frflag = 0;
+		}else if(rs_2_2.next() == false) {
+			player.frflag = 0;
+		}else if(rs_3.next() == false) {
+			player.frflag = 0;
+		}else {
+			player.frflag = 1;
 		}
 		
 		
 		return player;
+	}
+
+
+
+	public void addMatch(Match newMatch) throws SQLException {
+		String sql="INSERT INTO matches(player_id,rule,password,player_rank,t_limit,comment) values(?, ?, ?, ?, ?, ?)";
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setString(1,newMatch.playerId);
+		pstmt.setInt(2,newMatch.rule);
+		pstmt.setString(3,newMatch.password);
+		pstmt.setInt(4, newMatch.playerRank);
+		pstmt.setInt(5, newMatch.t_limit);
+		pstmt.setString(6, newMatch.comment);
+		pstmt.executeUpdate();
+		}
+
+	public void deleteMatch(String deleteID) throws SQLException {
+		String sql="DELETE FROM matches where Player_id= ?";
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setString(1, deleteID);
+		pstmt.executeUpdate();
+	}
+
+	public void insertFriend(String playerId, String otherId) throws SQLException {
+		String sql = "DELETE FROM friend_requests where recieve_player_id = ? AND send_player_id = ?";
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setString(1, playerId);
+		pstmt.setString(2, otherId);
+		pstmt.executeUpdate();
+
+		String sql_2 = "INSERT INTO friends(player_id, opponent_id) values(?, ?)";
+		PreparedStatement pstmt_2 = connection.prepareStatement(sql_2);
+		pstmt_2.setString(1, playerId);
+		pstmt_2.setString(2, otherId);
+		pstmt.executeUpdate();
+	}
+
+	public void deleteFriendrequest(String playerId, String otherId) throws SQLException {
+		String sql = "DELETE FROM friend_requests where recieve_player_id = ? AND send_player_id = ?";
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setString(1, playerId);
+		pstmt.setString(2, otherId);
+		pstmt.executeUpdate();
+
+	}
+
+	//フレンドリクエスト一覧の取得
+	public ArrayList<String> getFriendrequest(String playerId) throws SQLException {
+		String sql = "select recieve_player_id, send_player_id from friend_requests where recieve_player_id = ?";
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setString(1, playerId);
+		ResultSet rs = pstmt.executeQuery();
+		ArrayList<String> dbRequest = new ArrayList<String>();
+		while(rs.next()) {
+			dbRequest.add(rs.getString("send_player_id"));
+		}
+
+		return dbRequest;
 	}
 
 	
@@ -239,4 +306,26 @@ public void makeGameRecordDB(ArrayList<String> endSet) throws SQLException {
 
 
 
+	//friend_requestsに追加
+	public void insertFriendrequest(String playerId, String otherId) throws SQLException {
+		String sql = "INSERT INTO friend_requests(recieve_player_id,send_player_id) values(?, ?)";
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setString(1, otherId);
+		pstmt.setString(2, playerId);
+		pstmt.executeUpdate();
+
+	}
+
+	//フレンド解除
+	public void deleteFriend(String playerId, String otherId) throws SQLException {
+		String sql = "DELETE FROM friends where player_id = ? AND opponent_id = ?";
+		PreparedStatement pstmt = connection.prepareStatement(sql);
+		pstmt.setString(1, playerId);
+		pstmt.setString(2, otherId);
+		pstmt.executeUpdate();
+		PreparedStatement pstmt_2 = connection.prepareStatement(sql);
+		pstmt_2.setString(1, otherId);
+		pstmt_2.setString(2, playerId);
+		pstmt_2.executeUpdate();
+	}
 }
