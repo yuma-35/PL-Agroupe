@@ -25,6 +25,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -270,19 +271,47 @@ public class Mainmenu extends JPanel {
 
 		class Battle implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
+				if(matchbox.t_limit==1) {
+					if(matchbox.playerRank+1<Client.myPlayer.playerRank||matchbox.playerRank-1>Client.myPlayer.playerRank) {
+						JOptionPane.showMessageDialog(Disp.disp,"ランク制限のある卓です");
+						return;
+					}
+				}else if(matchbox.t_limit==2) {
+					if(matchbox.playerRank>Client.myPlayer.playerRank){
+						JOptionPane.showMessageDialog(Disp.disp,"ランク制限のある卓です");
+						return;
+					}
+				}else if(matchbox.t_limit==3) {
+					JOptionPane.showMessageDialog(Disp.disp,"フレンド限定の卓です");
+					//aフレンドかどうか確認 フレンドだったら
+					return;
+				}
 				if (matchbox.password != null) {
 					joinbox = new Join(Disp.disp, ModalityType.APPLICATION_MODAL, matchbox);
 					joinbox.setLocation(440, 220);
 					joinbox.setVisible(true);
 				} else {
-					try {
-						OthelloClient.send("battleMake", matchbox.playerId);
+					
+					try {	
+						ArrayList<String> sendPack =new ArrayList<String>();
+		    		sendPack.add(matchbox.playerId);
+		    		sendPack.add(Client.myPlayer.id);
+					OthelloClient.send("BattleEnter", sendPack);
+						
 					} catch (IOException e1) {
 						// TODO 自動生成された catch ブロック
 						e1.printStackTrace();
 					}
 					Disp.ChangeDisp(Disp.othello);
-					Disp.disp.othello.startOthello(matchbox.rule, 1);
+					try {
+						Disp.disp.othello.startOthello(matchbox.rule, 1,matchbox.playerId);
+					} catch (IOException e1) {
+						// TODO 自動生成された catch ブロック
+						e1.printStackTrace();
+					} catch (ClassNotFoundException e1) {
+						// TODO 自動生成された catch ブロック
+						e1.printStackTrace();
+					}
 				}
 			}
 		}
@@ -308,7 +337,7 @@ public class Mainmenu extends JPanel {
 			if (match.t_limit == 0) {
 				limitLabel.setText("");
 			} else if (match.t_limit == 1) {
-				limitLabel.setText("ランク±3以内");
+				limitLabel.setText("ランク±1以内");
 			} else if (match.t_limit == 2) {
 				limitLabel.setText("ランク" + match.playerRank + "以上");
 			} else if (match.t_limit == 3) {
@@ -365,7 +394,15 @@ public class Mainmenu extends JPanel {
 						joinbox.setVisible(true);
 					} else {
 						Disp.ChangeDisp(Disp.othello);
-						Disp.othello.startOthello(friendMatchBox.rule, 1);
+						try {
+							Disp.othello.startOthello(friendMatchBox.rule, 1,friendPlayerBox.id);
+						} catch (IOException e1) {
+							// TODO 自動生成された catch ブロック
+							e1.printStackTrace();
+						} catch (ClassNotFoundException e1) {
+							// TODO 自動生成された catch ブロック
+							e1.printStackTrace();
+						}
 					}
 				}
 			}
@@ -529,5 +566,15 @@ public class Mainmenu extends JPanel {
 				rbox.dispose();
 			}
 		}
+	}
+
+	public void reloadMyPlayer(String nameString) throws IOException, ClassNotFoundException {
+		// TODO 自動生成されたメソッド・スタブ
+		OthelloClient.send("getMyPlayer",nameString);
+		InputStream is = OthelloClient.socket1.getInputStream();
+		ObjectInputStream ois = new ObjectInputStream(is);
+		Player box=(Player)ois.readObject();
+		//System.out.println(box.win+" "+box.lose);
+		Client.myPlayer=box;
 	}
 }
