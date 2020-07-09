@@ -11,16 +11,31 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import client.OthelloClient;
+
 public class FriendRequest extends JPanel implements MouseListener{
 
 
-	JLabel f1 = new JLabel("たろう");
+	JLabel f1;
+	JLabel label;
+
+	String playerId;	//自分のID
+	String otherId;	//相手のID
+	ArrayList<String> requestData = new ArrayList<String>();
+
+	JButton yes;
+	JButton no;
+
 
 	FriendRequest(){
 
@@ -36,6 +51,12 @@ public class FriendRequest extends JPanel implements MouseListener{
 		label2.setForeground(Color.WHITE);
 		label2.setBounds(450, 140, 150, 50);
 
+		label = new JLabel();
+		label.setFont(new Font("MS ゴシック", Font.BOLD, 14));
+		label.setForeground(Color.YELLOW);
+		label.setBounds(380, 180, 300, 25);
+
+
 		JButton back = new JButton("戻る");
 		back.setFont(new Font("MS ゴシック", Font.BOLD, 20));
 		back.setBounds(420, 500, 150, 50);
@@ -49,17 +70,11 @@ public class FriendRequest extends JPanel implements MouseListener{
 		volume.setBackground(new Color(51, 102, 255));
 		volume.addActionListener(new toVolume());
 
-		//以下、フレンド申請があれば表示(例として1つ作っとく)
 
-		f1.setFont(new Font("MS ゴシック", Font.BOLD, 15));
-		f1.setForeground(Color.WHITE);
-		f1.setBounds(250, 220, 200, 20);
-		f1.addMouseListener(this);
-		button_approval(220);
 
 		this.add(label1);
 		this.add(label2);
-		this.add(f1);
+		this.add(label);
 		this.add(back);
 		this.add(volume);
 
@@ -111,13 +126,13 @@ public class FriendRequest extends JPanel implements MouseListener{
 
 	//承認、拒否ボタンを作るメソッド
 	public void button_approval(int y) {
-		JButton yes = new JButton("承認");
+		yes = new JButton("承認");
 		yes.setFont(new Font("MS ゴシック", Font.BOLD, 15));
 		yes.setBounds(420, y, 70, 20);
 		yes.setForeground(Color.WHITE);
 		yes.setBackground(new Color(51, 102, 255));
 		yes.addActionListener(new toFriendRegister_yes());
-		JButton no = new JButton("拒否");
+		no = new JButton("拒否");
 		no.setFont(new Font("MS ゴシック", Font.BOLD, 15));
 		no.setBounds(510, y, 70, 20);
 		no.setForeground(Color.WHITE);
@@ -133,14 +148,60 @@ public class FriendRequest extends JPanel implements MouseListener{
 	public class toFriendRegister_yes implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
 
-			Disp.ChangeDisp(Disp.friendregister);
+			try {
+
+				int location = yes.getLocation().y;
+				int m = (location - 220) / 25;
+
+				otherId = requestData.get(m);
+				ArrayList<String> data = new ArrayList<String>();
+				data.add(playerId);
+				data.add(otherId);
+				OthelloClient.send("friend_add", data);
+				InputStream is = OthelloClient.socket1.getInputStream();
+				ObjectInputStream ois = new ObjectInputStream(is);
+				String message = (String) ois.readObject();
+				if(message.equals("success")) {
+					label.setText(otherId+" をフレンドに追加しました");
+
+				}
+
+			} catch (IOException e1) {
+				// TODO 自動生成された catch ブロック
+				e1.printStackTrace();
+			} catch (ClassNotFoundException e1) {
+				// TODO 自動生成された catch ブロック
+				e1.printStackTrace();
+			}
+
 		}
 	}
 	//拒否が押されたときのアクション
 	public class toFriendRegister_no implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
 
-			Disp.ChangeDisp(Disp.friendregister);
+			try {
+				int location = yes.getLocation().y;
+				int m = (location - 220) / 25;
+				otherId = requestData.get(m);
+				ArrayList<String> data = new ArrayList<String>();
+				data.add(playerId);
+				data.add(otherId);
+				OthelloClient.send("friend_refuse", data);
+				InputStream is = OthelloClient.socket1.getInputStream();
+				ObjectInputStream ois = new ObjectInputStream(is);
+				String message = (String) ois.readObject();
+				if(message.equals("success")) {
+					label.setText(otherId+" からの申請を拒否しました");
+
+				}
+			} catch (IOException e1) {
+				// TODO 自動生成された catch ブロック
+				e1.printStackTrace();
+			} catch (ClassNotFoundException e1) {
+				// TODO 自動生成された catch ブロック
+				e1.printStackTrace();
+			}
 		}
 	}
 
@@ -157,9 +218,30 @@ public class FriendRequest extends JPanel implements MouseListener{
 	}
 
 	//フレンド申請情報を更新
-	void reloadFriendRequest() {
+	void reloadFriendRequest(String playerId, ArrayList<String> requestData) {
+		this.playerId = playerId;
+		this.requestData = requestData;
+
+		if(this.requestData.isEmpty()) {
+			label.setText("表示するフレンド申請はありません");
+		}
+
+		int n = requestData.size();
+
+		for(int i=0;i<n;i++) {
+			f1 = new JLabel(requestData.get(i));
+			f1.setFont(new Font("MS ゴシック", Font.BOLD, 15));
+			f1.setForeground(Color.WHITE);
+			f1.setBounds(300, 220 + (i * 25), 200, 20);
+			f1.addMouseListener(this);
+			button_approval(220 + (i * 25));
+			this.add(f1);
+
+		}
 
 	}
+
+
 
 }
 
@@ -178,12 +260,9 @@ class GetProfile extends JDialog{
 
 		this.setSize(600,300);
 		this.setLayout(null);
+		this.setResizable(false);
 		this.getContentPane().setBackground(Color.LIGHT_GRAY);
 
-		//タイトルバーを消す
-		dispose();
-	    setUndecorated(!isUndecorated());
-	    setVisible(true);
 
 		JButton ok = new JButton("フレンド申請");
 		ok.setFont(new Font("MS ゴシック", Font.BOLD, 12));

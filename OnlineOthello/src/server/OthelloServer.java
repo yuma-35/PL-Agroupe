@@ -10,11 +10,7 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-
 import javax.imageio.ImageIO;
-
-
-
 
 import database.DatabaseManager;
 import model.Match;
@@ -201,6 +197,7 @@ class OthelloServer {
 		OutputStream os = client.socket1.getOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(os);
 
+
 		if(!db.isAlreadyExists(otherId)) {
 			oos.writeObject("failed");
 			return;
@@ -229,7 +226,7 @@ class OthelloServer {
 			}
 			i++;
 		}while(i<roomList.size()) ;
-		
+
 		i=0;
 		do {
 			if(matchList.get(i).playerId!=deleteID ) {
@@ -240,12 +237,75 @@ class OthelloServer {
 		return;
 		}
 		//db.deleteMatch(deleteID);
-	
+
 	public void reloadMatchRequest(Object data,ClientThread client) throws IOException {
 		OutputStream os = client.socket1.getOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(os);
 		oos.writeObject(matchList);
 		return;
 
+	}
+
+	public void friend_add(Object data, ClientThread client)throws IOException, SQLException{
+
+		ArrayList<String> idData = (ArrayList<String>) data;
+		String playerId = idData.get(0);
+		String otherId = idData.get(1);
+		OutputStream os = client.socket1.getOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(os);
+
+		db.insertFriend(playerId, otherId);
+		oos.writeObject("success");
+	}
+
+	public void friend_refuse(Object data, ClientThread client)throws IOException, SQLException{
+
+		ArrayList<String> idData = (ArrayList<String>) data;
+		String playerId = idData.get(0);
+		String otherId = idData.get(0);
+		OutputStream os = client.socket1.getOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(os);
+
+		db.deleteFriendrequest(playerId, otherId);
+		oos.writeObject("success");
+	}
+
+	public void getFriendrequest(Object data, ClientThread client)throws IOException, SQLException{
+
+		String playerId = (String) data;
+		OutputStream os = client.socket1.getOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(os);
+		ArrayList dbRequest = new ArrayList<String>();
+		dbRequest = db.getFriendrequest(playerId);
+		if(dbRequest.isEmpty()) {
+			oos.writeObject("failed");
+			return;
+		}
+		oos.writeObject("success");
+		oos.writeObject(dbRequest);
+	}
+
+	public void friendrequest(Object data, ClientThread client)throws IOException, SQLException{
+
+		ArrayList<String> request = (ArrayList<String>) data;
+		String playerId = request.get(0);
+		String otherId = request.get(1);
+		OutputStream os = client.socket1.getOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(os);
+		db.insertFriendrequest(playerId, otherId);
+		oos.writeObject("success");
+	}
+
+
+	//フレンド解除
+	public void delfriend(Object data, ClientThread client)throws IOException, SQLException{
+
+		ArrayList<String> request = (ArrayList<String>) data;
+		String playerId = request.get(0);
+		String otherId = request.get(1);
+		OutputStream os = client.socket1.getOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(os);
+		db.deleteFriend(playerId, otherId);
+		oos.writeObject("success");
 	}
 }
