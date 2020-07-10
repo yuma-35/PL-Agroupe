@@ -37,6 +37,8 @@ public class FriendRequest extends JPanel implements MouseListener{
 	JButton yes;
 	JButton no;
 
+	int count = 0;
+
 
 	FriendRequest(){
 
@@ -143,9 +145,12 @@ public class FriendRequest extends JPanel implements MouseListener{
 	public class toFriendRegister implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
 			label.setText("");
-			remove(f1);
-			remove(yes);
-			remove(no);
+			if(count == 1) {
+				remove(f1);
+				remove(yes);
+				remove(no);
+				count--;
+			}
 			Disp.ChangeDisp(Disp.friendregister);
 		}
 	}
@@ -197,6 +202,7 @@ public class FriendRequest extends JPanel implements MouseListener{
 				if(message.equals("success")) {
 					label.setText(otherId+" をフレンドに追加しました");
 
+
 				}
 
 			} catch (IOException e1) {
@@ -226,6 +232,7 @@ public class FriendRequest extends JPanel implements MouseListener{
 				String message = (String) ois.readObject();
 				if(message.equals("success")) {
 					label.setText(otherId+" からの申請を拒否しました");
+
 
 				}
 			} catch (IOException e1) {
@@ -257,19 +264,21 @@ public class FriendRequest extends JPanel implements MouseListener{
 
 		if(this.requestData.isEmpty()) {
 			label.setText("表示するフレンド申請はありません");
-		}
+		}else {
 
-		int n = requestData.size();
+			int n = requestData.size();
 
-		for(int i=0;i<n;i++) {
-			f1 = new JLabel(requestData.get(i));
-			f1.setFont(new Font("MS ゴシック", Font.BOLD, 15));
-			f1.setForeground(Color.WHITE);
-			f1.setBounds(300, 220 + (i * 25), 200, 20);
-			f1.addMouseListener(this);
-			button_approval(220 + (i * 25));
-			this.add(f1);
+			for(int i=0;i<n;i++) {
+				f1 = new JLabel(requestData.get(i));
+				f1.setFont(new Font("MS ゴシック", Font.BOLD, 15));
+				f1.setForeground(Color.WHITE);
+				f1.setBounds(300, 220 + (i * 25), 200, 20);
+				f1.addMouseListener(this);
+				button_approval(220 + (i * 25));
+				this.add(f1);
 
+			}
+			count++;
 		}
 
 	}
