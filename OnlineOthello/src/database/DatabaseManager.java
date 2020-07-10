@@ -173,7 +173,8 @@ public class DatabaseManager {
 		pstmt_2.setString(1, playerId);
 		pstmt_2.setString(2, otherId);
 		ResultSet rs_2 = pstmt_2.executeQuery();
-		PreparedStatement pstmt_2_2 = connection.prepareStatement(sql_2);
+		String sql_2_2 = "select player_id, opponent_id from friends where player_id = ? AND opponent_id = ?";
+		PreparedStatement pstmt_2_2 = connection.prepareStatement(sql_2_2);
 		pstmt_2_2.setString(1, otherId);
 		pstmt_2_2.setString(2, playerId);
 		ResultSet rs_2_2 = pstmt_2_2.executeQuery();
@@ -184,17 +185,13 @@ public class DatabaseManager {
 		pstmt_3.setString(2, otherId);
 		ResultSet rs_3 = pstmt_3.executeQuery();
 
-		if(rs_2.next() == false){
-			player.frflag = 0;
-		}else if(rs_2_2.next() == false) {
-			player.frflag = 0;
-		}else if(rs_3.next() == false) {
+		if(rs_2.next() == false && rs_2_2.next() == false && rs_3.next() == false){
 			player.frflag = 0;
 		}else {
 			player.frflag = 1;
 		}
-		
-		
+
+
 		return player;
 	}
 
@@ -231,7 +228,7 @@ public class DatabaseManager {
 		PreparedStatement pstmt_2 = connection.prepareStatement(sql_2);
 		pstmt_2.setString(1, playerId);
 		pstmt_2.setString(2, otherId);
-		pstmt.executeUpdate();
+		pstmt_2.executeUpdate();
 	}
 
 	public void deleteFriendrequest(String playerId, String otherId) throws SQLException {
@@ -257,9 +254,9 @@ public class DatabaseManager {
 		return dbRequest;
 	}
 
-	
-	
-	
+
+
+
 
 
 public void updatePlayerDB(Player updatePlayer) throws SQLException {
@@ -296,7 +293,7 @@ public void makeGameRecordDB(ArrayList<String> endSet) throws SQLException {
 	}else if(endcase==5) {
 		pstmt.setInt(3, 3);
 	}
-	
+
 }
 
 

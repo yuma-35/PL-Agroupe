@@ -11,10 +11,6 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import com.mysql.cj.xdevapi.DbDoc;
-import com.sun.java.swing.plaf.windows.WindowsBorders.DashedBorder;
-import com.sun.org.glassfish.external.probe.provider.PluginPoint;
-
 import model.Match;
 
 public class ClientThread extends Thread {
@@ -125,11 +121,11 @@ public class ClientThread extends Thread {
 			ArrayList<String> datasetArrayList=(ArrayList<String>)data;
 			String hostname = datasetArrayList.get(0);
 			String myname=datasetArrayList.get(1);
-			
+
 			for (OthelloRoom room : server.roomList) {
-			
+
 				if (room.hostID.equals(hostname)) {
-					
+
 					room.enterSocket1 = socket1;
 					room.enterSocket2 = socket2;
 					enemySocket1 = room.hostSocket1;
@@ -141,7 +137,7 @@ public class ClientThread extends Thread {
 							sendpack.add(myname);
 							sendToEnemy("BattleStart", sendpack);
 							server.matchList.remove(server.matchList.indexOf(deleteMatch));
-							
+
 							return;
 						}
 					}

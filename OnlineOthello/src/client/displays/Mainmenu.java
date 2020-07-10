@@ -1,24 +1,20 @@
 package client.displays;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
-import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -30,8 +26,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 
 import client.OthelloClient;
@@ -236,6 +230,7 @@ public class Mainmenu extends JPanel {
 
 	public class toFriendRegisterB implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
+			Disp.friendregister.reloadFriendRegister(Client.myPlayer.id);
 			Disp.ChangeDisp(Disp.friendregister);
 		}
 	}
@@ -258,7 +253,7 @@ public class Mainmenu extends JPanel {
 		}
 	}
 
-	public class MatchPanel extends JPanel {
+	public class MatchPanel extends JPanel implements MouseListener{
 		JLabel enemyIDLabel = new JLabel("aaaaaaaaaa");
 		JLabel ruleLabel = new JLabel();
 		JLabel matchRankLabel = new JLabel("ランク8");
@@ -291,13 +286,13 @@ public class Mainmenu extends JPanel {
 					joinbox.setLocation(440, 220);
 					joinbox.setVisible(true);
 				} else {
-					
-					try {	
+
+					try {
 						ArrayList<String> sendPack =new ArrayList<String>();
 		    		sendPack.add(matchbox.playerId);
 		    		sendPack.add(Client.myPlayer.id);
 					OthelloClient.send("BattleEnter", sendPack);
-						
+
 					} catch (IOException e1) {
 						// TODO 自動生成された catch ブロック
 						e1.printStackTrace();
@@ -323,7 +318,8 @@ public class Mainmenu extends JPanel {
 			matchbox = match;
 			enemyIDLabel.setBounds(0, 0, 200, 30);
 			enemyIDLabel.setFont(new Font("MS ゴシック", Font.BOLD, 20));
-			
+			enemyIDLabel.addMouseListener(this);
+
 			this.add(enemyIDLabel);
 			limitLabel.setBounds(220, 35, 200, 30);
 			limitLabel.setFont(new Font("MS ゴシック", Font.BOLD, 20));
@@ -370,9 +366,58 @@ public class Mainmenu extends JPanel {
 			}
 		}
 
+		//マウスがボタンの枠内に入った時の処理
+		public void mouseEntered(MouseEvent evt) {
+			enemyIDLabel.setForeground(Color.YELLOW);
+		}
+		public void mouseExited(MouseEvent e) {
+			enemyIDLabel.setForeground(Color.WHITE);
+
+		}
+		public void mouseClicked(MouseEvent e) {
+
+		}
+		public void mousePressed(MouseEvent e) {
+			enemyIDLabel.setForeground(Color.RED);
+			String otherId = matchbox.playerId;
+
+			try {
+				ArrayList<String> data = new ArrayList<String>();
+				data.add(Client.myPlayer.id);
+				data.add(otherId);
+				OthelloClient.send("getProfile", data);
+				InputStream is = OthelloClient.socket1.getInputStream();
+				ObjectInputStream ois = new ObjectInputStream(is);
+				String message = (String)ois.readObject();
+				if(message.equals("failed")) {
+					return;
+				}
+				if(message.equals("success")) {
+					Player player = (Player)ois.readObject();
+					displayProfile sub = new displayProfile(Disp.disp, ModalityType.MODELESS);
+					sub.reloadProfile(player.id, player.playerRank, player.win, player.lose, player.draw, player.conceed, player.comment, player.iconImage, player.frflag);
+					sub.getId(Client.myPlayer.id, player.id);
+					sub.setLocation(400, 260);
+					sub.setVisible(true);
+				}
+			} catch (IOException e1) {
+				// TODO 自動生成された catch ブロック
+				e1.printStackTrace();
+			} catch (ClassNotFoundException e1) {
+				// TODO 自動生成された catch ブロック
+				e1.printStackTrace();
+			}
+
+		}
+
+		public void mouseReleased(MouseEvent e) {
+			// TODO 自動生成されたメソッド・スタブ
+
+		}
+
 	}
 
-	public class FriendPanel extends JPanel {
+	public class FriendPanel extends JPanel implements MouseListener{
 		JLabel friendID = new JLabel("yumaaaaaaa");
 		JLabel statusLabel = new JLabel();
 		JButton friendbattleButton = new JButton();
@@ -408,6 +453,7 @@ public class Mainmenu extends JPanel {
 			}
 		}
 
+
 		FriendPanel(int status, Match friendMatch, Player friendPlayer, int index) {
 			friendID.setFont(new Font("MS ゴシック", Font.BOLD, 16));
 			statusLabel.setFont(new Font("MS ゴシック", Font.BOLD, 10));
@@ -428,6 +474,7 @@ public class Mainmenu extends JPanel {
 			friendremoveButton.setFont(new Font("MS ゴシック", Font.BOLD, 12));
 
 			friendID.setBounds(5, 0, 200, 40);
+			friendID.addMouseListener(this);
 			statusLabel.setBounds(5, 25, 200, 40);
 			friendbattleButton.addActionListener(new friendBattleB());
 			friendremoveButton.addActionListener(new friendRemoveB());
@@ -459,6 +506,55 @@ public class Mainmenu extends JPanel {
 			this.add(friendremoveButton);
 
 		}
+
+		//マウスがボタンの枠内に入った時の処理
+				public void mouseEntered(MouseEvent evt) {
+					friendID.setForeground(Color.YELLOW);
+				}
+				public void mouseExited(MouseEvent e) {
+					friendID.setForeground(Color.WHITE);
+
+				}
+				public void mouseClicked(MouseEvent e) {
+
+				}
+				public void mousePressed(MouseEvent e) {
+					friendID.setForeground(Color.RED);
+					String otherId = friendPlayerBox.id;
+
+					try {
+						ArrayList<String> data = new ArrayList<String>();
+						data.add(Client.myPlayer.id);
+						data.add(otherId);
+						OthelloClient.send("getProfile", data);
+						InputStream is = OthelloClient.socket1.getInputStream();
+						ObjectInputStream ois = new ObjectInputStream(is);
+						String message = (String)ois.readObject();
+						if(message.equals("failed")) {
+							return;
+						}
+						if(message.equals("success")) {
+							Player player = (Player)ois.readObject();
+							displayProfile sub = new displayProfile(Disp.disp, ModalityType.MODELESS);
+							sub.reloadProfile(player.id, player.playerRank, player.win, player.lose, player.draw, player.conceed, player.comment, player.iconImage, player.frflag);
+							sub.getId(Client.myPlayer.id, player.id);
+							sub.setLocation(400, 260);
+							sub.setVisible(true);
+						}
+					} catch (IOException e1) {
+						// TODO 自動生成された catch ブロック
+						e1.printStackTrace();
+					} catch (ClassNotFoundException e1) {
+						// TODO 自動生成された catch ブロック
+						e1.printStackTrace();
+					}
+
+				}
+
+				public void mouseReleased(MouseEvent e) {
+					// TODO 自動生成されたメソッド・スタブ
+
+				}
 
 		public class friendRemoveB implements ActionListener {
 			public void actionPerformed(ActionEvent e) {

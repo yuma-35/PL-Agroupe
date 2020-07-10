@@ -210,7 +210,7 @@ class OthelloServer {
 		oos.writeObject(player);
 	}
 
-	
+
 
 	public void deleteMatch(Object data, ClientThread client) throws IOException, SQLException {
 		String deleteID = (String) data;
@@ -271,7 +271,7 @@ class OthelloServer {
 
 		ArrayList<String> idData = (ArrayList<String>) data;
 		String playerId = idData.get(0);
-		String otherId = idData.get(0);
+		String otherId = idData.get(1);
 		OutputStream os = client.socket1.getOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(os);
 
@@ -337,7 +337,7 @@ class OthelloServer {
 			}
 			i++;
 		} while (i < roomList.size());
-		
+
 	}
 
 	public void updatePlayer(Object data, ClientThread clientThread) throws SQLException {
@@ -352,5 +352,5 @@ class OthelloServer {
 		db.makeGameRecordDB(endSet);
 	}
 
-	
+
 }
