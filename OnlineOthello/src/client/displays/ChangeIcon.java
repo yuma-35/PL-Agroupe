@@ -3,7 +3,6 @@ package client.displays;
 import java.awt.Color;
 import java.awt.Dialog.ModalityType;
 import java.awt.Font;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -146,12 +145,11 @@ public class ChangeIcon extends JPanel {
 		ImageIcon icon = new ImageIcon(str);
 
 		//getScaledInstanceで大きさを変更
-		Image smallImg = icon.getImage().getScaledInstance((int) (icon.getIconWidth() * 0.07), -1,
-				Image.SCALE_SMOOTH);
-		ImageIcon smallIcon = new ImageIcon(smallImg);
+		//Image smallImg = icon.getImage().getScaledInstance((int) (icon.getIconWidth() * 0.07), -1,Image.SCALE_SMOOTH);
+		//ImageIcon smallIcon = new ImageIcon(smallImg);
 
 		//JLabelにアイコンを設定
-		JLabel l = new JLabel(smallIcon);
+		JLabel l = new JLabel(icon);
 
 		l.setBounds(10 + j, 50, 100, 100);
 		p.add(l);
@@ -170,16 +168,23 @@ public class ChangeIcon extends JPanel {
 	//決定ボタン
 	public class toStartM implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			boolean status1 = radio1.isSelected();
-			boolean status2 = radio2.isSelected();
-			boolean status3 = radio3.isSelected();
-			boolean status4 = radio4.isSelected();
-			boolean status5 = radio5.isSelected();
-
 			//ファイルのパス名
 			String str = null;
 			//ファイル名
 			String str2 = null;
+
+			boolean status1 = radio1.isSelected();
+			boolean status2 = radio2.isSelected();
+			boolean status3 = radio3.isSelected();
+			boolean status4 = radio4.isSelected();
+
+			if(file.length() == 5) {
+				boolean status5 = radio5.isSelected();
+				 if (status5 == true) {
+						str = files[4].getPath();
+						str2 = files[4].getName();
+				}
+			}
 
 			if (status1 == true) {
 				str = files[0].getPath();
@@ -193,10 +198,11 @@ public class ChangeIcon extends JPanel {
 			} else if (status4 == true) {
 				str = files[3].getPath();
 				str2 = files[3].getName();
-			} else if (status5 == true) {
+			} /*else if (status5 == true) {
 				str = files[4].getPath();
 				str2 = files[4].getName();
-			}
+			}*/
+
 
 			//ファイルに書き込む
 			try {
@@ -212,7 +218,7 @@ public class ChangeIcon extends JPanel {
 
 			//サーバへデータ送信
 			try {
-				Client.myPlayer.id = "peach";  //実験用
+				//Client.myPlayer.id = "peach";  //実験用
 				SendIcon send = new SendIcon(Client.myPlayer.id,str2,new File(str));
 				ArrayList<SendIcon> data = new ArrayList<SendIcon>();
 				data.add(send);

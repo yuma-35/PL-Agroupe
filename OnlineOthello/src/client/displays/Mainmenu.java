@@ -1,24 +1,18 @@
 package client.displays;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
-import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -30,8 +24,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 
 import client.OthelloClient;
@@ -66,6 +58,11 @@ public class Mainmenu extends JPanel {
 	JButton toSounds = new JButton("音量調整");
 	Font a = new Font("MS ゴシック", Font.BOLD, 20);
 	Font b = new Font("MS ゴシック", Font.BOLD, 10);
+
+//
+	ImageIcon myIcon = new ImageIcon();
+	JLabel mIcon = new JLabel();
+//
 
 	Mainmenu() {
 		setSize(1000, 600);
@@ -156,6 +153,12 @@ public class Mainmenu extends JPanel {
 		toGameRecord.setForeground(Color.white);
 		toGameRecord.setFont(new Font("MS ゴシック", Font.BOLD, 14));
 
+//
+		mIcon.setBounds(800, 70, 80, 80);
+		this.add(mIcon);
+
+//
+
 		this.add(toFriendRegister);
 		this.add(toGameRecord);
 		this.add(FriendTitleLabel);
@@ -170,6 +173,15 @@ public class Mainmenu extends JPanel {
 		this.add(toAccount);
 
 	}
+
+//
+	//アイコン用
+	void icon() {
+		myIcon = new ImageIcon(Disp.changeicon.getIcon());
+		mIcon.setIcon(myIcon);
+
+	}
+//
 
 	void reloadMatch() throws IOException, ClassNotFoundException {
 		lobiPanel.removeAll();
@@ -188,6 +200,7 @@ public class Mainmenu extends JPanel {
 
 	public class toStartS implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
+			Music.se();
 			msbox = new Music(Disp.disp, ModalityType.MODELESS);
 			msbox.setLocation(440, 220);
 			// this.addLogMessage("サブダイアログのモーダル表示処理を開始");
@@ -219,6 +232,7 @@ public class Mainmenu extends JPanel {
 		this.rankpointLabel.setText("あと" + (100 - Client.myPlayer.rankPoint) + "pt");
 		reloadFriendlist();
 		reloadMatch();
+		icon();
 	}
 
 	public void paintComponent(Graphics g) {
@@ -236,12 +250,14 @@ public class Mainmenu extends JPanel {
 
 	public class toFriendRegisterB implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
+			//Disp.friendregister.reloadFriendRegister("mina");
 			Disp.ChangeDisp(Disp.friendregister);
 		}
 	}
 
 	public class toGamerecordsB implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
+			Disp.gamerecords.reloadGamerecords();
 			Disp.ChangeDisp(Disp.gamerecords);
 		}
 	}
@@ -291,13 +307,13 @@ public class Mainmenu extends JPanel {
 					joinbox.setLocation(440, 220);
 					joinbox.setVisible(true);
 				} else {
-					
-					try {	
+
+					try {
 						ArrayList<String> sendPack =new ArrayList<String>();
 		    		sendPack.add(matchbox.playerId);
 		    		sendPack.add(Client.myPlayer.id);
 					OthelloClient.send("BattleEnter", sendPack);
-						
+
 					} catch (IOException e1) {
 						// TODO 自動生成された catch ブロック
 						e1.printStackTrace();
@@ -323,7 +339,7 @@ public class Mainmenu extends JPanel {
 			matchbox = match;
 			enemyIDLabel.setBounds(0, 0, 200, 30);
 			enemyIDLabel.setFont(new Font("MS ゴシック", Font.BOLD, 20));
-			
+
 			this.add(enemyIDLabel);
 			limitLabel.setBounds(220, 35, 200, 30);
 			limitLabel.setFont(new Font("MS ゴシック", Font.BOLD, 20));

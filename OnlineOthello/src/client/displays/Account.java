@@ -117,6 +117,7 @@ public class Account extends JPanel {
 	public class toStartM implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			try {
+
 				Disp.mainmenu.reloadMainmenu();
 			} catch (ClassNotFoundException e1) {
 				// TODO 自動生成された catch ブロック

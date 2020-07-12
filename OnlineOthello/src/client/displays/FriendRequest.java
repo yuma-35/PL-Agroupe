@@ -16,12 +16,14 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import client.OthelloClient;
+import model.Player;
 
 public class FriendRequest extends JPanel implements MouseListener{
 
@@ -29,12 +31,19 @@ public class FriendRequest extends JPanel implements MouseListener{
 	JLabel f1;
 	JLabel label;
 
+//
+	ImageIcon enemyIcon = new ImageIcon();
+	JLabel eIcon = new JLabel();
+//
+
 	String playerId;	//自分のID
 	String otherId;	//相手のID
 	ArrayList<String> requestData = new ArrayList<String>();
 
 	JButton yes;
 	JButton no;
+
+	int count = 0;
 
 
 	FriendRequest(){
@@ -93,11 +102,39 @@ public class FriendRequest extends JPanel implements MouseListener{
 	}
 	public void mousePressed(MouseEvent e) {
 		f1.setForeground(Color.RED);
-		GetProfile sub = new GetProfile(Disp.disp, ModalityType.MODELESS);
-		sub.setLocation(400, 260);
-		sub.setVisible(true);
+		int location = f1.getLocation().y;
+		int m = (location - 220) / 25;
+		otherId = requestData.get(m);
+
+		try {
+			ArrayList<String> data = new ArrayList<String>();
+			data.add(playerId);
+			data.add(otherId);
+			OthelloClient.send("getProfile", data);
+			InputStream is = OthelloClient.socket1.getInputStream();
+			ObjectInputStream ois = new ObjectInputStream(is);
+			String message = (String)ois.readObject();
+			if(message.equals("failed")) {
+				return;
+			}
+			if(message.equals("success")) {
+				Player player = (Player)ois.readObject();
+				GetProfile sub = new GetProfile(Disp.disp, ModalityType.MODELESS);
+				sub.reloadProfile(player.id, player.playerRank, player.win, player.lose, player.draw, player.conceed, player.comment, player.iconImage, player.frflag);
+				sub.getId(playerId, player.id);
+				sub.setLocation(400, 260);
+				sub.setVisible(true);
+			}
+		} catch (IOException e1) {
+			// TODO 自動生成された catch ブロック
+			e1.printStackTrace();
+		} catch (ClassNotFoundException e1) {
+			// TODO 自動生成された catch ブロック
+			e1.printStackTrace();
+		}
 
 	}
+
 	public void mouseReleased(MouseEvent e) {
 		// TODO 自動生成されたメソッド・スタブ
 
@@ -113,6 +150,13 @@ public class FriendRequest extends JPanel implements MouseListener{
 	//20:フレンド登録へ遷移
 	public class toFriendRegister implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
+			label.setText("");
+			if(count == 1) {
+				remove(f1);
+				remove(yes);
+				remove(no);
+				count--;
+			}
 			Disp.ChangeDisp(Disp.friendregister);
 		}
 	}
@@ -164,6 +208,7 @@ public class FriendRequest extends JPanel implements MouseListener{
 				if(message.equals("success")) {
 					label.setText(otherId+" をフレンドに追加しました");
 
+
 				}
 
 			} catch (IOException e1) {
@@ -193,6 +238,7 @@ public class FriendRequest extends JPanel implements MouseListener{
 				String message = (String) ois.readObject();
 				if(message.equals("success")) {
 					label.setText(otherId+" からの申請を拒否しました");
+
 
 				}
 			} catch (IOException e1) {
@@ -224,19 +270,49 @@ public class FriendRequest extends JPanel implements MouseListener{
 
 		if(this.requestData.isEmpty()) {
 			label.setText("表示するフレンド申請はありません");
-		}
+		}else {
 
-		int n = requestData.size();
+			int n = requestData.size();
 
-		for(int i=0;i<n;i++) {
-			f1 = new JLabel(requestData.get(i));
-			f1.setFont(new Font("MS ゴシック", Font.BOLD, 15));
-			f1.setForeground(Color.WHITE);
-			f1.setBounds(300, 220 + (i * 25), 200, 20);
-			f1.addMouseListener(this);
-			button_approval(220 + (i * 25));
-			this.add(f1);
+			for(int i=0;i<n;i++) {
 
+				//アイコン
+//				//アイコン要求
+		/*		try {
+					OthelloClient.send("geticon", requestData.get(i));
+					//受け取り
+					SendIcon iconData ;
+					InputStream is2 = OthelloClient.socket1.getInputStream();
+					ObjectInputStream ois2 = new ObjectInputStream(is2);
+					iconData = (SendIcon) ois2.readObject();
+
+					File f = iconData.getImage();
+					BufferedImage img = ImageIO.read(f);
+					enemyIcon = new ImageIcon(img);
+					Image smallImg = enemyIcon.getImage().getScaledInstance((int) (enemyIcon.getIconWidth() * 0.4), -1,
+				            Image.SCALE_SMOOTH);
+				    ImageIcon smallIcon = new ImageIcon(smallImg);
+					eIcon.setIcon(smallIcon);
+
+					eIcon.setBounds(250, 220 + (i * 25)-30, 25, 25);
+					this.add(eIcon);
+				} catch (IOException | ClassNotFoundException e) {
+					// TODO 自動生成された catch ブロック
+					e.printStackTrace();
+				}*/
+	//
+
+				f1 = new JLabel(requestData.get(i));
+				f1.setFont(new Font("MS ゴシック", Font.BOLD, 15));
+				f1.setForeground(Color.WHITE);
+				f1.setBounds(300, 220 + (i * 25), 200, 20);
+				f1.addMouseListener(this);
+				button_approval(220 + (i * 25));
+				this.add(f1);
+
+
+			}
+			count++;
 		}
 
 	}
@@ -252,6 +328,18 @@ class GetProfile extends JDialog{
 	//メインフレーム
 	Disp disp;
 
+	JLabel label1;
+	JLabel label2;
+	JLabel label3;
+	JLabel label4;
+	JLabel label5;
+
+	JButton ok;
+
+	String playerId;
+	String otherId;
+
+
 
 	public GetProfile(Disp disp, ModalityType mt) {
 		super(disp,mt);
@@ -263,10 +351,31 @@ class GetProfile extends JDialog{
 		this.setResizable(false);
 		this.getContentPane().setBackground(Color.LIGHT_GRAY);
 
+		label1 = new JLabel();
+		label1.setFont(new Font("MS ゴシック", Font.BOLD, 16));
+		label1.setForeground(Color.WHITE);
+		label1.setBounds(270, 50, 250, 25);
+		label2 = new JLabel();
+		label2.setFont(new Font("MS ゴシック", Font.BOLD, 12));
+		label2.setForeground(Color.WHITE);
+		label2.setBounds(270, 10, 250, 25);
+		label3 = new JLabel();
+		label3.setFont(new Font("MS ゴシック", Font.BOLD, 12));
+		label3.setForeground(Color.WHITE);
+		label3.setBounds(270, 80, 250, 25);
+		label4 = new JLabel();
+		label4.setFont(new Font("MS ゴシック", Font.BOLD, 12));
+		label4.setForeground(Color.WHITE);
+		label4.setBounds(220, 110, 250, 25);
+		label5 = new JLabel();
+		label5.setFont(new Font("MS ゴシック", Font.BOLD, 12));
+		label5.setForeground(Color.WHITE);
+		label5.setBounds(260, 140, 250, 25);
 
-		JButton ok = new JButton("フレンド申請");
+
+		ok = new JButton("フレンド申請");
 		ok.setFont(new Font("MS ゴシック", Font.BOLD, 12));
-		ok.setBounds(220, 250, 150, 30);
+		ok.setBounds(220, 220, 150, 30);
 		ok.setForeground(Color.WHITE);
 		ok.setBackground(new Color(51, 102, 255));
 		ok.addActionListener(new friendrequest());
@@ -280,7 +389,12 @@ class GetProfile extends JDialog{
 		back.setBackground(new Color(51, 102, 255));
 		back.addActionListener(new toBack());
 
-		this.add(back);
+		this.add(ok);
+		this.add(label1);
+		this.add(label2);
+		this.add(label3);
+		this.add(label4);
+		this.add(label5);
 	}
 
 
@@ -298,6 +412,20 @@ class GetProfile extends JDialog{
 
 			setVisible(false);	//サブモータルを消す
 		}
+	}
+
+	public void reloadProfile(String id, int rank, int win, int lose, int draw, int conceed, String comment, String icon, int flag) {
+		label1.setText(id);
+		label2.setText(icon);
+		label3.setText("ランク "+ rank);
+		label4.setText("対戦成績: "+win+"勝 "+lose+"敗 "+draw+"引き分け "+conceed+"投了");
+		label4.setText(comment);
+		ok.setEnabled(false);
+	}
+
+	public void getId(String playerId, String otherId) {
+		this.playerId = playerId;
+		this.otherId = otherId;
 	}
 
 
