@@ -211,7 +211,7 @@ no.setEnabled(false);
 		}
 		yes.addActionListener(new toFriendRegister_yes());
 		class toFriendRegister_no implements ActionListener{
-			
+
 			public void actionPerformed(ActionEvent e) {
 				yes.setEnabled(false);
 				no.setEnabled(false);
@@ -253,9 +253,9 @@ no.setEnabled(false);
 	}
 
 
-	
+
 	//拒否が押されたときのアクション
-	
+
 
 	//承認が押されたときのアクション
 	public class toFriendRegister_yes implements ActionListener{
@@ -353,9 +353,9 @@ no.setEnabled(false);
 				f1.addMouseListener(this);
 				button_approval(220 + (i * 25));
 				this.add(f1);
-			
 
-		
+
+
 
 				//アイコン
 //				//アイコン要求
@@ -424,26 +424,33 @@ class GetProfile extends JDialog{
 		this.getContentPane().setBackground(Color.LIGHT_GRAY);
 
 		label1 = new JLabel();
-		label1.setFont(new Font("MS ゴシック", Font.BOLD, 16));
+		label1.setFont(new Font("MS ゴシック", Font.BOLD, 22));
 		label1.setForeground(Color.WHITE);
-		label1.setBounds(270, 50, 250, 25);
+		label1.setBounds(170, 50, 250, 30);
+		label1.setHorizontalAlignment(JLabel.CENTER);
+
 		label2 = new JLabel();
 		label2.setFont(new Font("MS ゴシック", Font.BOLD, 12));
 		label2.setForeground(Color.WHITE);
-		label2.setBounds(270, 10, 250, 25);
+		label2.setBounds(170, 10, 250, 25);
+		label2.setHorizontalAlignment(JLabel.CENTER);
+
 		label3 = new JLabel();
 		label3.setFont(new Font("MS ゴシック", Font.BOLD, 12));
 		label3.setForeground(Color.WHITE);
-		label3.setBounds(270, 80, 250, 25);
+		label3.setBounds(170, 80, 250, 25);
+		label3.setHorizontalAlignment(JLabel.CENTER);
 		label4 = new JLabel();
-		label4.setFont(new Font("MS ゴシック", Font.BOLD, 12));
+		label4.setFont(new Font("MS ゴシック", Font.BOLD, 16));
 		label4.setForeground(Color.WHITE);
-		label4.setBounds(220, 110, 250, 25);
-		label5 = new JLabel();
-		label5.setFont(new Font("MS ゴシック", Font.BOLD, 12));
-		label5.setForeground(Color.WHITE);
-		label5.setBounds(260, 140, 250, 25);
+		label4.setBounds(150, 130, 300, 25);
+		label4.setHorizontalAlignment(JLabel.CENTER);
 
+		label5 = new JLabel();
+		label5.setFont(new Font("MS ゴシック", Font.BOLD, 16));
+		label5.setForeground(Color.WHITE);
+		label5.setBounds(150, 180, 400, 25);
+		label5.setHorizontalAlignment(JLabel.CENTER);
 
 		ok = new JButton("フレンド申請");
 		ok.setFont(new Font("MS ゴシック", Font.BOLD, 12));
@@ -491,7 +498,7 @@ class GetProfile extends JDialog{
 		label2.setText(icon);
 		label3.setText("ランク "+ rank);
 		label4.setText("対戦成績: "+win+"勝 "+lose+"敗 "+draw+"引き分け "+conceed+"投了");
-		label4.setText(comment);
+		label5.setText(comment);
 		ok.setEnabled(false);
 	}
 

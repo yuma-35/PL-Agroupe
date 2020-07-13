@@ -99,7 +99,7 @@ class OthelloServer {
 		ArrayList<String> logInData = (ArrayList<String>) data;
 		String id = logInData.get(0);
 		String hashedPassword = logInData.get(1);
-		
+
 		OutputStream os = client.socket1.getOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(os);
 
@@ -333,8 +333,13 @@ if(matchList.size()!=0) {
 		String otherId = request.get(1);
 		OutputStream os = client.socket1.getOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(os);
-		db.insertFriendrequest(playerId, otherId);
-		oos.writeObject("success");
+		boolean q = db.insertFriendrequest(playerId, otherId);
+		if(q) {
+			oos.writeObject("success");
+		}else{
+			oos.writeObject("failed");
+		}
+
 	}
 
 
@@ -346,7 +351,7 @@ if(matchList.size()!=0) {
 		String playerId = request.get(0);
 		String otherId = request.get(1);
 		db.deleteFriend(playerId, otherId);
-		
+
 	}
 
 	public void getMyPlayer(Object data, ClientThread client) throws IOException, SQLException {
@@ -403,17 +408,17 @@ if(matchList.size()!=0) {
 				if (friendList.get(i).status == 2) {
 
 					int z = 0;
-					
+
 					do {
-					
+
 						if (matchList.get(z).playerId.equals(friendList.get(i).id)) {
-				
+
 							friendList.get(i).frMatch = matchList.get(z);
 						}
 						z++;
 					} while (z < matchList.size());
 
-				
+
 				}
 				i++;
 			} while (i < friendList.size());
@@ -425,7 +430,7 @@ if(matchList.size()!=0) {
 
 	public int getStatus(String playerID) throws SQLException {
 		return db.getStatusDB(playerID);
-		
+
 	}
 
 	public void setStatus(String playerID, int i) throws SQLException {
