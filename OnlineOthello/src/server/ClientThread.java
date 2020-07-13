@@ -38,6 +38,7 @@ public class ClientThread extends Thread {
 				if(playerIDString!=null) {
 				int st = server.getStatus(playerIDString);
 				server.setStatus(playerIDString, 0);
+				System.out.println(playerIDString);
 				if (st == 1) {
 					
 				} else if (st == 2) {

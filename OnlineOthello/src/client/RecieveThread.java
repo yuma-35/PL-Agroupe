@@ -39,6 +39,7 @@ public class RecieveThread extends Thread {
 			int rule = Integer.parseInt(pack.get(0));
 			String enemyID = pack.get(1);
 			OthelloClient.send("StartSet", Client.myPlayer.id);
+			OthelloClient.send("setStatus", 3);
 			Disp.ChangeDisp(Disp.othello);
 			Disp.othello.startOthello(rule, 0, enemyID);
 		}
@@ -99,10 +100,12 @@ public class RecieveThread extends Thread {
 			Disp.disp.othello.chatArea.setText(Disp.disp.othello.chatBuild.toString());
 		}
 		if(operation.equals("EnemyDisconected")) {
+			System.out.println("終わった");
 			if (Disp.disp.othello.bw == 0) {// hostならroomを消す
 				OthelloClient.send("deleteRoom", Client.myPlayer.id);
 			}
 			Disp.disp.othello.gameEnd(4);
+			
 		}
 	}
 }

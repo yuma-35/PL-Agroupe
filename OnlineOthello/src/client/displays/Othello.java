@@ -138,6 +138,7 @@ public class Othello extends JPanel implements MouseListener {
 
 		ziKomaLabel.setBounds(350, 30, 200, 50);
 		ziKomaLabel.setFont(a);
+		ziKomaLabel.setBackground(Color.GRAY);
 		this.add(ziKomaLabel);
 		zikomahyouziJLabel.setBounds(425, 30, 50, 50);
 		this.add(zikomahyouziJLabel);
@@ -147,6 +148,7 @@ public class Othello extends JPanel implements MouseListener {
 		whitekoma.setBounds(570, 30, 50, 50);
 		tekiKomaLabel.setBounds(500, 30, 200, 50);
 		tekiKomaLabel.setFont(a);
+		tekiKomaLabel.setBackground(Color.GRAY);
 		this.add(tekiKomaLabel);
 		pasLabel.setBounds(400, 530, 200, 30);
 		pasLabel.setHorizontalAlignment(JLabel.CENTER);
@@ -256,31 +258,22 @@ public class Othello extends JPanel implements MouseListener {
 		}
 	}
 
-	public void getEnemy(String iDString) throws IOException, ClassNotFoundException {
-		ArrayList<String> pk = new ArrayList<String>();
-		pk.add(Client.myPlayer.id);
-		pk.add(iDString);
-		OthelloClient.send("getProfile", pk);
-		InputStream is2 = OthelloClient.socket1.getInputStream();
-		ObjectInputStream ois2 = new ObjectInputStream(is2);
-		ois2.readObject();
-		enemyPlayer = (Player) ois2.readObject();
-	}
+	
 
 	public void startOthello(int rule, int setBW, String enemyID) throws IOException, ClassNotFoundException {
-		getEnemy(enemyID);
-
+		enemyPlayer=OthelloClient.getEnemy(enemyID);
+		System.out.println("fsefegwgss");
 		// a相手のアイコン表示
-//		//アイコン要求
+//		//aアイコン要求
 		OthelloClient.send("geticon", enemyPlayer.getId());
-
+		System.out.println("fsefegwgss");
 		//受け取り
 		SendIcon iconData ;
 		InputStream is2 = OthelloClient.socket1.getInputStream();
 		ObjectInputStream ois2 = new ObjectInputStream(is2);
 		//ois2.readObject();
 		iconData = (SendIcon) ois2.readObject();
-
+		System.out.println("fsefegwgss");
 		File f = iconData.getImage();
 		BufferedImage img = ImageIO.read(f);
 		enemyIcon = new ImageIcon(img);
@@ -294,7 +287,7 @@ public class Othello extends JPanel implements MouseListener {
 	            Image.SCALE_SMOOTH);
 	    ImageIcon smallIcon2 = new ImageIcon(smallImg2);
 		mIcon.setIcon(smallIcon2 );
-
+		
 //
 
 		BoardBackLabel.setIcon(new ImageIcon(Disp.changeboard.getBoard()));
@@ -599,6 +592,7 @@ public class Othello extends JPanel implements MouseListener {
 		}else {
 
 			if (myTurn) {
+				Music.se();
 				int x = 1 + (int) e.getPoint().x / 50;
 				int y = 1 + (int) e.getPoint().y / 50;
 				try {
@@ -668,7 +662,8 @@ public class Othello extends JPanel implements MouseListener {
 		g2d.fillRect(20, 40, 230, 500);
 		g2d.fillRect(750, 40, 220, 500);
 		g2d.fillRect(400, 490, 200, 70);
-
+		g2d.fillRect(350, 35, 50, 40);
+		g2d.fillRect(500, 35, 50, 40);
 	}
 
 	public class Item1 implements ActionListener {
@@ -803,8 +798,10 @@ public class Othello extends JPanel implements MouseListener {
 		rsbox = new Result(Disp.disp, ModalityType.APPLICATION_MODAL, endcase);
 		rsbox.setLocationRelativeTo(null);
 		rsbox.setVisible(true);
-		Disp.disp.ChangeDisp(Disp.mainmenu);
 		Disp.mainmenu.reloadMainmenu();
+		Disp.disp.ChangeDisp(Disp.mainmenu);
+		OthelloClient.send("setStatus", 1);
+		
 	}
 
 	public class Result extends JDialog {
@@ -822,7 +819,25 @@ public class Othello extends JPanel implements MouseListener {
 
 		public class friendRequest implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
-				friendRequestButton.setEnabled(false);
+			
+				try {
+					ArrayList<String> data = new ArrayList<String>();
+
+					data.add(Client.myPlayer.id);
+					data.add(enemyPlayer.id);
+					OthelloClient.send("friendrequest", data);
+					InputStream is = OthelloClient.socket1.getInputStream();
+					ObjectInputStream ois = new ObjectInputStream(is);
+					String message = (String) ois.readObject();
+					friendRequestButton.setEnabled(false);
+					return;
+				} catch (IOException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				}
 			}
 		}
 
@@ -843,6 +858,8 @@ public class Othello extends JPanel implements MouseListener {
 			if (enemyPlayer.frflag == 1) {
 				friendRequestButton.setEnabled(false);
 			}
+		
+			
 			class Back implements ActionListener {
 				public void actionPerformed(ActionEvent e) {
 					timer.cancel();
@@ -942,23 +959,23 @@ public class Othello extends JPanel implements MouseListener {
 
 							}
 
-							Client.myPlayer.rankPoint = xnow;
-							try {
-								OthelloClient.send("updatePlayer", Client.myPlayer);
-								ArrayList<String> gameRecordPackage = new ArrayList<String>();
-								gameRecordPackage.add(Client.myPlayer.id);
-								gameRecordPackage.add(enemyPlayer.id);
-								gameRecordPackage.add(String.valueOf(endcase));
-								OthelloClient.send("MakeGameRecord", gameRecordPackage);
-								// a対局記録作る
-							} catch (IOException e) {
-								// TODO 自動生成された catch ブロック
-								e.printStackTrace();
-							}
-
-							sendflag = false;
+							
+						}
+						Client.myPlayer.rankPoint = xnow;
+						try {
+							OthelloClient.send("updatePlayer", Client.myPlayer);
+							ArrayList<String> gameRecordPackage = new ArrayList<String>();
+							gameRecordPackage.add(Client.myPlayer.id);
+							gameRecordPackage.add(enemyPlayer.id);
+							gameRecordPackage.add(String.valueOf(endcase));
+							OthelloClient.send("MakeGameRecord", gameRecordPackage);
+							// a対局記録作る
+						} catch (IOException e) {
+							// TODO 自動生成された catch ブロック
+							e.printStackTrace();
 						}
 
+						sendflag = false;
 					}
 
 					if (addpoint <= 0 && !(rankbox == 0 && now == 0)) {

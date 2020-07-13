@@ -353,9 +353,9 @@ no.setEnabled(false);
 				f1.addMouseListener(this);
 				button_approval(220 + (i * 25));
 				this.add(f1);
+			
 
-
-			for(int i=0;i<n;i++) {
+		
 
 				//アイコン
 //				//アイコン要求
@@ -382,14 +382,6 @@ no.setEnabled(false);
 					e.printStackTrace();
 				}*/
 	//
-
-				f1 = new JLabel(requestData.get(i));
-				f1.setFont(new Font("MS ゴシック", Font.BOLD, 15));
-				f1.setForeground(Color.WHITE);
-				f1.setBounds(300, 220 + (i * 25), 200, 20);
-				f1.addMouseListener(this);
-				button_approval(220 + (i * 25));
-				this.add(f1);
 
 			}
 			count++;

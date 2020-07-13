@@ -173,7 +173,7 @@ public class Gamerecords extends JPanel {
 	}
 
 	//myPlayer記録の書き換え
-	void setPlayerrecord() {
+	/*void setPlayerrecord() {
 		//reset
 		Client.myPlayer.win = 0;
 		Client.myPlayer.lose = 0;
@@ -188,7 +188,7 @@ public class Gamerecords extends JPanel {
 				Client.myPlayer.conceed += data.get(i).getConceed();
 			}
 		}
-	}
+	}*/
 
 	//再読み込み
 	void reloadGamerecords() {
@@ -213,7 +213,6 @@ public class Gamerecords extends JPanel {
 			e1.printStackTrace();
 		}
 
-		setPlayerrecord();
 		getRecordsNum();
 		getTotalNum();
 		getText();

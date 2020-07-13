@@ -1,12 +1,18 @@
 package client;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import javax.swing.UIManager;
+
+import model.Client;
 import model.Match;
+import model.Player;
 import client.displays.Disp;
 
 public class OthelloClient {
@@ -49,4 +55,31 @@ public class OthelloClient {
 		// 送信データ書き込み
 		oos.writeObject(object);
 	}
+	static public int receiveMSG() throws IOException, ClassNotFoundException {
+		int i;
+		InputStream is = OthelloClient.socket1.getInputStream();
+		ObjectInputStream ois = new ObjectInputStream(is);
+		i=(int)ois.readObject();
+		System.out.println(i);
+		return i;
+	}
+	static public Player getEnemy(String iDString) throws IOException, ClassNotFoundException {
+		Player enePlayer;
+		ArrayList<String> pk = new ArrayList<String>();
+		pk.add(Client.myPlayer.id);
+		pk.add(iDString);
+		OthelloClient.send("getProfile", pk);
+		System.out.println("fsefegwg1ss");
+		InputStream is2 = OthelloClient.socket1.getInputStream();
+		System.out.println("fsefegwg2s");
+		ObjectInputStream ois2 = new ObjectInputStream(is2);
+		System.out.println("fsefegwg3ss");
+		String message=(String) ois2.readObject();
+		
+		System.out.println(message);
+		enePlayer=(Player) ois2.readObject();
+		return enePlayer;
+	}
 }
+
+

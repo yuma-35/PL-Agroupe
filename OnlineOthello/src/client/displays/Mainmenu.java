@@ -62,7 +62,7 @@ public class Mainmenu extends JPanel {
 	JButton toSounds = new JButton("音量調整");
 	Font a = new Font("MS ゴシック", Font.BOLD, 20);
 	Font b = new Font("MS ゴシック", Font.BOLD, 10);
-
+	JButton reloadButton=new JButton("更新");
 //
 	ImageIcon myIcon = new ImageIcon();
 	JLabel mIcon = new JLabel();
@@ -84,6 +84,12 @@ public class Mainmenu extends JPanel {
 
 		this.add(friendScroll);
 
+		reloadButton.setBounds(470, 155, 60, 30);
+		reloadButton.setBackground(new Color(51, 102, 255));
+		reloadButton.setForeground(Color.WHITE);
+		reloadButton.addActionListener(new reload());
+		this.add(reloadButton);
+		
 		toMakematch.setBounds(460, 425, 80, 30);
 		toMakematch.setBackground(new Color(51, 102, 255));
 		toMakematch.setForeground(Color.WHITE);
@@ -221,7 +227,7 @@ public class Mainmenu extends JPanel {
 friendScroll.add(friendlistPanel);
 	}
 
-	void reloadMainmenu() throws ClassNotFoundException, IOException {
+	public void reloadMainmenu() throws ClassNotFoundException, IOException {
 		this.idLabel.setText("ID: " + Client.myPlayer.id);
 		this.recordWinLabel.setText(Client.myPlayer.win + "勝");
 		this.recordLoseLabel.setText(Client.myPlayer.lose + "敗");
@@ -276,7 +282,18 @@ friendScroll.add(friendlistPanel);
 			Disp.ChangeDisp(Disp.maketable);
 		}
 	}
-
+	public class reload implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+		    try {
+				reloadMainmenu();
+				repaint();
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO 自動生成された catch ブロック
+				e1.printStackTrace();
+			}
+		    
+		}
+	}
 	public class MatchPanel extends JPanel implements MouseListener {
 		JLabel enemyIDLabel = new JLabel("aaaaaaaaaa");
 		JLabel ruleLabel = new JLabel();
@@ -480,7 +497,6 @@ friendScroll.add(friendlistPanel);
 		JButton friendremoveButton = new JButton("解除");
 		
 		Player friendPlayerBox = new Player();
-		Match friendMatchBox = new Match();
 
 		class friendBattleB implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
@@ -507,9 +523,8 @@ friendScroll.add(friendlistPanel);
 		    		sendPack.add(friendPlayerBox.frMatch.playerId);
 		    		sendPack.add(Client.myPlayer.id);
 					OthelloClient.send("BattleEnter", sendPack);
-					InputStream is = OthelloClient.socket1.getInputStream();
-					ObjectInputStream ois = new ObjectInputStream(is);
-					int message = (int) ois.readObject();
+			
+					int message = OthelloClient.receiveMSG();
 					if(message==0) {
 						JOptionPane.showMessageDialog(Disp.disp, "既に削除された卓です");
 						Disp.disp.mainmenu.reloadMainmenu();
@@ -518,8 +533,9 @@ friendScroll.add(friendlistPanel);
 					}
 					
 					OthelloClient.send("setStatus",3);
-					Disp.disp.othello.startOthello(friendMatchBox.rule, 1,friendMatchBox.playerId);
 					Disp.disp.ChangeDisp(Disp.disp.othello);
+					Disp.disp.othello.startOthello(friendPlayerBox.frMatch.rule, 1,friendPlayerBox.id);
+					
 					} catch (IOException e1) {
 						// TODO 自動生成された catch ブロック
 						e1.printStackTrace();
@@ -546,7 +562,6 @@ friendScroll.add(friendlistPanel);
 			friendbattleButton.setBackground(new Color(51, 102, 255));
 			friendbattleButton.setForeground(Color.white);
 			friendbattleButton.setFont(new Font("MS ゴシック", Font.BOLD, 12));
-			friendbattleButton.addActionListener(new friendBattleB());
 			friendremoveButton.setBounds(115, 31, 60, 25);
 			friendremoveButton.setBackground(new Color(51, 102, 255));
 			friendremoveButton.setForeground(Color.white);
@@ -558,10 +573,17 @@ friendScroll.add(friendlistPanel);
 					rbox.setVisible(true);
 				}}
 			
+			class friendbattleRequestB implements ActionListener {
+				public void actionPerformed(ActionEvent e) {
+					frbox = new FriendBattleRequest(Disp.disp, ModalityType.APPLICATION_MODAL, friendPlayer.id);
+					frbox.setLocation(440, 220);
+					frbox.setVisible(true);
+				}}
+			
 			friendID.setBounds(5, 0, 200, 40);
 			friendID.addMouseListener(this);
 			statusLabel.setBounds(5, 25, 200, 40);
-			friendbattleButton.addActionListener(new friendBattleB());
+			
 			friendremoveButton.addActionListener(new friendRemoveB());
 			friendID.setText(friendPlayer.id);
 			if (friendPlayer.status == 0) {
@@ -569,11 +591,13 @@ friendScroll.add(friendlistPanel);
 				statusLabel.setText("オフライン");
 			} else if (friendPlayer.status == 1) {
 				this.add(friendbattleButton);
+				friendbattleButton.addActionListener(new friendbattleRequestB());
 				statusLabel.setForeground(Color.green);
 				statusLabel.setText("オンライン");
 				friendbattleButton.setText("申込");
 			} else if (friendPlayer.status == 2) {
 				this.add(friendbattleButton);
+				friendbattleButton.addActionListener(new friendBattleB());
 				friendbattleButton.setText("参加");
 				statusLabel.setForeground(Color.ORANGE);
 				if (friendPlayer.frMatch.rule == 0) {

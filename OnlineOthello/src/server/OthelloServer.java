@@ -246,6 +246,7 @@ class OthelloServer {
 	public void deleteMatch(Object data, ClientThread client) throws IOException, SQLException {
 		String deleteID = (String) data;
 		int i = 0;
+		if(matchList.size()!=0) {
 		do {
 			if (roomList.get(i).hostID != deleteID) {
 				roomList.remove(i);
@@ -253,9 +254,9 @@ class OthelloServer {
 			i++;
 
 		} while (i < roomList.size());
-
+		}
 		i = 0;
-
+if(matchList.size()!=0) {
 		do {
 			if (matchList.get(i).playerId != deleteID) {
 				matchList.remove(i);
@@ -264,6 +265,7 @@ class OthelloServer {
 		} while (i < matchList.size());
 		return;
 
+	}
 	}
 
 	// db.deleteMatch(deleteID);
@@ -360,13 +362,14 @@ class OthelloServer {
 		// TODO 自動生成されたメソッド・スタブ
 		String hostName = (String) data;
 		int i = 0;
+		if(roomList.size()!=0) {
 		do {
 			if (roomList.get(i).hostID == hostName) {
 				roomList.remove(i);
 			}
 			i++;
 		} while (i < roomList.size());
-
+		}
 	}
 
 	public void updatePlayer(Object data, ClientThread clientThread) throws SQLException {
@@ -395,11 +398,12 @@ class OthelloServer {
 		String name = (String) data;
 		ArrayList<Player> friendList = db.getFriendList(db.getFriendNameList(name));
 		int i = 0;
-		if (friendList.size() != 0) {
+		if (friendList.size() != 0&&matchList.size()!=0) {
 			do {
 				if (friendList.get(i).status == 2) {
 
 					int z = 0;
+					
 					do {
 					
 						if (matchList.get(z).playerId.equals(friendList.get(i).id)) {
@@ -407,10 +411,10 @@ class OthelloServer {
 							friendList.get(i).frMatch = matchList.get(z);
 						}
 						z++;
-					} while (z < roomList.size());
+					} while (z < matchList.size());
 
+				
 				}
-
 				i++;
 			} while (i < friendList.size());
 		}
@@ -425,6 +429,7 @@ class OthelloServer {
 	}
 
 	public void setStatus(String playerID, int i) throws SQLException {
+		System.out.println(playerID+" okoko "+i);
 		db.setStatusDB(playerID,i);
 		return;
 	}

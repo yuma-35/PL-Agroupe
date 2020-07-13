@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 public class Disp extends JFrame {
 	public static Disp disp;
 	public static StartDisp start = new StartDisp();
-	static Mainmenu mainmenu = new Mainmenu();
+	public static Mainmenu mainmenu = new Mainmenu();
 	static BattleApply battleApply = new BattleApply();
 	static OthelloWait othellowait = new OthelloWait();
 	public static Othello othello = new Othello();

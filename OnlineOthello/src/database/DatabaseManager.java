@@ -284,6 +284,8 @@ public class DatabaseManager {
 				player.frflag = 1;
 			}
 
+		}else {
+			player.frflag=1;
 		}
 
 		return player;
@@ -381,7 +383,7 @@ public class DatabaseManager {
 		} else if (endcase == 5) {
 			pstmt.setInt(3, 3);
 		}
-
+		pstmt.executeUpdate();
 	}
 
 	// friend_requestsに追加
@@ -478,6 +480,7 @@ public class DatabaseManager {
 		// TODO 自動生成されたメソッド・スタブ
 		String sql = "update players SET status = ? where id = ?";
 		PreparedStatement pstmt = connection.prepareStatement(sql);
+		System.out.println(playerID+" feakokoko "+i);
 		pstmt.setInt(1, i);
 		pstmt.setString(2, playerID);
 		pstmt.executeUpdate();
