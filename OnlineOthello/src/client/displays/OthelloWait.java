@@ -105,7 +105,15 @@ public class OthelloWait extends JPanel {
 			timer = null;
 			try {
 				OthelloClient.send("deleteMatch",Client.myPlayer.id);
+				OthelloClient.send("deleteRoom",Client.myPlayer.id);
+				OthelloClient.send("setStatus", 1);	
 			} catch (IOException e1) {
+				// TODO 自動生成された catch ブロック
+				e1.printStackTrace();
+			}
+			try {
+				Disp.disp.mainmenu.reloadMainmenu();
+			} catch (ClassNotFoundException | IOException e1) {
 				// TODO 自動生成された catch ブロック
 				e1.printStackTrace();
 			}

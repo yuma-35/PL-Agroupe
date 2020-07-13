@@ -17,4 +17,5 @@ public class Player implements Serializable{
 	public String answer;
 	public int status;
 	public int frflag;
+	public Match frMatch;//フレンド関連用
 }
