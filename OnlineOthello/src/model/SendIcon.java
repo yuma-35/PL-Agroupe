@@ -14,4 +14,8 @@ public class SendIcon implements Serializable{
 		this.image  = file;
 	}
 
+	public File getImage() {
+		return image;
+	}
+
 }

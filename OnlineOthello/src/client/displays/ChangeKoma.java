@@ -16,6 +16,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
@@ -40,9 +41,13 @@ public class ChangeKoma extends JPanel {
 	 JRadioButton radio5;
 	 JRadioButton radio6;
 	 JRadioButton radio7;
-	 JRadioButton radio8;
-	 JRadioButton radio9;
-	 JRadioButton radio0;
+	 JRadioButton radio11;
+	 JRadioButton radio22;
+	 JRadioButton radio33;
+	 JRadioButton radio44;
+	 JRadioButton radio55;
+	 JRadioButton radio66;
+	 JRadioButton radio77;
 
 	//ボタン
 		JButton toSounds = new JButton("音量調整");
@@ -93,7 +98,7 @@ public class ChangeKoma extends JPanel {
 		//画像
          for (int i = 0; i < Bfiles.length ; i++) {
         	 ImageTest(Bheight/3,Bfiles[i].getPath(),p);
-        	 j = j + 150;
+        	 j = j + 100;
          }
 
          p.setBackground(Color.LIGHT_GRAY);
@@ -104,7 +109,7 @@ public class ChangeKoma extends JPanel {
 
          for (int i = 0; i < Wfiles.length ; i++) {
         	ImageTest(Wheight/2,Wfiles[i].getPath(),q);
- 		    j = j + 150;
+ 		    j = j + 100;
          }
 
          q.setBackground(Color.LIGHT_GRAY);
@@ -137,55 +142,74 @@ public class ChangeKoma extends JPanel {
 	        radio3 = new JRadioButton("", false);
 	        radio4 = new JRadioButton("", false);
 	        radio5 = new JRadioButton("", false);
+	        radio6 = new JRadioButton("", false);
+	        radio7 = new JRadioButton("", false);
 	        radio1.setBackground(Color.LIGHT_GRAY);
 	        radio2.setBackground(Color.LIGHT_GRAY);
 	        radio3.setBackground(Color.LIGHT_GRAY);
 	        radio4.setBackground(Color.LIGHT_GRAY);
 	        radio5.setBackground(Color.LIGHT_GRAY);
+	        radio6.setBackground(Color.LIGHT_GRAY);
+	        radio7.setBackground(Color.LIGHT_GRAY);
 	        ButtonGroup group = new ButtonGroup();
 	        group.add(radio1);
 	        group.add(radio2);
 	        group.add(radio3);
 	        group.add(radio4);
 	        group.add(radio5);
+	        group.add(radio6);
+	        group.add(radio7);
 	        radio1.setBounds(200, i, 100, 25);
-	        radio2.setBounds(350, i, 100, 25);
-	        radio3.setBounds(500, i, 100, 25);
-	        radio4.setBounds(650, i, 100, 25);
-	        radio5.setBounds(800, i, 100, 25);
+	        radio2.setBounds(300, i, 100, 25);
+	        radio3.setBounds(400, i, 100, 25);
+	        radio4.setBounds(500, i, 100, 25);
+	        radio5.setBounds(600, i, 100, 25);
+	        radio6.setBounds(700, i, 100, 25);
+	        radio7.setBounds(800, i, 100, 25);
 	        this.add(radio1);
 	        this.add(radio2);
 	        this.add(radio3);
 	        this.add(radio4);
 	        this.add(radio5);
-
-	        radio6 = new JRadioButton("", true);
-	        radio7 = new JRadioButton("", false);
-	        radio8 = new JRadioButton("", false);
-	        radio9 = new JRadioButton("", false);
-	        radio0 = new JRadioButton("", false);
-	        radio6.setBackground(Color.LIGHT_GRAY);
-	        radio7.setBackground(Color.LIGHT_GRAY);
-	        radio8.setBackground(Color.LIGHT_GRAY);
-	        radio9.setBackground(Color.LIGHT_GRAY);
-	        radio0.setBackground(Color.LIGHT_GRAY);
-	        ButtonGroup group2 = new ButtonGroup();
-	        group2.add(radio6);
-	        group2.add(radio7);
-	        group2.add(radio8);
-	        group2.add(radio9);
-	        group2.add(radio0);
-	        radio6.setBounds(200, k, 100, 25);
-	        radio7.setBounds(350, k, 100, 25);
-	        radio8.setBounds(500, k, 100, 25);
-	        radio9.setBounds(650, k, 100, 25);
-	        radio0.setBounds(800, k, 100, 25);
 	        this.add(radio6);
 	        this.add(radio7);
-	        this.add(radio8);
-	        this.add(radio9);
-	        this.add(radio0);
 
+	        radio11 = new JRadioButton("", true);
+	        radio22 = new JRadioButton("", false);
+	        radio33 = new JRadioButton("", false);
+	        radio44 = new JRadioButton("", false);
+	        radio55 = new JRadioButton("", false);
+	        radio66 = new JRadioButton("", false);
+	        radio77 = new JRadioButton("", false);
+	        radio11.setBackground(Color.LIGHT_GRAY);
+	        radio22.setBackground(Color.LIGHT_GRAY);
+	        radio33.setBackground(Color.LIGHT_GRAY);
+	        radio44.setBackground(Color.LIGHT_GRAY);
+	        radio55.setBackground(Color.LIGHT_GRAY);
+	        radio66.setBackground(Color.LIGHT_GRAY);
+	        radio77.setBackground(Color.LIGHT_GRAY);
+	        ButtonGroup group2 = new ButtonGroup();
+	        group2.add(radio11);
+	        group2.add(radio22);
+	        group2.add(radio33);
+	        group2.add(radio44);
+	        group2.add(radio55);
+	        group2.add(radio66);
+	        group2.add(radio77);
+	        radio11.setBounds(200, k, 100, 25);
+	        radio22.setBounds(300, k, 100, 25);
+	        radio33.setBounds(400, k, 100, 25);
+	        radio44.setBounds(500, k, 100, 25);
+	        radio55.setBounds(600, k, 100, 25);
+	        radio66.setBounds(700, k, 100, 25);
+	        radio77.setBounds(800, k, 100, 25);
+	        this.add(radio11);
+	        this.add(radio22);
+	        this.add(radio33);
+	        this.add(radio44);
+	        this.add(radio55);
+	        this.add(radio66);
+	        this.add(radio77);
 
 		}
 
@@ -217,6 +241,9 @@ public class ChangeKoma extends JPanel {
 	            boolean status3 = radio3.isSelected();
 	            boolean status4 = radio4.isSelected();
 	            boolean status5 = radio5.isSelected();
+	            boolean status6 = radio6.isSelected();
+	            boolean status7 = radio7.isSelected();
+
 
 	            //ファイルのパス名
 	            String str = null;
@@ -231,6 +258,10 @@ public class ChangeKoma extends JPanel {
 	            	str = Bfiles[3].getPath();
 	            }else if(status5 == true) {
 	            	str = Bfiles[4].getPath();
+	            }else if(status6 == true) {
+	            	str = Bfiles[5].getPath();
+	            }else if(status7 == true) {
+	            	str = Bfiles[6].getPath();
 	            }
 
 	          //ファイルに書き込む
@@ -240,28 +271,35 @@ public class ChangeKoma extends JPanel {
 	 				bw.close();
 	 			} catch(IOException e1){
 	     			  System.out.println(e1);
+	     			 JOptionPane.showMessageDialog(Disp.disp, "エラーが発生しました");
 	     		}
 
 	 			//白
-	 			boolean status6 = radio6.isSelected();
-	            boolean status7 = radio7.isSelected();
-	            boolean status8 = radio8.isSelected();
-	            boolean status9 = radio9.isSelected();
-	            boolean status0 = radio0.isSelected();
+	     		boolean status11 = radio11.isSelected();
+	            boolean status22 = radio22.isSelected();
+	            boolean status33 = radio33.isSelected();
+	            boolean status44 = radio44.isSelected();
+	            boolean status55 = radio55.isSelected();
+	            boolean status66 = radio66.isSelected();
+	            boolean status77 = radio77.isSelected();
 
 	            //ファイルのパス名
 	            String str1 = null;
 
-	            if(status6 == true) {
+	            if(status11 == true) {
 	            	str1 = Wfiles[0].getPath();
-	            }else if(status7 == true) {
+	            }else if(status22 == true) {
 	            	str1 = Wfiles[1].getPath();
-	            }else if(status8 == true) {
+	            }else if(status33 == true) {
 	            	str1 = Wfiles[2].getPath();
-	            }else if(status9 == true) {
+	            }else if(status44 == true) {
 	            	str1 = Wfiles[3].getPath();
-	            }else if(status0 == true) {
+	            }else if(status55 == true) {
 	            	str1 = Wfiles[4].getPath();
+	            }else if(status66 == true) {
+	            	str1 = Wfiles[5].getPath();
+	            }else if(status77 == true) {
+	            	str1 = Wfiles[6].getPath();
 	            }
 
 	          //ファイルに書き込む
@@ -271,6 +309,7 @@ public class ChangeKoma extends JPanel {
 	 				bw.close();
 	 			} catch(IOException e1){
 	     			  System.out.println(e1);
+	     			  JOptionPane.showMessageDialog(Disp.disp, "エラーが発生しました");
 	     		}
 
  	     		Disp.ChangeDisp(Disp.account);
@@ -292,6 +331,7 @@ public class ChangeKoma extends JPanel {
 
 				} catch(IOException e1){
 		 			  System.out.println(e1);
+		 			 JOptionPane.showMessageDialog(Disp.disp, "エラーが発生しました");
 		 		}
 				return str2;
 
@@ -311,6 +351,7 @@ public class ChangeKoma extends JPanel {
 
 			} catch(IOException e1){
 	 			  System.out.println(e1);
+	 			 JOptionPane.showMessageDialog(Disp.disp, "エラーが発生しました");
 	 		}
 			return str2;
 

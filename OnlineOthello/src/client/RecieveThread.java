@@ -7,10 +7,9 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
-import com.sun.org.glassfish.external.probe.provider.PluginPoint;
+//import com.sun.org.glassfish.external.probe.provider.PluginPoint;
 
 import client.displays.Disp;
-import client.displays.Othello.sendchat;
 import model.Client;
 
 public class RecieveThread extends Thread {

@@ -17,4 +17,24 @@ public class Player implements Serializable{
 	public String answer;
 	public int status;
 	public int frflag;
+
+	public String getId() {
+		return id;
+	}
+
+	public int getWin() {
+		return win;
+	}
+
+	public int getLose() {
+		return lose;
+	}
+
+	public int getDraw() {
+		return draw;
+	}
+
+	public int getConceed() {
+		return conceed;
+	}
 }

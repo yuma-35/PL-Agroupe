@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 import database.DatabaseManager;
+import model.GameRecordToPlayer;
 import model.Match;
 import model.Player;
 import model.SendIcon;
@@ -159,6 +160,40 @@ class OthelloServer {
 		}
 	}
 
+	//対局記録取得
+	public void gamerecord(Object data, ClientThread client) {
+		String playerId = (String) data;
+
+		OutputStream os;
+		try {
+			os = client.socket1.getOutputStream();
+
+			ObjectOutputStream oos = new ObjectOutputStream(os);
+			ArrayList grtp = new ArrayList<GameRecordToPlayer>();
+			grtp = db.getGameRecords(playerId);
+
+			oos.writeObject("success");
+			oos.writeObject(grtp);
+		} catch (IOException | SQLException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+
+	}
+
+	//アイコン取得
+	public void geticon(Object data, ClientThread client) throws IOException, SQLException {
+		String Id = (String) data;
+		OutputStream os = client.socket1.getOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(os);
+
+		//送信用
+		SendIcon iconData ;
+
+		iconData = db.sendIcon(Id);
+		oos.writeObject(iconData);
+	}
+
 	public void forget(Object i, ClientThread client) throws IOException, SQLException {
 		String id = (String) i;
 		OutputStream os = client.socket1.getOutputStream();
@@ -197,8 +232,6 @@ class OthelloServer {
 		OutputStream os = client.socket1.getOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(os);
 
-
-
 		if (!db.isAlreadyExists(otherId)) {
 
 			oos.writeObject("failed");
@@ -209,8 +242,6 @@ class OthelloServer {
 		oos.writeObject("success");
 		oos.writeObject(player);
 	}
-
-	
 
 	public void deleteMatch(Object data, ClientThread client) throws IOException, SQLException {
 		String deleteID = (String) data;
@@ -233,19 +264,19 @@ class OthelloServer {
 		} while (i < matchList.size());
 		return;
 
-		}
-
+	}
 
 	// db.deleteMatch(deleteID);
-	public void makeMatch(Object data,ClientThread client)throws IOException,SQLException{
-		Match newMatch=(Match) data;
+	public void makeMatch(Object data, ClientThread client) throws IOException, SQLException {
+		Match newMatch = (Match) data;
 		matchList.add(newMatch);
-		OthelloRoom newRoom=new OthelloRoom();
-		newRoom.hostID=newMatch.playerId;
-		newRoom.hostSocket1=client.socket1;
-		newRoom.hostSocket2=client.socket2;
+		OthelloRoom newRoom = new OthelloRoom();
+		newRoom.hostID = newMatch.playerId;
+		newRoom.hostSocket1 = client.socket1;
+		newRoom.hostSocket2 = client.socket2;
 		roomList.add(newRoom);
 	}
+
 	public void reloadMatchRequest(Object data, ClientThread client) throws IOException {
 		OutputStream os = client.socket1.getOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(os);
@@ -254,8 +285,7 @@ class OthelloServer {
 
 	}
 
-
-	public void friend_add(Object data, ClientThread client)throws IOException, SQLException{
+	public void friend_add(Object data, ClientThread client) throws IOException, SQLException {
 
 		ArrayList<String> idData = (ArrayList<String>) data;
 		String playerId = idData.get(0);
@@ -267,7 +297,7 @@ class OthelloServer {
 		oos.writeObject("success");
 	}
 
-	public void friend_refuse(Object data, ClientThread client)throws IOException, SQLException{
+	public void friend_refuse(Object data, ClientThread client) throws IOException, SQLException {
 
 		ArrayList<String> idData = (ArrayList<String>) data;
 		String playerId = idData.get(0);
@@ -279,14 +309,14 @@ class OthelloServer {
 		oos.writeObject("success");
 	}
 
-	public void getFriendrequest(Object data, ClientThread client)throws IOException, SQLException{
+	public void getFriendrequest(Object data, ClientThread client) throws IOException, SQLException {
 
 		String playerId = (String) data;
 		OutputStream os = client.socket1.getOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(os);
 		ArrayList dbRequest = new ArrayList<String>();
 		dbRequest = db.getFriendrequest(playerId);
-		if(dbRequest.isEmpty()) {
+		if (dbRequest.isEmpty()) {
 			oos.writeObject("failed");
 			return;
 		}
@@ -294,7 +324,7 @@ class OthelloServer {
 		oos.writeObject(dbRequest);
 	}
 
-	public void friendrequest(Object data, ClientThread client)throws IOException, SQLException{
+	public void friendrequest(Object data, ClientThread client) throws IOException, SQLException {
 
 		ArrayList<String> request = (ArrayList<String>) data;
 		String playerId = request.get(0);
@@ -305,9 +335,8 @@ class OthelloServer {
 		oos.writeObject("success");
 	}
 
-
 	//フレンド解除
-	public void delfriend(Object data, ClientThread client)throws IOException, SQLException{
+	public void delfriend(Object data, ClientThread client) throws IOException, SQLException {
 
 		ArrayList<String> request = (ArrayList<String>) data;
 		String playerId = request.get(0);
@@ -322,14 +351,14 @@ class OthelloServer {
 		String idString = (String) data;
 		OutputStream os = client.socket1.getOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(os);
-		Player playerdata=db.getPlayer(idString, idString);
+		Player playerdata = db.getPlayer(idString, idString);
 		oos.writeObject(playerdata);
 
 	}
 
 	public void deleteRoom(Object data, ClientThread clientThread) {
 		// TODO 自動生成されたメソッド・スタブ
-		String hostName =(String)data;
+		String hostName = (String) data;
 		int i = 0;
 		do {
 			if (roomList.get(i).hostID != hostName) {
@@ -337,20 +366,19 @@ class OthelloServer {
 			}
 			i++;
 		} while (i < roomList.size());
-		
+
 	}
 
 	public void updatePlayer(Object data, ClientThread clientThread) throws SQLException {
 		// TODO 自動生成されたメソッド・スタブ
-		Player updatePlayer =(Player)data;
+		Player updatePlayer = (Player) data;
 		db.updatePlayerDB(updatePlayer);
 	}
 
 	public void makeGameRecord(Object data, ClientThread clientThread) throws SQLException {
 		// TODO 自動生成されたメソッド・スタブ
-		ArrayList<String> endSet=(ArrayList<String>)data;
+		ArrayList<String> endSet = (ArrayList<String>) data;
 		db.makeGameRecordDB(endSet);
 	}
 
-	
 }

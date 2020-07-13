@@ -5,11 +5,14 @@ import java.awt.Dialog.ModalityType;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -18,6 +21,7 @@ import java.util.HashSet;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -32,6 +36,7 @@ import javax.swing.border.LineBorder;
 import client.OthelloClient;
 import model.Client;
 import model.Player;
+import model.SendIcon;
 
 //turn変わるたびにおける場所検索のメソッド起動
 //aラベルに条件付けして自動で変わるようにする
@@ -56,6 +61,12 @@ public class Othello extends JPanel implements MouseListener {
 	ImageIcon blackIcon = new ImageIcon();
 	ImageIcon whiteIcon = new ImageIcon();
 	ImageIcon enable = new ImageIcon("image\\SystemImage\\enable.png");
+
+//
+	ImageIcon enemyIcon = new ImageIcon();
+	ImageIcon myIcon = new ImageIcon();
+//
+
 	public StringBuilder chatBuild = new StringBuilder();
 	JLabel myLabel = new JLabel("自分");
 	JLabel enemyLabel = new JLabel("相手");
@@ -63,6 +74,10 @@ public class Othello extends JPanel implements MouseListener {
 	JLabel enemyIDLabel = new JLabel("taro123");
 	JLabel blackkoma = new JLabel(blackIcon);
 	JLabel whitekoma = new JLabel(whiteIcon);
+//
+	JLabel eIcon = new JLabel();
+	JLabel mIcon = new JLabel();
+//
 	JLabel ziKomaLabel = new JLabel("自分:");
 	JLabel tekiKomaLabel = new JLabel("相手:");
 	JLabel turnLabel = new JLabel("あなたのターンです");
@@ -149,9 +164,17 @@ public class Othello extends JPanel implements MouseListener {
 		myIDLabel.setFont(a);
 		this.add(myIDLabel);
 
-		enemyIDLabel.setBounds(80, 310, 200, 50);
+		enemyIDLabel.setBounds(80, 310, 100, 50);
 		enemyIDLabel.setFont(a);
 		this.add(enemyIDLabel);
+
+//
+		eIcon.setBounds(40, 300, 80, 80);
+		this.add(eIcon);
+		mIcon.setBounds(40, 80, 80, 80);
+		this.add(mIcon);
+
+//
 
 		myItem1Button.setBounds(80, 150, 50, 50);
 		myItem1Button.addActionListener(new Item1());
@@ -202,6 +225,8 @@ public class Othello extends JPanel implements MouseListener {
 
 		this.add(blackkoma);
 		this.add(whitekoma);
+
+
 		this.add(chatPane);
 		this.add(myItem1Button);
 		this.add(myItem2Button);
@@ -213,6 +238,8 @@ public class Othello extends JPanel implements MouseListener {
 		this.add(enemyItem3Button);
 		this.add(enemyItem4Button);
 		this.add(enemyItem5Button);
+
+
 
 	}
 
@@ -243,6 +270,31 @@ public class Othello extends JPanel implements MouseListener {
 		getEnemy(enemyID);
 
 		// a相手のアイコン表示
+//		//アイコン要求
+		OthelloClient.send("geticon", enemyPlayer.getId());
+
+		//受け取り
+		SendIcon iconData ;
+		InputStream is2 = OthelloClient.socket1.getInputStream();
+		ObjectInputStream ois2 = new ObjectInputStream(is2);
+		//ois2.readObject();
+		iconData = (SendIcon) ois2.readObject();
+
+		File f = iconData.getImage();
+		BufferedImage img = ImageIO.read(f);
+		enemyIcon = new ImageIcon(img);
+		Image smallImg = enemyIcon.getImage().getScaledInstance((int) (enemyIcon.getIconWidth() * 0.6), -1,
+	            Image.SCALE_SMOOTH);
+	    ImageIcon smallIcon = new ImageIcon(smallImg);
+		eIcon.setIcon(smallIcon);
+
+		myIcon = new ImageIcon(Disp.changeicon.getIcon());
+		Image smallImg2 = myIcon.getImage().getScaledInstance((int) (myIcon.getIconWidth() * 0.6), -1,
+	            Image.SCALE_SMOOTH);
+	    ImageIcon smallIcon2 = new ImageIcon(smallImg2);
+		mIcon.setIcon(smallIcon2 );
+
+//
 
 		BoardBackLabel.setIcon(new ImageIcon(Disp.changeboard.getBoard()));
 		blackIcon = new ImageIcon(Disp.changekoma.getBlack());
@@ -438,7 +490,7 @@ public class Othello extends JPanel implements MouseListener {
 			System.out.print("エラー");
 			return 0;
 		}
-		
+
 	}
 
 	public void flipserch(int distX, int distY, int xx, int yy, int mode, boolean turn) {
@@ -568,7 +620,7 @@ public class Othello extends JPanel implements MouseListener {
 		g2d.fillRect(20, 40, 230, 500);
 		g2d.fillRect(750, 40, 220, 500);
 		g2d.fillRect(400, 490, 200, 70);
-	
+
 	}
 
 	public class Item1 implements ActionListener {
