@@ -175,7 +175,71 @@ public class FriendRequest extends JPanel implements MouseListener{
 		yes.setBounds(420, y, 70, 20);
 		yes.setForeground(Color.WHITE);
 		yes.setBackground(new Color(51, 102, 255));
+		//a承認が押されたときのアクション
+		class toFriendRegister_yes implements ActionListener{
+			public void actionPerformed(ActionEvent e) {
+yes.setEnabled(false);
+no.setEnabled(false);
+				try {
+
+					int location = yes.getLocation().y;
+					int m = (location - 220) / 25;
+
+					otherId = requestData.get(m);
+					ArrayList<String> data = new ArrayList<String>();
+					data.add(playerId);
+					data.add(otherId);
+					OthelloClient.send("friend_add", data);
+					InputStream is = OthelloClient.socket1.getInputStream();
+					ObjectInputStream ois = new ObjectInputStream(is);
+					String message = (String) ois.readObject();
+					if(message.equals("success")) {
+						label.setText(otherId+" をフレンドに追加しました");
+
+
+					}
+
+				} catch (IOException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				}
+
+			}
+		}
 		yes.addActionListener(new toFriendRegister_yes());
+		class toFriendRegister_no implements ActionListener{
+			
+			public void actionPerformed(ActionEvent e) {
+				yes.setEnabled(false);
+				no.setEnabled(false);
+				try {
+					int location = yes.getLocation().y;
+					int m = (location - 220) / 25;
+					otherId = requestData.get(m);
+					ArrayList<String> data = new ArrayList<String>();
+					data.add(playerId);
+					data.add(otherId);
+					OthelloClient.send("friend_refuse", data);
+					InputStream is = OthelloClient.socket1.getInputStream();
+					ObjectInputStream ois = new ObjectInputStream(is);
+					String message = (String) ois.readObject();
+					if(message.equals("success")) {
+						label.setText(otherId+" からの申請を拒否しました");
+
+
+					}
+				} catch (IOException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				}
+			}
+		}
 		no = new JButton("拒否");
 		no.setFont(new Font("MS ゴシック", Font.BOLD, 15));
 		no.setBounds(510, y, 70, 20);
@@ -187,6 +251,11 @@ public class FriendRequest extends JPanel implements MouseListener{
 		this.add(no);
 
 	}
+
+
+	
+	//拒否が押されたときのアクション
+	
 
 	//承認が押されたときのアクション
 	public class toFriendRegister_yes implements ActionListener{
@@ -253,6 +322,7 @@ public class FriendRequest extends JPanel implements MouseListener{
 
 
 
+
 	public class toProfile implements ActionListener{
 		public void actionPerformed(ActionEvent e) {
 
@@ -273,6 +343,17 @@ public class FriendRequest extends JPanel implements MouseListener{
 		}else {
 
 			int n = requestData.size();
+
+
+			for(int i=0;i<n;i++) {
+				f1 = new JLabel(requestData.get(i));
+				f1.setFont(new Font("MS ゴシック", Font.BOLD, 15));
+				f1.setForeground(Color.WHITE);
+				f1.setBounds(300, 220 + (i * 25), 200, 20);
+				f1.addMouseListener(this);
+				button_approval(220 + (i * 25));
+				this.add(f1);
+
 
 			for(int i=0;i<n;i++) {
 
@@ -309,7 +390,6 @@ public class FriendRequest extends JPanel implements MouseListener{
 				f1.addMouseListener(this);
 				button_approval(220 + (i * 25));
 				this.add(f1);
-
 
 			}
 			count++;

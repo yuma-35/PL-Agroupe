@@ -17,6 +17,8 @@ public class Player implements Serializable{
 	public String answer;
 	public int status;
 	public int frflag;
+	public Match frMatch;//フレンド関連用
+
 
 	public String getId() {
 		return id;
@@ -37,4 +39,5 @@ public class Player implements Serializable{
 	public int getConceed() {
 		return conceed;
 	}
+
 }

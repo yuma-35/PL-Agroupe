@@ -99,7 +99,7 @@ class OthelloServer {
 		ArrayList<String> logInData = (ArrayList<String>) data;
 		String id = logInData.get(0);
 		String hashedPassword = logInData.get(1);
-
+		
 		OutputStream os = client.socket1.getOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(os);
 
@@ -301,7 +301,7 @@ class OthelloServer {
 
 		ArrayList<String> idData = (ArrayList<String>) data;
 		String playerId = idData.get(0);
-		String otherId = idData.get(0);
+		String otherId = idData.get(1);
 		OutputStream os = client.socket1.getOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(os);
 
@@ -335,16 +335,16 @@ class OthelloServer {
 		oos.writeObject("success");
 	}
 
-	//フレンド解除
+
+	// フレンド解除
+
 	public void delfriend(Object data, ClientThread client) throws IOException, SQLException {
 
 		ArrayList<String> request = (ArrayList<String>) data;
 		String playerId = request.get(0);
 		String otherId = request.get(1);
-		OutputStream os = client.socket1.getOutputStream();
-		ObjectOutputStream oos = new ObjectOutputStream(os);
 		db.deleteFriend(playerId, otherId);
-		oos.writeObject("success");
+		
 	}
 
 	public void getMyPlayer(Object data, ClientThread client) throws IOException, SQLException {
@@ -361,7 +361,7 @@ class OthelloServer {
 		String hostName = (String) data;
 		int i = 0;
 		do {
-			if (roomList.get(i).hostID != hostName) {
+			if (roomList.get(i).hostID == hostName) {
 				roomList.remove(i);
 			}
 			i++;
@@ -380,5 +380,70 @@ class OthelloServer {
 		ArrayList<String> endSet = (ArrayList<String>) data;
 		db.makeGameRecordDB(endSet);
 	}
+
+
+	public void getfr(Object data, ClientThread clientThread) throws IOException, SQLException {
+		ArrayList<String> names = (ArrayList<String>) data;
+		OutputStream os = clientThread.socket1.getOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(os);
+		oos.writeObject(db.getfr(names.get(0), names.get(1)));
+
+	}
+
+	public void getFriendList(Object data, ClientThread clientThread) throws SQLException, IOException {
+		// TODO 自動生成されたメソッド・スタブ
+		String name = (String) data;
+		ArrayList<Player> friendList = db.getFriendList(db.getFriendNameList(name));
+		int i = 0;
+		if (friendList.size() != 0) {
+			do {
+				if (friendList.get(i).status == 2) {
+
+					int z = 0;
+					do {
+					
+						if (matchList.get(z).playerId.equals(friendList.get(i).id)) {
+				
+							friendList.get(i).frMatch = matchList.get(z);
+						}
+						z++;
+					} while (z < roomList.size());
+
+				}
+
+				i++;
+			} while (i < friendList.size());
+		}
+		OutputStream os = clientThread.socket1.getOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(os);
+		oos.writeObject(friendList);
+	}
+
+	public int getStatus(String playerID) throws SQLException {
+		return db.getStatusDB(playerID);
+		
+	}
+
+	public void setStatus(String playerID, int i) throws SQLException {
+		db.setStatusDB(playerID,i);
+		return;
+	}
+
+	public void disconePenaltyForResult(String playerIDString) throws SQLException {
+		Player penaPlayer;
+		penaPlayer=db.getPlayer(playerIDString, playerIDString);
+		penaPlayer.conceed++;
+		penaPlayer.rankPoint=penaPlayer.rankPoint-50;
+		if(penaPlayer.rankPoint<0) {
+			penaPlayer.rankPoint=penaPlayer.rankPoint+100;
+			penaPlayer.playerRank--;
+			if(penaPlayer.playerRank<0) {
+				penaPlayer.rankPoint=0;
+				penaPlayer.playerRank=0;
+			}
+		}
+		db.updatePlayerDB(penaPlayer);
+	}
+
 
 }

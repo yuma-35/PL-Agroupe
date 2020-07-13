@@ -98,5 +98,11 @@ public class RecieveThread extends Thread {
 			Disp.disp.othello.chatBuild.append(Disp.disp.othello.enemyPlayer.id + "：" + newChat + "\n");
 			Disp.disp.othello.chatArea.setText(Disp.disp.othello.chatBuild.toString());
 		}
+		if(operation.equals("EnemyDisconected")) {
+			if (Disp.disp.othello.bw == 0) {// hostならroomを消す
+				OthelloClient.send("deleteRoom", Client.myPlayer.id);
+			}
+			Disp.disp.othello.gameEnd(4);
+		}
 	}
 }

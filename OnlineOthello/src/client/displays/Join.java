@@ -5,12 +5,19 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+
+
 import javax.swing.JTextField;
 
 import client.OthelloClient;
@@ -94,14 +101,20 @@ public class Join extends JDialog {
 		    		sendPack.add(amatch.playerId);
 		    		sendPack.add(Client.myPlayer.id);
 					OthelloClient.send("BattleEnter", sendPack);
-				} catch (IOException e1) {
-					// TODO 自動生成された catch ブロック
-					e1.printStackTrace();
-				}
-		    	dispose();
-		    	disp.ChangeDisp(disp.othello);
-		    	try {
+					InputStream is = OthelloClient.socket1.getInputStream();
+					ObjectInputStream ois = new ObjectInputStream(is);
+					int message = (int) ois.readObject();
+					if(message==0) {
+						JOptionPane.showMessageDialog(Disp.disp, "既に削除された卓です");
+						disp.mainmenu.reloadMainmenu();
+						Disp.mainmenu.repaint();
+					return;
+					}
+					
+					OthelloClient.send("setStatus",3);
 					disp.othello.startOthello(amatch.rule, 1,amatch.playerId);
+			    	disp.ChangeDisp(disp.othello);
+			    	dispose();
 				} catch (IOException e1) {
 					// TODO 自動生成された catch ブロック
 					e1.printStackTrace();
@@ -109,6 +122,8 @@ public class Join extends JDialog {
 					// TODO 自動生成された catch ブロック
 					e1.printStackTrace();
 				}
+		    	
+		    	
 		    }else {
 		    wrongJLabel.setVisible(true);
 

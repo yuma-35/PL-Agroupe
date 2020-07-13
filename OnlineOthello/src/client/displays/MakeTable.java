@@ -215,6 +215,7 @@ public class MakeTable extends JPanel {
 
 			try {
 				OthelloClient.send("makeMatch",newMatch);
+				OthelloClient.send("setStatus", 2);
 			} catch (IOException e1) {
 				// TODO 自動生成された catch ブロック
 				e1.printStackTrace();
@@ -224,7 +225,8 @@ public class MakeTable extends JPanel {
 			} else if (radio5.isSelected()) {
 				Disp.othellowait.reloadOthelloWait(1);
 			}
-
+			
+		
 			Disp.ChangeDisp(Disp.othellowait);
 		}
 

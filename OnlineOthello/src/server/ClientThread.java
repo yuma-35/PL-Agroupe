@@ -10,13 +10,14 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
 import model.Match;
 
 public class ClientThread extends Thread {
 	private OthelloServer server = OthelloServer.getInstance();
+	public String playerIDString;
 	public Socket socket1;
 	public Socket socket2;
+	public String enemyIDString;
 	public Socket enemySocket1;
 	public Socket enemySocket2;
 	public int number;
@@ -31,8 +32,36 @@ public class ClientThread extends Thread {
 			while (!socket1.isClosed()) {
 				recieve();
 			}
-		} catch (Exception e) {
+		} catch (Exception e) {// a切断時の処理
 			e.printStackTrace();
+			try {
+				if(playerIDString!=null) {
+				int st = server.getStatus(playerIDString);
+				server.setStatus(playerIDString, 0);
+				if (st == 1) {
+					
+				} else if (st == 2) {
+					server.deleteMatch(playerIDString, this);
+					server.deleteRoom(playerIDString, this);
+				} else if (st == 3) {
+					sendToEnemy("EnemyDisconected", 0);
+					server.deleteRoom(playerIDString, this);
+					ArrayList<String> pack=new ArrayList<String>();
+					pack.add(playerIDString);
+					pack.add(enemyIDString);
+					pack.add("6");
+					server.makeGameRecord(pack, this);
+					server.disconePenaltyForResult(playerIDString);
+				}
+				}
+			} catch (SQLException e1) {
+				// TODO 自動生成された catch ブロック
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO 自動生成された catch ブロック
+				e1.printStackTrace();
+			}
+			
 		}
 	}
 
@@ -68,6 +97,9 @@ public class ClientThread extends Thread {
 		}
 		if (operation.equals("logIn")) {
 			server.logIn(data, this);
+			ArrayList<String> logInData = (ArrayList<String>) data;
+			String id = logInData.get(0);
+			playerIDString = id;
 			return;
 		}
 
@@ -79,7 +111,6 @@ public class ClientThread extends Thread {
 			server.addIIcon(data, this);
 		}
 
-
 		if (operation.equals("forget")) {
 
 			server.forget(data, this);
@@ -90,20 +121,19 @@ public class ClientThread extends Thread {
 			return;
 		}
 
-
 		if (operation.equals("getProfile")) {
 
 			server.getProfile(data, this);
 		}
-		if(operation.equals("makeMatch")) {
+		if (operation.equals("makeMatch")) {
 			server.makeMatch(data, this);
 			return;
 		}
-		if(operation.equals("updatePlayer")) {
-			server.updatePlayer(data,this);
+		if (operation.equals("updatePlayer")) {
+			server.updatePlayer(data, this);
 		}
-		if(operation.equals("deleteRoom")) {
-			server.deleteRoom(data,this);
+		if (operation.equals("deleteRoom")) {
+			server.deleteRoom(data, this);
 		}
 		if (operation.equals("deleteMatch")) {
 			server.deleteMatch(data, this);
@@ -118,9 +148,12 @@ public class ClientThread extends Thread {
 			return;
 		}
 		if (operation.equals("BattleEnter")) {
-			ArrayList<String> datasetArrayList=(ArrayList<String>)data;
+			ArrayList<String> datasetArrayList = (ArrayList<String>) data;
 			String hostname = datasetArrayList.get(0);
-			String myname=datasetArrayList.get(1);
+			String myname = datasetArrayList.get(1);
+			enemyIDString=hostname;
+			OutputStream os = this.socket1.getOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(os);
 
 			for (OthelloRoom room : server.roomList) {
 
@@ -132,66 +165,84 @@ public class ClientThread extends Thread {
 					enemySocket2 = room.hostSocket2;
 					for (Match deleteMatch : server.matchList) {
 						if (deleteMatch.playerId.equals(hostname)) {
-							ArrayList<String> sendpack=new ArrayList<String>();
+							ArrayList<String> sendpack = new ArrayList<String>();
 							sendpack.add(String.valueOf(deleteMatch.rule));
 							sendpack.add(myname);
 							sendToEnemy("BattleStart", sendpack);
 							server.matchList.remove(server.matchList.indexOf(deleteMatch));
+
+							oos.writeObject(1);
 
 							return;
 						}
 					}
 				}
 			}
+			
+			oos.writeObject(0);
+			return;
 		}
 		if (operation.equals("StartSet")) {
 			String nameString = (String) data;
+			enemyIDString=nameString;
 			for (OthelloRoom room : server.roomList) {
 				if (room.hostID.equals(nameString)) {
-					enemySocket1=room.enterSocket1;
-					enemySocket2=room.enterSocket2;
+					enemySocket1 = room.enterSocket1;
+					enemySocket2 = room.enterSocket2;
 					return;
 				}
 			}
 		}
-		if(operation.equals("SendAction")) {
-			Point actionpoint=(Point)data;
-			sendToEnemy("action",actionpoint);
+		if (operation.equals("SendAction")) {
+			Point actionpoint = (Point) data;
+			sendToEnemy("action", actionpoint);
 		}
-		if(operation.equals("SendChat")) {
-			String messageString=(String)data;
-			sendToEnemy("chat",messageString);
+		if (operation.equals("SendChat")) {
+			String messageString = (String) data;
+			sendToEnemy("chat", messageString);
 		}
-		if(operation.equals("MakeGameRecord")) {
-			server.makeGameRecord(data,this);
+		if (operation.equals("MakeGameRecord")) {
+			server.makeGameRecord(data, this);
 			return;
 		}
 
-		if(operation.equals("friend_add")) {
-			server.friend_add(data,this);
+		if (operation.equals("friend_add")) {
+			server.friend_add(data, this);
 
 			return;
 		}
-		if(operation.equals("friend_refuse")) {
-			server.friend_refuse(data,this);
+		if (operation.equals("friend_refuse")) {
+			server.friend_refuse(data, this);
 
 			return;
 		}
-		if(operation.equals("getFriendrequest")) {
-			server.getFriendrequest(data,this);
+		if (operation.equals("getFriendrequest")) {
+			server.getFriendrequest(data, this);
 
 			return;
 		}
-		if(operation.equals("friendrequest")) {
-			server.friendrequest(data,this);
+		if (operation.equals("friendrequest")) {
+			server.friendrequest(data, this);
 
 			return;
 		}
-		if(operation.equals("delfriend")) {
-			server.delfriend(data,this);
-
+		if (operation.equals("delfriend")) {
+			server.delfriend(data, this);
 			return;
 		}
+		if (operation.equals("getfr")) {
+			server.getfr(data, this);
+		}
+		if (operation.equals("reloadFriendList")) {
+			server.getFriendList(data, this);
+			return;
+		}
+		if (operation.equals("setStatus")) {
+		int st=(int)data;
+			server.setStatus(playerIDString,st);
+			return;
+		}
+
 		if(operation.equals("gamerecord")) {
 			server.gamerecord(data,this);
 

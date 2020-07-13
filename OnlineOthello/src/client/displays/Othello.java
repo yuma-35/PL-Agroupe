@@ -166,6 +166,7 @@ public class Othello extends JPanel implements MouseListener {
 
 		enemyIDLabel.setBounds(80, 310, 100, 50);
 		enemyIDLabel.setFont(a);
+		enemyIDLabel.addMouseListener(this);
 		this.add(enemyIDLabel);
 
 //
@@ -538,25 +539,43 @@ public class Othello extends JPanel implements MouseListener {
 	}
 
 	public void mouseEntered(MouseEvent e) {
+		Object obj = e.getSource();
+		if(obj == enemyIDLabel) {
+			enemyIDLabel.setForeground(Color.YELLOW);
+		}
 	}
 
 	public void mouseExited(MouseEvent e) {
+		Object obj = e.getSource();
+		if(obj == enemyIDLabel) {
+			enemyIDLabel.setForeground(Color.WHITE);
+		}
 	}
 
 	public void mousePressed(MouseEvent e) {
-	}
+		Object obj = e.getSource();
+		if(obj == enemyIDLabel) {
+			enemyIDLabel.setForeground(Color.RED);
+			String otherId = enemyPlayer.id;
 
-	public void mouseReleased(MouseEvent e) {
-	}
-
-	public void mouseClicked(MouseEvent e) {
-
-		if (myTurn) {
-			int x = 1 + (int) e.getPoint().x / 50;
-			int y = 1 + (int) e.getPoint().y / 50;
 			try {
-				if (BoardInformation[x][y] == 3) {
-					action(x, y);
+				ArrayList<String> data = new ArrayList<String>();
+				data.add(Client.myPlayer.id);
+				data.add(otherId);
+				OthelloClient.send("getProfile", data);
+				InputStream is = OthelloClient.socket1.getInputStream();
+				ObjectInputStream ois = new ObjectInputStream(is);
+				String message = (String)ois.readObject();
+				if(message.equals("failed")) {
+					return;
+				}
+				if(message.equals("success")) {
+					Player player = (Player)ois.readObject();
+					displayProfile sub = new displayProfile(Disp.disp, ModalityType.MODELESS);
+					sub.reloadProfile(player.id, player.playerRank, player.win, player.lose, player.draw, player.conceed, player.comment, player.iconImage, player.frflag);
+					sub.getId(Client.myPlayer.id, player.id);
+					sub.setLocation(400, 260);
+					sub.setVisible(true);
 				}
 			} catch (IOException e1) {
 				// TODO 自動生成された catch ブロック
@@ -564,6 +583,35 @@ public class Othello extends JPanel implements MouseListener {
 			} catch (ClassNotFoundException e1) {
 				// TODO 自動生成された catch ブロック
 				e1.printStackTrace();
+			}
+		}
+
+	}
+
+	public void mouseReleased(MouseEvent e) {
+	}
+
+	public void mouseClicked(MouseEvent e) {
+
+		Object obj = e.getSource();
+		if(obj == enemyIDLabel) {
+
+		}else {
+
+			if (myTurn) {
+				int x = 1 + (int) e.getPoint().x / 50;
+				int y = 1 + (int) e.getPoint().y / 50;
+				try {
+					if (BoardInformation[x][y] == 3) {
+						action(x, y);
+					}
+				} catch (IOException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				}
 			}
 		}
 	}
