@@ -21,8 +21,6 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import client.OthelloClient;
-import model.Client;
-import model.Player;
 
 public class StartDisp extends JPanel {
 	JButton toForget;

@@ -8,8 +8,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -60,6 +62,11 @@ public class Mainmenu extends JPanel {
 	JButton toSounds = new JButton("音量調整");
 	Font a = new Font("MS ゴシック", Font.BOLD, 20);
 	Font b = new Font("MS ゴシック", Font.BOLD, 10);
+
+//
+	ImageIcon myIcon = new ImageIcon();
+	JLabel mIcon = new JLabel();
+//
 
 	Mainmenu() {
 		setSize(1000, 600);
@@ -141,6 +148,12 @@ public class Mainmenu extends JPanel {
 		toGameRecord.setForeground(Color.white);
 		toGameRecord.setFont(new Font("MS ゴシック", Font.BOLD, 14));
 
+//
+		mIcon.setBounds(800, 70, 80, 80);
+		this.add(mIcon);
+
+//
+
 		this.add(toFriendRegister);
 		this.add(toGameRecord);
 		this.add(FriendTitleLabel);
@@ -155,6 +168,15 @@ public class Mainmenu extends JPanel {
 		this.add(toAccount);
 
 	}
+
+//
+	//アイコン用
+	void icon() {
+		myIcon = new ImageIcon(Disp.changeicon.getIcon());
+		mIcon.setIcon(myIcon);
+
+	}
+//
 
 	void reloadMatch() throws IOException, ClassNotFoundException {
 		lobiPanel.removeAll();
@@ -173,6 +195,7 @@ public class Mainmenu extends JPanel {
 
 	public class toStartS implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
+			Music.se();
 			msbox = new Music(Disp.disp, ModalityType.MODELESS);
 			msbox.setLocation(440, 220);
 			// this.addLogMessage("サブダイアログのモーダル表示処理を開始");
@@ -208,6 +231,7 @@ friendScroll.add(friendlistPanel);
 		this.rankpointLabel.setText("あと" + (100 - Client.myPlayer.rankPoint) + "pt");
 		reloadFriendlist();
 		reloadMatch();
+		icon();
 	}
 
 	public void paintComponent(Graphics g) {
@@ -225,13 +249,18 @@ friendScroll.add(friendlistPanel);
 
 	public class toFriendRegisterB implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
+
 			Disp.friendregister.reloadFriendRegister(Client.myPlayer.id);
+
+			//Disp.friendregister.reloadFriendRegister("mina");
+
 			Disp.ChangeDisp(Disp.friendregister);
 		}
 	}
 
 	public class toGamerecordsB implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
+			Disp.gamerecords.reloadGamerecords();
 			Disp.ChangeDisp(Disp.gamerecords);
 		}
 	}
@@ -339,7 +368,9 @@ friendScroll.add(friendlistPanel);
 			matchbox = match;
 			enemyIDLabel.setBounds(0, 0, 200, 30);
 			enemyIDLabel.setFont(new Font("MS ゴシック", Font.BOLD, 20));
+
 			enemyIDLabel.addMouseListener(this);
+
 
 			this.add(enemyIDLabel);
 			limitLabel.setBounds(220, 35, 200, 30);

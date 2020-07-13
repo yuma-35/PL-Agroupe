@@ -17,6 +17,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
@@ -36,6 +37,11 @@ public class ChangeBoard extends JPanel {
 	JRadioButton radio3;
 	JRadioButton radio4;
 	JRadioButton radio5;
+	JRadioButton radio6;
+	JRadioButton radio7;
+	JRadioButton radio8;
+	JRadioButton radio9;
+	JRadioButton radio0;
 
 	//ボタン
 	JButton toSounds = new JButton("音量調整");
@@ -66,8 +72,13 @@ public class ChangeBoard extends JPanel {
 		//ボタン
 		ButtonTest();
 
-		for (int i = 0; i < files.length; i++) {
+		//画像
+		for (int i = 0; i < 5; i++) {
 			ImageTest(files[i].getPath());
+		}
+		j = 0;
+		for (int j = 5; j < files.length; j++) {
+			ImageTest2(files[j].getPath());
 		}
 
 		p.setBackground(Color.LIGHT_GRAY);
@@ -99,33 +110,63 @@ public class ChangeBoard extends JPanel {
 		radio2 = new JRadioButton("", false);
 		radio3 = new JRadioButton("", false);
 		radio4 = new JRadioButton("", false);
+		radio5 = new JRadioButton("", false);
+		radio6 = new JRadioButton("", false);
+		radio7 = new JRadioButton("", false);
+		radio8 = new JRadioButton("", false);
+		radio9 = new JRadioButton("", false);
+		radio0 = new JRadioButton("", false);
 		radio1.setBackground(Color.LIGHT_GRAY);
 		radio2.setBackground(Color.LIGHT_GRAY);
 		radio3.setBackground(Color.LIGHT_GRAY);
 		radio4.setBackground(Color.LIGHT_GRAY);
+		radio5.setBackground(Color.LIGHT_GRAY);
+		radio6.setBackground(Color.LIGHT_GRAY);
+		radio7.setBackground(Color.LIGHT_GRAY);
+		radio8.setBackground(Color.LIGHT_GRAY);
+		radio9.setBackground(Color.LIGHT_GRAY);
+		radio0.setBackground(Color.LIGHT_GRAY);
 		ButtonGroup group = new ButtonGroup();
 		group.add(radio1);
 		group.add(radio2);
 		group.add(radio3);
 		group.add(radio4);
+		group.add(radio5);
+		group.add(radio6);
+		group.add(radio7);
+		group.add(radio8);
+		group.add(radio9);
+		group.add(radio0);
 		radio1.setBounds(220, 230, 100, 25);
 		radio2.setBounds(350, 230, 100, 25);
 		radio3.setBounds(480, 230, 100, 25);
 		radio4.setBounds(610, 230, 100, 25);
+		radio5.setBounds(740, 230, 100, 25);
+		radio6.setBounds(220, 350, 100, 25);
+		radio7.setBounds(350, 350, 100, 25);
+		radio8.setBounds(480, 350, 100, 25);
+		radio9.setBounds(610, 350, 100, 25);
+		radio0.setBounds(740, 350, 100, 25);
 		this.add(radio1);
 		this.add(radio2);
 		this.add(radio3);
 		this.add(radio4);
+		this.add(radio5);
+		this.add(radio6);
+		this.add(radio7);
+		this.add(radio8);
+		this.add(radio9);
+		this.add(radio0);
 
 		//オリジナル
-		if (files.length == 5) {
-			radio5 = new JRadioButton("", false);
-			radio5.setBackground(Color.LIGHT_GRAY);
-			group.add(radio5);
+		/*	if (files.length == 5) {
+				radio5 = new JRadioButton("", false);
+				radio5.setBackground(Color.LIGHT_GRAY);
+				group.add(radio5);
 
-			radio5.setBounds(740, 230, 100, 25);
-			this.add(radio5);
-		}
+				radio5.setBounds(740, 230, 100, 25);
+				this.add(radio5);
+			}*/
 	}
 
 	//画像
@@ -133,7 +174,7 @@ public class ChangeBoard extends JPanel {
 		ImageIcon icon = new ImageIcon(str);
 
 		//getScaledInstanceで大きさを変更
-		Image smallImg = icon.getImage().getScaledInstance((int) (icon.getIconWidth() * 0.07), -1,
+		Image smallImg = icon.getImage().getScaledInstance((int) (icon.getIconWidth() * 0.11), -1,
 				Image.SCALE_SMOOTH);
 		ImageIcon smallIcon = new ImageIcon(smallImg);
 
@@ -141,6 +182,22 @@ public class ChangeBoard extends JPanel {
 		JLabel l = new JLabel(smallIcon);
 
 		l.setBounds(10 + j, 50, 100, 100);
+		p.add(l);
+		j = j + 130;
+	}
+
+	public void ImageTest2(String str) {
+		ImageIcon icon = new ImageIcon(str);
+
+		//getScaledInstanceで大きさを変更
+		Image smallImg = icon.getImage().getScaledInstance((int) (icon.getIconWidth() * 0.11), -1,
+				Image.SCALE_SMOOTH);
+		ImageIcon smallIcon = new ImageIcon(smallImg);
+
+		//JLabelにアイコンを設定
+		JLabel l = new JLabel(smallIcon);
+
+		l.setBounds(10 + j, 170, 100, 100);
 		p.add(l);
 		j = j + 130;
 	}
@@ -162,6 +219,11 @@ public class ChangeBoard extends JPanel {
 			boolean status3 = radio3.isSelected();
 			boolean status4 = radio4.isSelected();
 			boolean status5 = radio5.isSelected();
+			boolean status6 = radio6.isSelected();
+			boolean status7 = radio7.isSelected();
+			boolean status8 = radio8.isSelected();
+			boolean status9 = radio9.isSelected();
+			boolean status0 = radio0.isSelected();
 
 			//ファイルのパス名
 			String str = null;
@@ -176,6 +238,16 @@ public class ChangeBoard extends JPanel {
 				str = files[3].getPath();
 			} else if (status5 == true) {
 				str = files[4].getPath();
+			} else if (status6 == true) {
+				str = files[5].getPath();
+			} else if (status7 == true) {
+				str = files[6].getPath();
+			} else if (status8 == true) {
+				str = files[7].getPath();
+			} else if (status9 == true) {
+				str = files[8].getPath();
+			} else if (status0 == true) {
+				str = files[9].getPath();
 			}
 
 			//ファイルに書き込む
@@ -188,6 +260,7 @@ public class ChangeBoard extends JPanel {
 				Disp.ChangeDisp(Disp.account);
 			} catch (IOException e1) {
 				System.out.println(e1);
+				JOptionPane.showMessageDialog(Disp.disp, "エラーが発生しました");
 			}
 		}
 	}
@@ -208,6 +281,7 @@ public class ChangeBoard extends JPanel {
 
 		} catch (IOException e1) {
 			System.out.println(e1);
+			JOptionPane.showMessageDialog(Disp.disp, "エラーが発生しました");
 		}
 		return str2;
 

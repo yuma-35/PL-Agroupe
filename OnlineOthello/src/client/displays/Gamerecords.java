@@ -8,16 +8,25 @@ import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import client.OthelloClient;
 import model.Client;
+import model.GameRecordToPlayer;
 
 public class Gamerecords extends JPanel {
+	//受け取り用
+	ArrayList<GameRecordToPlayer> data = new ArrayList<GameRecordToPlayer>();
+
 	//ボタン
 	JButton toSounds = new JButton("音量調整");
 	JButton toMain = new JButton("戻る");
@@ -126,15 +135,19 @@ public class Gamerecords extends JPanel {
 
 	//記録数取得
 	private void getRecordsNum() {
-		recordsnum.setText("n" + "/100");//nを書き換える
+		if (data == null) {
+			recordsnum.setText(0 + "/100");
+		} else {
+			recordsnum.setText(data.size() + "/100");
+		}
 	}
 
 	//全体記録数
 	private void getTotalNum() {
 		// TODO 自動生成されたメソッド・スタブ
-		totalnum.setText(Client.myPlayer.win + "勝  " + Client.myPlayer.lose + "敗  "
-				+ Client.myPlayer.draw + "引き分け  "
-				+ Client.myPlayer.conceed + "投了");
+		totalnum.setText(Client.myPlayer.getWin() + "勝  " + Client.myPlayer.getLose() + "敗  "
+				+ Client.myPlayer.getDraw() + "引き分け  "
+				+ Client.myPlayer.getConceed() + "投了");
 
 	}
 
@@ -142,13 +155,65 @@ public class Gamerecords extends JPanel {
 	private void getText() {
 		//クリア
 		textarea.setText("");
-		for (int i = 1; i <= 100; i++) {
-			textarea.append(i + "\n");//対戦記録を取得する
+		if (data != null) {
+			for (int i = 1; i <= 100; i++) {
+				if (i <= data.size()) {
+					textarea.append(i + "   " + data.get(i - 1).getOpponentId() + "  "
+							+ data.get(i - 1).getWin() + "勝  "
+							+ data.get(i - 1).getLose() + "敗  "
+							+ data.get(i - 1).getDraw() + "引き分け  "
+							+ data.get(i - 1).getConceed() + "投了" + "\n");//対戦記録を取得する
+				} else {
+					;
+				}
+			}
+		} else {
+			textarea.setText("                              対局記録がありません");
+		}
+	}
+
+	//myPlayer記録の書き換え
+	void setPlayerrecord() {
+		//reset
+		Client.myPlayer.win = 0;
+		Client.myPlayer.lose = 0;
+		Client.myPlayer.draw = 0;
+		Client.myPlayer.conceed = 0;
+
+		if (data != null) {
+			for (int i = 0; i < data.size(); i++) {
+				Client.myPlayer.win += data.get(i).getWin();
+				Client.myPlayer.lose += data.get(i).getLose();
+				Client.myPlayer.draw += data.get(i).getDraw();
+				Client.myPlayer.conceed += data.get(i).getConceed();
+			}
 		}
 	}
 
 	//再読み込み
 	void reloadGamerecords() {
+		try {
+			//サーバへデータ送信
+			//Client.myPlayer.id = "peach"; //実験用
+			OthelloClient.send("gamerecord", Client.myPlayer.id);
+
+			//受け取り
+			InputStream is = OthelloClient.socket1.getInputStream();
+			ObjectInputStream ois = new ObjectInputStream(is);
+			String message = (String) ois.readObject();
+			if (message.equals("failed")) {
+				JOptionPane.showMessageDialog(Disp.disp, "エラーが発生しました");
+				return;
+			}
+			if (message.equals("success")) {
+				data = (ArrayList<GameRecordToPlayer>) ois.readObject();
+			}
+		} catch (IOException | ClassNotFoundException e1) {
+			// TODO 自動生成された catch ブロック
+			e1.printStackTrace();
+		}
+
+		setPlayerrecord();
 		getRecordsNum();
 		getTotalNum();
 		getText();

@@ -10,9 +10,6 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
-import com.mysql.cj.xdevapi.DbDoc;
-
 import model.Match;
 
 public class ClientThread extends Thread {
@@ -157,6 +154,7 @@ public class ClientThread extends Thread {
 			enemyIDString=hostname;
 			OutputStream os = this.socket1.getOutputStream();
 			ObjectOutputStream oos = new ObjectOutputStream(os);
+
 			for (OthelloRoom room : server.roomList) {
 
 				if (room.hostID.equals(hostname)) {
@@ -172,7 +170,9 @@ public class ClientThread extends Thread {
 							sendpack.add(myname);
 							sendToEnemy("BattleStart", sendpack);
 							server.matchList.remove(server.matchList.indexOf(deleteMatch));
+
 							oos.writeObject(1);
+
 							return;
 						}
 					}
@@ -242,5 +242,17 @@ public class ClientThread extends Thread {
 			server.setStatus(playerIDString,st);
 			return;
 		}
+
+		if(operation.equals("gamerecord")) {
+			server.gamerecord(data,this);
+
+			return;
+		}
+		if(operation.equals("geticon")) {
+			server.geticon(data,this);
+
+			return;
+		}
+
 	}
 }

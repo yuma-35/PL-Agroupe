@@ -13,12 +13,16 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
+
+
 import javax.swing.JTextField;
 
 import client.OthelloClient;
-import model.*;
+import model.Client;
+import model.Match;
 
 public class Join extends JDialog {
 	//メインフレーム
@@ -43,7 +47,7 @@ public class Join extends JDialog {
 
 		//モーダル表示
 		Join(Disp disp, ModalityType mt,Match match){
-			
+
 			super(disp,mt);
 			this.disp = disp;
             amatch=match;
@@ -122,7 +126,7 @@ public class Join extends JDialog {
 		    	
 		    }else {
 		    wrongJLabel.setVisible(true);
-		    	
+
 		    }
 
 

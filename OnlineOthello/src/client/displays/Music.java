@@ -32,8 +32,8 @@ public class Music extends JDialog {
 	Disp disp;
 
 	//変更を保存するファイル
-	static File fB = new File("save-data/BGM.txt");
-	static File fS = new File("save-data/SE.txt");
+	static File fB = new File("Save-data/BGM.txt");
+	static File fS = new File("Save-data/SE.txt");
 
 	//ボタン
 	JButton toMain = new JButton("戻る");
@@ -46,12 +46,17 @@ public class Music extends JDialog {
 	JLabel name3 = new JLabel("SE");
 
 	//JSlider
-	static JSlider sliderB = new JSlider(-80, 6, (int) getVol(fB));
-	static JSlider sliderS = new JSlider(-80, 6, (int) getVol(fS));
+	//	static JSlider sliderB = new JSlider(-80, 6, (int) getVol(fB));
+	//	static JSlider sliderS = new JSlider(-80, 6, (int) getVol(fS));
+
+	static JSlider sliderB = new JSlider(0, 100, (int) getVol(fB));
+	static JSlider sliderS = new JSlider(0, 100, (int) getVol(fS));
 
 	//音量
 	static FloatControl ctrl;
 	static FloatControl ctrl2;
+
+
 
 	Music(Disp disp, ModalityType mt) {
 		super(disp, mt);
@@ -65,7 +70,7 @@ public class Music extends JDialog {
 		this.setLayout(null);
 		this.setResizable(false);
 
-		//a戻るボタン
+		//戻るボタン
 		toMain.setFont(new Font("MS ゴシック", Font.BOLD, 10));
 		toMain.setForeground(Color.WHITE);
 		toMain.setBackground(color);
@@ -102,19 +107,21 @@ public class Music extends JDialog {
 	//slider
 	public class changeB implements ChangeListener {
 		public void stateChanged(ChangeEvent e) {
-			ctrl.setValue((float) sliderB.getValue());
-			//System.out.println("B:" + (float)sliderB.getValue());
+			//			ctrl.setValue((float) sliderB.getValue());
+			ctrl.setValue((float) Math.log10((float) sliderB.getValue() / 100) * 20);
 
 		}
 	}
 
 	public class changeS implements ChangeListener {
 		public void stateChanged(ChangeEvent e) {
-			ctrl2.setValue((float) sliderS.getValue());
-			// System.out.println("S:" + (float)sliderS.getValue());
+
+			//			ctrl2.setValue((float) sliderS.getValue());
+			ctrl2.setValue((float) Math.log10((float) sliderS.getValue() / 100) * 20);
 
 		}
 	}
+
 
 	//戻るボタン
 	public class toStartM implements ActionListener {
@@ -144,70 +151,71 @@ public class Music extends JDialog {
 	public static void bgm() {
 		AudioInputStream ais = null;
 		try {
-			ais = AudioSystem.getAudioInputStream(new File("BGM,SE/Alarm01.wav"));
+			ais = AudioSystem.getAudioInputStream(new File("BGM,SE/15.wav"));
 			AudioFormat af = ais.getFormat();
 			DataLine.Info info = new DataLine.Info(Clip.class, af);
 			Clip clip = (Clip) AudioSystem.getLine(info);
 
 			clip.open(ais);
 
-			clip.loop(Clip.LOOP_CONTINUOUSLY);//ループ
-			clip.flush();
+
+			//			clip.loop(Clip.LOOP_CONTINUOUSLY);//ループ
+			//			clip.flush();
 
 			//音量
 			ctrl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
 			//音量取得
-			ctrl.setValue(getVol(fB));
+			//ctrl.setValue(getVol(fB));
+			ctrl.setValue((float) Math.log10((float) getVol(fB) / 100) * 20);
+
+
+			clip.loop(Clip.LOOP_CONTINUOUSLY);//ループ
+			clip.flush();
 
 			while (clip.isActive()) {
 				Thread.sleep(100);
 			}
 
-			clip.close();
 		} catch (UnsupportedAudioFileException | IOException | LineUnavailableException | InterruptedException e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				ais.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+
 		}
 	}
 
-	//SEを鳴らす
+	//SE読み込み
 	public static void se() {
-		AudioInputStream ais = null;
+		AudioInputStream ais2 = null;
 		try {
-			ais = AudioSystem.getAudioInputStream(new File("BGM,SE\\Windows Ding.wav"));
-			AudioFormat af = ais.getFormat();
-			DataLine.Info info = new DataLine.Info(Clip.class, af);
-			Clip clip2 = (Clip) AudioSystem.getLine(info);
+			ais2 = AudioSystem.getAudioInputStream(new File("BGM,SE/cursor1_choice.wav"));
+			AudioFormat af2 = ais2.getFormat();
+			DataLine.Info info2 = new DataLine.Info(Clip.class, af2);
+			Clip clip2 = (Clip) AudioSystem.getLine(info2);
 
-			clip2.open(ais);
 
-			clip2.loop(0);//1回
+			clip2.open(ais2);
+			//			clip2.loop(0);//1回
+			//			clip2.flush();
 
-			clip2.flush();
 
 			//音量
 			ctrl2 = (FloatControl) clip2.getControl(FloatControl.Type.MASTER_GAIN);
 			//音量取得
-			ctrl2.setValue(getVol(fS));
+			ctrl2.setValue((float) Math.log10((float) getVol(fS) / 100) * 20);
+			//			ctrl2.setValue(getVol(fS));
+
+			clip2.loop(0);//1回
+			clip2.flush();
 
 			while (clip2.isActive()) {
 				Thread.sleep(100);
 			}
 
-			clip2.close();
-		} catch (UnsupportedAudioFileException | IOException | LineUnavailableException | InterruptedException e) {
+		} catch (UnsupportedAudioFileException | IOException
+				| LineUnavailableException | InterruptedException e) {
 			e.printStackTrace();
 		} finally {
-			try {
-				ais.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+
 		}
 	}
 

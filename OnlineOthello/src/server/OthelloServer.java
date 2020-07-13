@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 
 import database.DatabaseManager;
+import model.GameRecordToPlayer;
 import model.Match;
 import model.Player;
 import model.SendIcon;
@@ -159,6 +160,40 @@ class OthelloServer {
 		}
 	}
 
+	//対局記録取得
+	public void gamerecord(Object data, ClientThread client) {
+		String playerId = (String) data;
+
+		OutputStream os;
+		try {
+			os = client.socket1.getOutputStream();
+
+			ObjectOutputStream oos = new ObjectOutputStream(os);
+			ArrayList grtp = new ArrayList<GameRecordToPlayer>();
+			grtp = db.getGameRecords(playerId);
+
+			oos.writeObject("success");
+			oos.writeObject(grtp);
+		} catch (IOException | SQLException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+
+	}
+
+	//アイコン取得
+	public void geticon(Object data, ClientThread client) throws IOException, SQLException {
+		String Id = (String) data;
+		OutputStream os = client.socket1.getOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(os);
+
+		//送信用
+		SendIcon iconData ;
+
+		iconData = db.sendIcon(Id);
+		oos.writeObject(iconData);
+	}
+
 	public void forget(Object i, ClientThread client) throws IOException, SQLException {
 		String id = (String) i;
 		OutputStream os = client.socket1.getOutputStream();
@@ -300,7 +335,9 @@ class OthelloServer {
 		oos.writeObject("success");
 	}
 
+
 	// フレンド解除
+
 	public void delfriend(Object data, ClientThread client) throws IOException, SQLException {
 
 		ArrayList<String> request = (ArrayList<String>) data;
@@ -343,6 +380,7 @@ class OthelloServer {
 		ArrayList<String> endSet = (ArrayList<String>) data;
 		db.makeGameRecordDB(endSet);
 	}
+
 
 	public void getfr(Object data, ClientThread clientThread) throws IOException, SQLException {
 		ArrayList<String> names = (ArrayList<String>) data;
@@ -406,5 +444,6 @@ class OthelloServer {
 		}
 		db.updatePlayerDB(penaPlayer);
 	}
+
 
 }
