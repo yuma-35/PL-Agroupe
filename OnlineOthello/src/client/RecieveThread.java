@@ -163,6 +163,23 @@ public class RecieveThread extends Thread {
 			this.setSize(500, 300);
 			request = name;
 			rulebox=rule;
+			JLabel enemyJLabel=new JLabel();
+			JLabel ruleJLabel=new JLabel();
+			enemyJLabel.setText(request);
+			enemyJLabel.setBounds(150, 100, 200, 50);
+			enemyJLabel.setHorizontalAlignment(JLabel.CENTER);
+			enemyJLabel.setFont(new Font("MS ゴシック",Font.BOLD,20));
+			
+			this.add(enemyJLabel);
+			if(rule==0) {
+			ruleJLabel.setText("通常戦");
+			}else {
+				ruleJLabel.setText("アイテム戦");
+			}
+			ruleJLabel.setBounds(150, 170,200,50 );
+			ruleJLabel.setFont(new Font("MS ゴシック",Font.BOLD,20));
+			ruleJLabel.setHorizontalAlignment(JLabel.CENTER);
+			this.add(ruleJLabel);
 			JLabel label = new JLabel("フレンドから対戦申し込みが届きました");
 			label.setFont(new Font("MS ゴシック", Font.BOLD, 15));
 			label.setForeground(Color.BLACK);

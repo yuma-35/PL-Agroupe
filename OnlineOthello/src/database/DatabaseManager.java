@@ -503,7 +503,6 @@ public class DatabaseManager {
 		// TODO 自動生成されたメソッド・スタブ
 		String sql = "update players SET status = ? where id = ?";
 		PreparedStatement pstmt = connection.prepareStatement(sql);
-		System.out.println(playerID+" feakokoko "+i);
 		pstmt.setInt(1, i);
 		pstmt.setString(2, playerID);
 		pstmt.executeUpdate();
