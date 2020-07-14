@@ -254,6 +254,28 @@ public class ClientThread extends Thread {
 
 			return;
 		}
+		if(operation.equals("ApplyBattle")) {
+			
+			if(server.applyBattleSet(data,this)){
+			ArrayList<String> recievedata=(ArrayList<String>)data;
+			ArrayList<String> pack=new ArrayList<String>();
+			pack.add(playerIDString);
+			pack.add(recievedata.get(1));
+			sendToEnemy("ReceiveBattleApply",pack);
+			}
+		return;
+		}
+		if(operation.equals("RefuseRequest")) {
+			server.getEnemyThread(data,this);
+			sendToEnemy("RefuseBattleApply", 0);
+			return;
+		}
+		if(operation.equals("OKRequest")) {
+			server.getEnemyThread(data,this);
+			String nameString=(String)data;
+			sendToEnemy("OKBattleApply", nameString);
+			return;
+		}
 
 	}
 }

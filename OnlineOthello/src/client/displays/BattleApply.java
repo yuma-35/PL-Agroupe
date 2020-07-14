@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -22,7 +23,7 @@ public class BattleApply extends JPanel {
 	JLabel waitLabel = new JLabel("対戦相手を待っています");
 	int waitLabelcount = 0;
 	JLabel taiki = new JLabel("対戦申込画面");
-
+public int rule;
 	Font a = new Font("MS ゴシック", Font.BOLD, 24);
 
 	public BattleApply() {
@@ -55,6 +56,7 @@ public class BattleApply extends JPanel {
 
 	public void reloadBattleApply(int item) {
 		//	enemyID.setText(Client.myPlayer.id);
+		rule=item;
 		timer = new Timer();
 		timer.schedule(new TimerTask() {
 			public void run() {
@@ -91,6 +93,12 @@ public class BattleApply extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 			timer.cancel();
 			timer = null;
+			try {
+				Disp.mainmenu.reloadMainmenu();
+			} catch (ClassNotFoundException | IOException e1) {
+				// TODO 自動生成された catch ブロック
+				e1.printStackTrace();
+			}
 			Disp.ChangeDisp(Disp.mainmenu);
 		}
 	}

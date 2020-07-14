@@ -1,18 +1,37 @@
 package client;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.awt.Dialog.ModalityType;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
+import client.RecieveThread.FriendBattleRequestDialog;
+import client.displays.BattleApply;
+
 //import com.sun.org.glassfish.external.probe.provider.PluginPoint;
 
 import client.displays.Disp;
+import client.displays.BattleRequest.toRelease;
+import client.displays.Mainmenu.FriendBattleRequest;
 import model.Client;
 
 public class RecieveThread extends Thread {
+	public FriendBattleRequestDialog fbrdBox;
+
 	public RecieveThread() {
 	}
 
@@ -70,11 +89,10 @@ public class RecieveThread extends Thread {
 						OthelloClient.send("deleteRoom", Client.myPlayer.id);
 					}
 					Disp.disp.othello.gameEnd(Disp.disp.othello.countEnd());
-				return;
+					return;
 				}
 				Disp.disp.othello.passEndListenner = true;
-				}
-			 else if (actionPoint.x == 10) {
+			} else if (actionPoint.x == 10) {
 				Disp.disp.othello.gameEnd(2);
 				return;
 			}
@@ -99,13 +117,142 @@ public class RecieveThread extends Thread {
 			Disp.disp.othello.chatBuild.append(Disp.disp.othello.enemyPlayer.id + "：" + newChat + "\n");
 			Disp.disp.othello.chatArea.setText(Disp.disp.othello.chatBuild.toString());
 		}
-		if(operation.equals("EnemyDisconected")) {
+		if (operation.equals("EnemyDisconected")) {
 			System.out.println("終わった");
 			if (Disp.disp.othello.bw == 0) {// hostならroomを消す
 				OthelloClient.send("deleteRoom", Client.myPlayer.id);
 			}
 			Disp.disp.othello.gameEnd(4);
-			
+
+		}
+		if (operation.equals("ReceiveBattleApply")) {
+			ArrayList<String> receivePack = (ArrayList<String>) data;
+			String nameString = receivePack.get(0);
+			int rule = Integer.parseInt(receivePack.get(1));
+			fbrdBox = new FriendBattleRequestDialog(Disp.disp, ModalityType.APPLICATION_MODAL, nameString, rule);
+			fbrdBox.setLocation(440, 220);
+			fbrdBox.setVisible(true);
+		}
+		if (operation.equals("OKBattleApply")) {
+			if (Disp.disp.nowPanel == Disp.disp.battleApply) {
+				String enemyID = (String) data;
+				Disp.othello.startOthello(Disp.disp.battleApply.rule, 0, enemyID);
+				Disp.disp.ChangeDisp(Disp.othello);
+			} else {
+				// aもうとりさげたよ
+
+			}
+
+		}
+		if (operation.equals("RefuseBattleApply")) {
+			JOptionPane.showMessageDialog(Disp.disp, "対戦申込が拒否されました");
+			Disp.disp.mainmenu.reloadMainmenu();
+			Disp.disp.ChangeDisp(Disp.disp.mainmenu);
+		}
+	}
+
+	public class FriendBattleRequestDialog extends JDialog {
+		Disp disp;
+		String request;
+		int rulebox;
+
+		public FriendBattleRequestDialog(Disp disp, ModalityType mt, String name, int rule) {
+			super(disp, mt);
+			this.disp = disp;
+			this.setLayout(null);
+			this.setSize(500, 300);
+			request = name;
+			rulebox=rule;
+			JLabel label = new JLabel("フレンドから対戦申し込みが届きました");
+			label.setFont(new Font("MS ゴシック", Font.BOLD, 15));
+			label.setForeground(Color.BLACK);
+			label.setHorizontalAlignment(JLabel.CENTER);
+			label.setBounds(100, 50, 300, 20);
+			this.add(label);
+
+			JButton no = new JButton("拒否");
+			no.setFont(new Font("MS ゴシック", Font.BOLD, 10));
+			no.setBounds(270, 200, 60, 30);
+			no.setForeground(Color.WHITE);
+			no.setBackground(new Color(51, 102, 255));
+			no.addActionListener(new toRelease());
+			this.add(no);
+
+			JButton yes = new JButton("承認");
+			yes.setFont(new Font("MS ゴシック", Font.BOLD, 10));
+			yes.setBounds(170, 200, 60, 30);
+			yes.setForeground(Color.WHITE);
+			yes.setBackground(new Color(51, 102, 255));
+			yes.addActionListener(new OK());
+			this.add(yes);
+			this.addWindowListener(new WinListener());
+		}
+
+		class WinListener implements WindowListener {
+
+			public void windowOpened(WindowEvent e) {
+				/* 処理したい内容をここに記述する */
+			}
+
+			public void windowClosing(WindowEvent e) {
+				// for (int i = 0; i < request.length; i++) {
+				try {
+					OthelloClient.send("RefuseRequest", request);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+			// }
+
+			public void windowClosed(WindowEvent e) {
+				/* 処理したい内容をここに記述する */
+			}
+
+			public void windowIconified(WindowEvent e) {
+				/* 処理したい内容をここに記述する */
+			}
+
+			public void windowDeiconified(WindowEvent e) {
+				/* 処理したい内容をここに記述する */
+			}
+
+			public void windowActivated(WindowEvent e) {
+				/* 処理したい内容をここに記述する */
+			}
+
+			public void windowDeactivated(WindowEvent e) {
+				/* 処理したい内容をここに記述する */
+			}
+		}
+
+		public class toRelease implements ActionListener {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					OthelloClient.send("RefuseRequest", request);
+				} catch (IOException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				}
+				dispose();
+			}
+		}
+
+		public class OK implements ActionListener {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					OthelloClient.send("OKRequest", request);
+					Disp.ChangeDisp(disp.othello);
+					OthelloClient.send("setStatus", 3);
+					disp.othello.startOthello(rulebox, 1,request);
+				} catch (IOException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				}
+				dispose();
+			}
 		}
 	}
 }

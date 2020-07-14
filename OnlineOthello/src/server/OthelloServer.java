@@ -99,7 +99,7 @@ class OthelloServer {
 		ArrayList<String> logInData = (ArrayList<String>) data;
 		String id = logInData.get(0);
 		String hashedPassword = logInData.get(1);
-		
+
 		OutputStream os = client.socket1.getOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(os);
 
@@ -160,7 +160,7 @@ class OthelloServer {
 		}
 	}
 
-	//対局記録取得
+	// 対局記録取得
 	public void gamerecord(Object data, ClientThread client) {
 		String playerId = (String) data;
 
@@ -181,14 +181,14 @@ class OthelloServer {
 
 	}
 
-	//アイコン取得
+	// アイコン取得
 	public void geticon(Object data, ClientThread client) throws IOException, SQLException {
 		String Id = (String) data;
 		OutputStream os = client.socket1.getOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(os);
 
-		//送信用
-		SendIcon iconData ;
+		// 送信用
+		SendIcon iconData;
 
 		iconData = db.sendIcon(Id);
 		oos.writeObject(iconData);
@@ -246,26 +246,26 @@ class OthelloServer {
 	public void deleteMatch(Object data, ClientThread client) throws IOException, SQLException {
 		String deleteID = (String) data;
 		int i = 0;
-		if(matchList.size()!=0) {
-		do {
-			if (roomList.get(i).hostID != deleteID) {
-				roomList.remove(i);
-			}
-			i++;
+		if (matchList.size() != 0) {
+			do {
+				if (roomList.get(i).hostID != deleteID) {
+					roomList.remove(i);
+				}
+				i++;
 
-		} while (i < roomList.size());
+			} while (i < roomList.size());
 		}
 		i = 0;
-if(matchList.size()!=0) {
-		do {
-			if (matchList.get(i).playerId != deleteID) {
-				matchList.remove(i);
-			}
-			i++;
-		} while (i < matchList.size());
-		return;
+		if (matchList.size() != 0) {
+			do {
+				if (matchList.get(i).playerId != deleteID) {
+					matchList.remove(i);
+				}
+				i++;
+			} while (i < matchList.size());
+			return;
 
-	}
+		}
 	}
 
 	// db.deleteMatch(deleteID);
@@ -337,7 +337,6 @@ if(matchList.size()!=0) {
 		oos.writeObject("success");
 	}
 
-
 	// フレンド解除
 
 	public void delfriend(Object data, ClientThread client) throws IOException, SQLException {
@@ -346,7 +345,7 @@ if(matchList.size()!=0) {
 		String playerId = request.get(0);
 		String otherId = request.get(1);
 		db.deleteFriend(playerId, otherId);
-		
+
 	}
 
 	public void getMyPlayer(Object data, ClientThread client) throws IOException, SQLException {
@@ -362,13 +361,13 @@ if(matchList.size()!=0) {
 		// TODO 自動生成されたメソッド・スタブ
 		String hostName = (String) data;
 		int i = 0;
-		if(roomList.size()!=0) {
-		do {
-			if (roomList.get(i).hostID == hostName) {
-				roomList.remove(i);
-			}
-			i++;
-		} while (i < roomList.size());
+		if (roomList.size() != 0) {
+			do {
+				if (roomList.get(i).hostID == hostName) {
+					roomList.remove(i);
+				}
+				i++;
+			} while (i < roomList.size());
 		}
 	}
 
@@ -384,7 +383,6 @@ if(matchList.size()!=0) {
 		db.makeGameRecordDB(endSet);
 	}
 
-
 	public void getfr(Object data, ClientThread clientThread) throws IOException, SQLException {
 		ArrayList<String> names = (ArrayList<String>) data;
 		OutputStream os = clientThread.socket1.getOutputStream();
@@ -398,22 +396,21 @@ if(matchList.size()!=0) {
 		String name = (String) data;
 		ArrayList<Player> friendList = db.getFriendList(db.getFriendNameList(name));
 		int i = 0;
-		if (friendList.size() != 0&&matchList.size()!=0) {
+		if (friendList.size() != 0 && matchList.size() != 0) {
 			do {
 				if (friendList.get(i).status == 2) {
 
 					int z = 0;
-					
+
 					do {
-					
+
 						if (matchList.get(z).playerId.equals(friendList.get(i).id)) {
-				
+
 							friendList.get(i).frMatch = matchList.get(z);
 						}
 						z++;
 					} while (z < matchList.size());
 
-				
 				}
 				i++;
 			} while (i < friendList.size());
@@ -425,30 +422,75 @@ if(matchList.size()!=0) {
 
 	public int getStatus(String playerID) throws SQLException {
 		return db.getStatusDB(playerID);
-		
+
 	}
 
 	public void setStatus(String playerID, int i) throws SQLException {
-		System.out.println(playerID+" okoko "+i);
-		db.setStatusDB(playerID,i);
+	
+		db.setStatusDB(playerID, i);
 		return;
 	}
 
 	public void disconePenaltyForResult(String playerIDString) throws SQLException {
 		Player penaPlayer;
-		penaPlayer=db.getPlayer(playerIDString, playerIDString);
+		penaPlayer = db.getPlayer(playerIDString, playerIDString);
 		penaPlayer.conceed++;
-		penaPlayer.rankPoint=penaPlayer.rankPoint-50;
-		if(penaPlayer.rankPoint<0) {
-			penaPlayer.rankPoint=penaPlayer.rankPoint+100;
+		penaPlayer.rankPoint = penaPlayer.rankPoint - 50;
+		if (penaPlayer.rankPoint < 0) {
+			penaPlayer.rankPoint = penaPlayer.rankPoint + 100;
 			penaPlayer.playerRank--;
-			if(penaPlayer.playerRank<0) {
-				penaPlayer.rankPoint=0;
-				penaPlayer.playerRank=0;
+			if (penaPlayer.playerRank < 0) {
+				penaPlayer.rankPoint = 0;
+				penaPlayer.playerRank = 0;
 			}
 		}
 		db.updatePlayerDB(penaPlayer);
 	}
 
+	public boolean applyBattleSet(Object data, ClientThread clientThread) throws SQLException, IOException {
+		// TODO 自動生成されたメソッド・スタブ
+		ArrayList<String> pack = (ArrayList<String>) data;
+		String enemyid=pack.get(0);
+		
+		int i = 0;
+		int st;
+		st=db.getStatusDB(enemyid);
+		OutputStream os = clientThread.socket1.getOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(os);
+		
+		if (clientList.size() != 0&&st!=3&&st!=2&&st!=0) {
+			do {
+				if (clientList.get(i).playerIDString.equals(enemyid)) {
+					clientThread.enemySocket1 = clientList.get(i).socket1;
+					clientThread.enemySocket2 = clientList.get(i).socket2;
+					oos.writeObject(0);
+					return true;
+				}
+				i++;
+			} while (i < clientList.size());
+		
+		}
+		oos.writeObject(1);
+		return false;
+	}
+
+	public void getEnemyThread(Object data, ClientThread clientThread) throws SQLException {
+		String enemyID=(String)data;
+		int st;
+		st=db.getStatusDB(enemyID);
+		int i=0;
+		if (clientList.size() != 0&&st!=0) {
+			do {
+				if (clientList.get(i).playerIDString.equals(enemyID)) {
+					clientThread.enemySocket1 = clientList.get(i).socket1;
+					clientThread.enemySocket2 = clientList.get(i).socket2;
+					return;
+				}
+				i++;
+			} while (i < clientList.size());
+		
+		}
+		
+	}
 
 }
