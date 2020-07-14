@@ -2,18 +2,24 @@ package client.displays;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 
 import client.OthelloClient;
+import model.SendIcon;
 
 class displayProfile extends JDialog {
 
@@ -31,6 +37,11 @@ class displayProfile extends JDialog {
 
 	String playerId;
 	String otherId;
+
+	//
+	ImageIcon eIcon = new ImageIcon();
+
+	//
 
 
 	public displayProfile(Disp disp, ModalityType mt) {
@@ -51,7 +62,10 @@ class displayProfile extends JDialog {
 		label2 = new JLabel();
 		label2.setFont(new Font("MS ゴシック", Font.BOLD, 12));
 		label2.setForeground(Color.WHITE);
-		label2.setBounds(270, 10, 250, 25);
+		//label2.setBounds(270, 10, 250, 25);
+		//
+		label2.setBounds(270, 10, 250, 50);
+		//
 		label3 = new JLabel();
 		label3.setFont(new Font("MS ゴシック", Font.BOLD, 12));
 		label3.setForeground(Color.WHITE);
@@ -131,7 +145,32 @@ class displayProfile extends JDialog {
 
 	public void reloadProfile(String id, int rank, int win, int lose, int draw, int conceed, String comment, String icon, int flag) {
 		label1.setText(id);
-		label2.setText(icon);
+//
+		//アイコン要求
+		try {
+			OthelloClient.send("geticon", id);
+			//受け取り
+			SendIcon iconData;
+			InputStream is2 = OthelloClient.socket1.getInputStream();
+			ObjectInputStream ois2 = new ObjectInputStream(is2);
+			iconData = (SendIcon) ois2.readObject();
+
+			File f = iconData.getImage();
+			BufferedImage img = ImageIO.read(f);
+			eIcon = new ImageIcon(img);
+			Image smallImg = eIcon.getImage().getScaledInstance((int) (eIcon.getIconWidth() * 0.7), -1,
+					Image.SCALE_SMOOTH);
+			ImageIcon smallIcon = new ImageIcon(smallImg);
+			label2.setIcon(smallIcon);
+			//label2.setIcon(eIcon);
+
+
+		} catch (IOException | ClassNotFoundException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+//
+		//label2.setText(icon);
 		label3.setText("ランク "+ rank);
 		label4.setText("対戦成績: "+win+"勝 "+lose+"敗 "+draw+"引き分け "+conceed+"投了");
 		label4.setText(comment);
