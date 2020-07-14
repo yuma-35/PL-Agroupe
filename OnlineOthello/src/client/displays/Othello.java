@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -43,25 +44,27 @@ import model.SendIcon;
 
 public class Othello extends JPanel implements MouseListener {
 	Result rsbox;
+	public boolean fullFlag = false;
 	public boolean myTurn = true;
 	public Player enemyPlayer = new Player();
 	public int bw;// 黒なら0で先手 白なら1で後手 2ならあいてるけど置けない3なら置ける 境界なら8
-	int bwE;
+	public int bwE;
 	boolean flipFlag = false;// flip用
 	boolean enableFlag = false;
 	public boolean passEndListenner;
 	Timer timer = new Timer();
-	ArrayList<Point> potential = new ArrayList<Point>();
+	public ArrayList<Point> potential = new ArrayList<Point>();
 	JLabel[][] BoardLabels = new JLabel[8][8];
-	int[][] BoardInformation = new int[10][10];
+	public int[][] BoardInformation = new int[10][10];
 	boolean doubleAction = false;
 	Music msbox;
 	JLabel tekikomahyouziJLabel = new JLabel();
 	JLabel zikomahyouziJLabel = new JLabel();
 	ImageIcon blackIcon = new ImageIcon();
 	ImageIcon whiteIcon = new ImageIcon();
-	ImageIcon enable = new ImageIcon("image\\SystemImage\\enable.png");
-
+	ImageIcon enable = new ImageIcon("image/SystemImage/enable.png");
+	ImageIcon blue = new ImageIcon("image/SystemImage/blue.png");
+	boolean spyFlag = false;
 //
 	ImageIcon enemyIcon = new ImageIcon();
 	ImageIcon myIcon = new ImageIcon();
@@ -77,23 +80,23 @@ public class Othello extends JPanel implements MouseListener {
 //
 	JLabel eIcon = new JLabel();
 	JLabel mIcon = new JLabel();
-//
+	Point spyXY = new Point();
 	JLabel ziKomaLabel = new JLabel("自分:");
 	JLabel tekiKomaLabel = new JLabel("相手:");
 	JLabel turnLabel = new JLabel("あなたのターンです");
 	JButton toSounds = new JButton("音量調整");
 	JLabel BoardBackLabel = new JLabel();
 	JButton conceedButton = new JButton("投了");
-	JButton myItem1Button = new JButton(new ImageIcon("image\\SystemImage\\bomb.jpg"));
-	JButton myItem2Button = new JButton();
-	JButton myItem3Button = new JButton();
-	JButton myItem4Button = new JButton();
-	JButton myItem5Button = new JButton();
-	JButton enemyItem1Button = new JButton(new ImageIcon("image\\SystemImage\\bomb.jpg"));
-	JButton enemyItem2Button = new JButton(new ImageIcon("image\\SystemImage\\bomb.jpg"));
-	JButton enemyItem3Button = new JButton(new ImageIcon("image\\SystemImage\\bomb.jpg"));
-	JButton enemyItem4Button = new JButton(new ImageIcon("image\\SystemImage\\bomb.jpg"));
-	JButton enemyItem5Button = new JButton(new ImageIcon("image\\SystemImage\\bomb.jpg"));
+	public JButton myItem1Button = new JButton(new ImageIcon("image/SystemImage/bomb.jpg"));
+	public JButton myItem2Button = new JButton(new ImageIcon("image/SystemImage/ItemDice.png"));
+	public JButton myItem3Button = new JButton(new ImageIcon("image/SystemImage/ItemSkip.png"));
+	public JButton myItem4Button = new JButton(new ImageIcon("image/SystemImage/ItemSteal.png"));
+	public JButton myItem5Button = new JButton(new ImageIcon("image/SystemImage/ItemSpy.png"));
+	public JButton enemyItem1Button = new JButton(new ImageIcon("image/SystemImage/bomb.jpg"));
+	public JButton enemyItem2Button = new JButton(new ImageIcon("image/SystemImage/ItemDice.png"));
+	public JButton enemyItem3Button = new JButton(new ImageIcon("image/SystemImage/ItemSkip.png"));
+	public JButton enemyItem4Button = new JButton(new ImageIcon("image/SystemImage/ItemSteal.png"));
+	public JButton enemyItem5Button = new JButton(new ImageIcon("image/SystemImage/ItemSpy.png"));
 	public JLabel pasLabel = new JLabel("");
 	public JTextArea chatArea = new JTextArea();
 	JTextArea chatIn = new JTextArea();
@@ -150,7 +153,7 @@ public class Othello extends JPanel implements MouseListener {
 		tekiKomaLabel.setFont(a);
 		tekiKomaLabel.setBackground(Color.GRAY);
 		this.add(tekiKomaLabel);
-		pasLabel.setBounds(400, 530, 200, 30);
+		pasLabel.setBounds(325, 530, 350, 30);
 		pasLabel.setHorizontalAlignment(JLabel.CENTER);
 		pasLabel.setFont(a);
 		this.add(pasLabel);
@@ -181,23 +184,23 @@ public class Othello extends JPanel implements MouseListener {
 
 		myItem1Button.setBounds(80, 150, 50, 50);
 		myItem1Button.addActionListener(new Item1());
-		myItem1Button.setToolTipText("アイテムの説明");
+		myItem1Button.setToolTipText("Bomb");
 
 		myItem2Button.setBounds(140, 150, 50, 50);
 		myItem2Button.addActionListener(new Item2());
-		myItem2Button.setToolTipText("アイテムの説明");
+		myItem2Button.setToolTipText("Dice:置けない場所にランダムに1つコマを置く");
 
 		myItem3Button.setBounds(50, 210, 50, 50);
 		myItem3Button.addActionListener(new Item3());
-		myItem3Button.setToolTipText("アイテムの説明");
+		myItem3Button.setToolTipText("Skip:自分の番をとばす");
 
 		myItem4Button.setBounds(110, 210, 50, 50);
 		myItem4Button.addActionListener(new Item4());
-		myItem4Button.setToolTipText("アイテムの説明");
+		myItem4Button.setToolTipText("Steal:相手のコマをランダムに1つひっくり返す");
 
 		myItem5Button.setBounds(170, 210, 50, 50);
 		myItem5Button.addActionListener(new Item5());
-		myItem5Button.setToolTipText("アイテムの説明");
+		myItem5Button.setToolTipText("Spy:好きなところに相手のコマを一つ置く（この時、他のコマはひっくり返らない）");
 
 		enemyItem1Button.setBounds(80, 370, 50, 50);
 		enemyItem1Button.setToolTipText("アイテムの説明");
@@ -229,7 +232,6 @@ public class Othello extends JPanel implements MouseListener {
 		this.add(blackkoma);
 		this.add(whitekoma);
 
-
 		this.add(chatPane);
 		this.add(myItem1Button);
 		this.add(myItem2Button);
@@ -241,8 +243,6 @@ public class Othello extends JPanel implements MouseListener {
 		this.add(enemyItem3Button);
 		this.add(enemyItem4Button);
 		this.add(enemyItem5Button);
-
-
 
 	}
 
@@ -258,36 +258,36 @@ public class Othello extends JPanel implements MouseListener {
 		}
 	}
 
-	
-
 	public void startOthello(int rule, int setBW, String enemyID) throws IOException, ClassNotFoundException {
-		enemyPlayer=OthelloClient.getEnemy(enemyID);
-		
+		enemyPlayer = OthelloClient.getEnemy(enemyID);
+		spyFlag = false;
+		fullFlag = false;
+		pasLabel.setText("");
 		// a相手のアイコン表示
 //		//aアイコン要求
 		OthelloClient.send("geticon", enemyPlayer.getId());
-		
-		//受け取り
-		SendIcon iconData ;
+
+		// 受け取り
+		SendIcon iconData;
 		InputStream is2 = OthelloClient.socket1.getInputStream();
 		ObjectInputStream ois2 = new ObjectInputStream(is2);
-		//ois2.readObject();
+		// ois2.readObject();
 		iconData = (SendIcon) ois2.readObject();
-		
+
 		File f = iconData.getImage();
 		BufferedImage img = ImageIO.read(f);
 		enemyIcon = new ImageIcon(img);
 		Image smallImg = enemyIcon.getImage().getScaledInstance((int) (enemyIcon.getIconWidth() * 0.6), -1,
-	            Image.SCALE_SMOOTH);
-	    ImageIcon smallIcon = new ImageIcon(smallImg);
+				Image.SCALE_SMOOTH);
+		ImageIcon smallIcon = new ImageIcon(smallImg);
 		eIcon.setIcon(smallIcon);
 
 		myIcon = new ImageIcon(Disp.changeicon.getIcon());
 		Image smallImg2 = myIcon.getImage().getScaledInstance((int) (myIcon.getIconWidth() * 0.6), -1,
-	            Image.SCALE_SMOOTH);
-	    ImageIcon smallIcon2 = new ImageIcon(smallImg2);
-		mIcon.setIcon(smallIcon2 );
-		
+				Image.SCALE_SMOOTH);
+		ImageIcon smallIcon2 = new ImageIcon(smallImg2);
+		mIcon.setIcon(smallIcon2);
+
 //
 
 		BoardBackLabel.setIcon(new ImageIcon(Disp.changeboard.getBoard()));
@@ -359,6 +359,7 @@ public class Othello extends JPanel implements MouseListener {
 	}
 
 	public boolean boardRepaint() {
+		boolean fullListenner = true;
 		if (myTurn) {
 			conceedButton.setEnabled(true);
 		} else {
@@ -376,27 +377,33 @@ public class Othello extends JPanel implements MouseListener {
 					pasFlag = false;
 					if (myTurn) {
 						BoardLabels[s - 1][t - 1].setIcon(enable);
+
 					} else {
 						BoardLabels[s - 1][t - 1].setIcon(null);
 					}
+					fullListenner = false;
 				} else {
 					BoardLabels[s - 1][t - 1].setIcon(null);
-
+					fullListenner = false;
 				}
 			}
 		}
 		if (myTurn) {
 			if (pasFlag) {
 				turnLabel.setText("相手のターンです");
-				pasLabel.setText("パスされました");
+
 			} else {
 				turnLabel.setText("あなたのターンです");
-				pasLabel.setText("");
+
 			}
 		} else {
 			turnLabel.setText("相手のターンです");
-			pasLabel.setText("");
+
 		}
+		if(fullListenner) {
+			fullFlag=true;
+		}
+		
 		return pasFlag;
 	}
 
@@ -480,7 +487,7 @@ public class Othello extends JPanel implements MouseListener {
 			} else {
 				return 1;
 			}
-		}else {
+		} else {
 			System.out.print("エラー");
 			return 0;
 		}
@@ -533,21 +540,21 @@ public class Othello extends JPanel implements MouseListener {
 
 	public void mouseEntered(MouseEvent e) {
 		Object obj = e.getSource();
-		if(obj == enemyIDLabel) {
+		if (obj == enemyIDLabel) {
 			enemyIDLabel.setForeground(Color.YELLOW);
 		}
 	}
 
 	public void mouseExited(MouseEvent e) {
 		Object obj = e.getSource();
-		if(obj == enemyIDLabel) {
+		if (obj == enemyIDLabel) {
 			enemyIDLabel.setForeground(Color.WHITE);
 		}
 	}
 
 	public void mousePressed(MouseEvent e) {
 		Object obj = e.getSource();
-		if(obj == enemyIDLabel) {
+		if (obj == enemyIDLabel) {
 			enemyIDLabel.setForeground(Color.RED);
 			String otherId = enemyPlayer.id;
 
@@ -558,14 +565,15 @@ public class Othello extends JPanel implements MouseListener {
 				OthelloClient.send("getProfile", data);
 				InputStream is = OthelloClient.socket1.getInputStream();
 				ObjectInputStream ois = new ObjectInputStream(is);
-				String message = (String)ois.readObject();
-				if(message.equals("failed")) {
+				String message = (String) ois.readObject();
+				if (message.equals("failed")) {
 					return;
 				}
-				if(message.equals("success")) {
-					Player player = (Player)ois.readObject();
+				if (message.equals("success")) {
+					Player player = (Player) ois.readObject();
 					displayProfile sub = new displayProfile(Disp.disp, ModalityType.MODELESS);
-					sub.reloadProfile(player.id, player.playerRank, player.win, player.lose, player.draw, player.conceed, player.comment, player.iconImage, player.frflag);
+					sub.reloadProfile(player.id, player.playerRank, player.win, player.lose, player.draw,
+							player.conceed, player.comment, player.iconImage, player.frflag);
 					sub.getId(Client.myPlayer.id, player.id);
 					sub.setLocation(400, 260);
 					sub.setVisible(true);
@@ -587,17 +595,27 @@ public class Othello extends JPanel implements MouseListener {
 	public void mouseClicked(MouseEvent e) {
 
 		Object obj = e.getSource();
-		if(obj == enemyIDLabel) {
+		if (obj == enemyIDLabel) {
 
-		}else {
+		} else {
 
 			if (myTurn) {
 				Music.se();
 				int x = 1 + (int) e.getPoint().x / 50;
 				int y = 1 + (int) e.getPoint().y / 50;
+
 				try {
-					if (BoardInformation[x][y] == 3) {
-						action(x, y);
+					if (spyFlag) {
+						if (BoardInformation[x][y] == 3 || BoardInformation[x][y] == 2) {
+							spyXY.x = x;
+							spyXY.y = y;
+							action(15, 15);
+							myItem5Button.setEnabled(false);
+						}
+					} else {
+						if (BoardInformation[x][y] == 3) {
+							action(x, y);
+						}
 					}
 				} catch (IOException e1) {
 					// TODO 自動生成された catch ブロック
@@ -611,48 +629,117 @@ public class Othello extends JPanel implements MouseListener {
 	}
 
 	public void Item1() {
+
 		// potentialとboardinformationをいじる
 	}
 
-	public void Item2() {
-
+	public Point Item2() {
+		Random random = new Random();
+		int x;
+		int y;
+		do {
+			x = 1 + random.nextInt(9);
+			y = 1 + random.nextInt(9);
+		} while (BoardInformation[x][y] != 2);
+		BoardInformation[x][y] = bw;
+		potential.remove(new Point(x, y));
+		for (int s = -1; s <= 1; s++) {// getenable用の処理
+			for (int t = -1; t <= 1; t++) {
+				if (!(s == 0 && t == 0)) {
+					if (BoardInformation[x + s][y + t] == 2)
+						potential.add(new Point(x + s, y + t));
+				}
+			}
+		}
+		potential = new ArrayList<Point>(new HashSet<>(potential));
+		return new Point(x, y);
 	}
 
 	public void Item3() {
 
 	}
 
-	public void Item4() {
-
+	public Point Item4() {
+		Random random = new Random();
+		int x;
+		int y;
+		do {
+			x = 1 + random.nextInt(9);
+			y = 1 + random.nextInt(9);
+		} while (BoardInformation[x][y] != Disp.disp.othello.bwE);
+		BoardInformation[x][y] = bw;
+		for (int s = -1; s <= 1; s++) {
+			for (int t = -1; t <= 1; t++) {
+				if (!(s == 0 && t == 0)) {
+					flipserch(s, t, x, y, 1, myTurn);
+					flipFlag = false;
+				}
+			}
+		}
+		return new Point(x, y);
 	}
 
-	public void Item5() {
-
+	public void Item5(Point point) throws ClassNotFoundException, IOException {
+		BoardInformation[point.x][point.y] = bwE;
+		potential.remove(new Point(point.x, point.y));
+		for (int s = -1; s <= 1; s++) {// getenable用の処理
+			for (int t = -1; t <= 1; t++) {
+				if (!(s == 0 && t == 0)) {
+					if (BoardInformation[point.x + s][point.y + t] == 2)
+						potential.add(new Point(point.x + s, point.y + t));
+				}
+			}
+		}
+		potential = new ArrayList<Point>(new HashSet<>(potential));
 	}
 
 	public void action(int x, int y) throws IOException, ClassNotFoundException {
+		ArrayList<Point> sendPack = new ArrayList<Point>();
+		pasLabel.setText("");
 		if (x == 11 && y == 11) {
-			Item1();
+			sendPack.add(new Point(11, 11));
+			Item1();// bomb
+			OthelloClient.send("SendAction", sendPack);
+			pasLabel.setText("Bombを使用しました");
 		} else if (x == 12 && y == 12) {
-			Item2();
+			sendPack.add(new Point(12, 12));
+			sendPack.add(Item2());
+			OthelloClient.send("SendAction", sendPack);// dice
+			pasLabel.setText("Diceを使用しました");
 		} else if (x == 13 && y == 13) {
-			Item3();
+			sendPack.add(new Point(13, 13));
+			Item3();// skip
+			OthelloClient.send("SendAction", sendPack);
+			pasLabel.setText("Skipを使用しました");
 		} else if (x == 14 && y == 14) {
-			Item4();
+			sendPack.add(new Point(14, 14));
+			sendPack.add(Item4());
+			sendPack.add(new Point(14, 14));
+			OthelloClient.send("SendAction", sendPack);
+			pasLabel.setText("Stealを使用しました");
 		} else if (x == 15 && y == 15) {
-			Item5();
+			sendPack.add(new Point(15, 15));
+			spyFlag = false;
+			Item5(spyXY);
+			sendPack.add(new Point(spyXY.x, spyXY.y));
+			OthelloClient.send("SendAction", sendPack);
+			pasLabel.setText("Spyを使用しました");
 		} else if (x == 10 && y == 10) {
-			Point pointmessage = new Point(x, y);
-			OthelloClient.send("SendAction", pointmessage);
+			sendPack.add(new Point(10, 10));
+
+			OthelloClient.send("SendAction", sendPack);
 			gameEnd(3);
 			return;
 		} else if (BoardInformation[x][y] == 3) {
 			flip(x, y);
+			sendPack.add(new Point(0, 0));
+			sendPack.add(new Point(x, y));
+			OthelloClient.send("SendAction", sendPack);
 		}
 		Point pointmessage = new Point(x, y);
 		myTurn = false;
 		boardRepaint();
-		OthelloClient.send("SendAction", pointmessage);
+
 	}
 
 	public void paintComponent(Graphics g) {
@@ -661,7 +748,8 @@ public class Othello extends JPanel implements MouseListener {
 		g2d.setColor(Color.LIGHT_GRAY);
 		g2d.fillRect(20, 40, 230, 500);
 		g2d.fillRect(750, 40, 220, 500);
-		g2d.fillRect(400, 490, 200, 70);
+		g2d.fillRect(400, 490, 200, 35);
+		g2d.fillRect(325, 525, 350, 35);
 		g2d.fillRect(350, 35, 50, 40);
 		g2d.fillRect(500, 35, 50, 40);
 	}
@@ -730,17 +818,30 @@ public class Othello extends JPanel implements MouseListener {
 	public class Item5 implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			if (myTurn) {
-				myItem5Button.setEnabled(false);
-				try {
-					action(15, 15);
-				} catch (IOException e1) {
-					// TODO 自動生成された catch ブロック
-					e1.printStackTrace();
-				} catch (ClassNotFoundException e1) {
-					// TODO 自動生成された catch ブロック
-					e1.printStackTrace();
+				if (!spyFlag) {
+					boardRepaintSPY();
+					spyFlag = true;
+				} else {
+					boardRepaint();
+					spyFlag = false;
 				}
+			}
+		}
 
+		private void boardRepaintSPY() {
+			// TODO 自動生成されたメソッド・スタブ
+			for (int s = 1; s < 9; s++) {// a初期盤面セット
+				for (int t = 1; t < 9; t++) {
+					if (BoardInformation[s][t] == 0) {
+						BoardLabels[s - 1][t - 1].setIcon(blackIcon);
+					} else if (BoardInformation[s][t] == 1) {
+						BoardLabels[s - 1][t - 1].setIcon(whiteIcon);
+
+					} else {
+						BoardLabels[s - 1][t - 1].setIcon(blue);
+
+					}
+				}
 			}
 		}
 	}
@@ -801,7 +902,7 @@ public class Othello extends JPanel implements MouseListener {
 		Disp.mainmenu.reloadMainmenu();
 		Disp.disp.ChangeDisp(Disp.mainmenu);
 		OthelloClient.send("setStatus", 1);
-		
+
 	}
 
 	public class Result extends JDialog {
@@ -819,7 +920,7 @@ public class Othello extends JPanel implements MouseListener {
 
 		public class friendRequest implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
-			
+
 				try {
 					ArrayList<String> data = new ArrayList<String>();
 
@@ -858,8 +959,7 @@ public class Othello extends JPanel implements MouseListener {
 			if (enemyPlayer.frflag == 1) {
 				friendRequestButton.setEnabled(false);
 			}
-		
-			
+
 			class Back implements ActionListener {
 				public void actionPerformed(ActionEvent e) {
 					timer.cancel();
@@ -959,7 +1059,6 @@ public class Othello extends JPanel implements MouseListener {
 
 							}
 
-							
 						}
 						Client.myPlayer.rankPoint = xnow;
 						try {
@@ -1025,5 +1124,54 @@ public class Othello extends JPanel implements MouseListener {
 			}
 			return i;
 		}
+	}
+
+	public void receiveItem1(Point xy) {
+
+	}
+
+	public void receiveItem2(Point xy) {
+		// TODO 自動生成されたメソッド・スタブ
+		BoardInformation[xy.x][xy.y] = bwE;
+		potential.remove(new Point(xy.x, xy.y));
+		for (int s = -1; s <= 1; s++) {// getenable用の処理
+			for (int t = -1; t <= 1; t++) {
+				if (!(s == 0 && t == 0)) {
+					if (BoardInformation[xy.x + s][xy.y + t] == 2)
+						potential.add(new Point(xy.x + s, xy.y + t));
+				}
+			}
+		}
+		potential = new ArrayList<Point>(new HashSet<>(potential));
+	}
+
+	public void receiveItem3(Point xy) {
+	}
+
+	public void receiveItem4(Point xy) {
+		BoardInformation[xy.x][xy.y] = bwE;
+		for (int s = -1; s <= 1; s++) {
+			for (int t = -1; t <= 1; t++) {
+				if (!(s == 0 && t == 0)) {
+					flipserch(s, t, xy.x, xy.y, 1, myTurn);
+					flipFlag = false;
+				}
+			}
+		}
+
+	}
+
+	public void receiveItem5(Point xy) {
+		BoardInformation[xy.x][xy.y] = bw;
+		potential.remove(new Point(xy.x, xy.y));
+		for (int s = -1; s <= 1; s++) {// getenable用の処理
+			for (int t = -1; t <= 1; t++) {
+				if (!(s == 0 && t == 0)) {
+					if (BoardInformation[xy.x + s][xy.y + t] == 2)
+						potential.add(new Point(xy.x + s, xy.y + t));
+				}
+			}
+		}
+		potential = new ArrayList<Point>(new HashSet<>(potential));
 	}
 }

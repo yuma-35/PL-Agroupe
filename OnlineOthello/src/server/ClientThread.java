@@ -198,8 +198,8 @@ public class ClientThread extends Thread {
 			}
 		}
 		if (operation.equals("SendAction")) {
-			Point actionpoint = (Point) data;
-			sendToEnemy("action", actionpoint);
+ArrayList<Point> send=(ArrayList<Point>)data;
+			sendToEnemy("action", send);
 		}
 		if (operation.equals("SendChat")) {
 			String messageString = (String) data;
@@ -274,12 +274,12 @@ public class ClientThread extends Thread {
 			return;
 		}
 		if (operation.equals("OKRequest")) {
-			
-			ArrayList<String> packArrayList=(ArrayList<String>)data;
-			ArrayList<String>sendpack=new ArrayList<String>();
+
+			ArrayList<String> packArrayList = (ArrayList<String>) data;
+			ArrayList<String> sendpack = new ArrayList<String>();
 			sendpack.add(playerIDString);
 			sendpack.add(packArrayList.get(1));
-			server.getEnemyThread(packArrayList.get(0),this);
+			server.getEnemyThread(packArrayList.get(0), this);
 			sendToEnemy("OKBattleApply", sendpack);
 			return;
 		}
@@ -287,7 +287,8 @@ public class ClientThread extends Thread {
 			ArrayList<String> pack = (ArrayList<String>) data;
 			String enemyid = pack.get(0);
 			int msg = Integer.parseInt(pack.get(1));
-			int i = 0;System.out.println(msg +"ai"+enemyid);
+			int i = 0;
+			System.out.println(msg + "ai" + enemyid);
 			if (server.clientList.size() != 0) {
 				do {
 					if (server.clientList.get(i).playerIDString.equals(enemyid)) {
@@ -295,7 +296,7 @@ public class ClientThread extends Thread {
 						OutputStream os = server.clientList.get(i).socket1.getOutputStream();
 						ObjectOutputStream oos = new ObjectOutputStream(os);
 						oos.writeObject(msg);
-					
+
 					}
 					i++;
 				} while (i < server.clientList.size());
@@ -303,5 +304,6 @@ public class ClientThread extends Thread {
 			}
 
 		}
+	
 	}
 }
