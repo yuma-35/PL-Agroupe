@@ -134,12 +134,20 @@ public class RecieveThread extends Thread {
 			fbrdBox.setVisible(true);
 		}
 		if (operation.equals("OKBattleApply")) {
-			if (Disp.disp.nowPanel == Disp.disp.battleApply) {
-				String enemyID = (String) data;
+			ArrayList<String> packag=new ArrayList<String>();
+			
+				ArrayList<String> packa=(ArrayList<String>)data;
+				String enemyID = packa.get(0);
+				int getrule=Integer.parseInt(packa.get(1));
+				packag.add(enemyID);
+				if (Disp.disp.battleApply.enemyID.getText().equals(enemyID)&&Disp.disp.battleApply.rule==getrule) {
 				Disp.othello.startOthello(Disp.disp.battleApply.rule, 0, enemyID);
 				Disp.disp.ChangeDisp(Disp.othello);
+				packag.add("0");
+				OthelloClient.send("ApplyMSG", packag);
 			} else {
-				// aもうとりさげたよ
+				packag.add("1");
+					OthelloClient.send("ApplyMSG",packag);
 
 			}
 
@@ -149,6 +157,7 @@ public class RecieveThread extends Thread {
 			Disp.disp.mainmenu.reloadMainmenu();
 			Disp.disp.ChangeDisp(Disp.disp.mainmenu);
 		}
+		
 	}
 
 	public class FriendBattleRequestDialog extends JDialog {
@@ -176,7 +185,7 @@ public class RecieveThread extends Thread {
 			}else {
 				ruleJLabel.setText("アイテム戦");
 			}
-			ruleJLabel.setBounds(150, 170,200,50 );
+			ruleJLabel.setBounds(150, 150,200,50 );
 			ruleJLabel.setFont(new Font("MS ゴシック",Font.BOLD,20));
 			ruleJLabel.setHorizontalAlignment(JLabel.CENTER);
 			this.add(ruleJLabel);
@@ -257,10 +266,24 @@ public class RecieveThread extends Thread {
 		public class OK implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					OthelloClient.send("OKRequest", request);
-					Disp.ChangeDisp(disp.othello);
-					OthelloClient.send("setStatus", 3);
-					disp.othello.startOthello(rulebox, 1,request);
+					ArrayList<String> pack =new ArrayList<String>();
+					pack.add(request);
+					pack.add(String.valueOf(rulebox));
+					OthelloClient.send("OKRequest", pack);
+					InputStream is = OthelloClient.socket1.getInputStream();
+					ObjectInputStream ois = new ObjectInputStream(is);
+				int	message=(int)ois.readObject();
+					if(message==0) {//成功
+						Disp.ChangeDisp(disp.othello);
+						OthelloClient.send("setStatus", 3);
+						disp.othello.startOthello(rulebox, 1,request);
+						
+					}else {
+						dispose();
+						JOptionPane.showMessageDialog(Disp.disp, "申込が取り下げられました");
+					
+					}
+				
 				} catch (IOException e1) {
 					// TODO 自動生成された catch ブロック
 					e1.printStackTrace();

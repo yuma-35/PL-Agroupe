@@ -35,25 +35,25 @@ public class ClientThread extends Thread {
 		} catch (Exception e) {// a切断時の処理
 			e.printStackTrace();
 			try {
-				if(playerIDString!=null) {
-				int st = server.getStatus(playerIDString);
-				server.setStatus(playerIDString, 0);
-				System.out.println(playerIDString);
-				if (st == 1) {
-					
-				} else if (st == 2) {
-					server.deleteMatch(playerIDString, this);
-					server.deleteRoom(playerIDString, this);
-				} else if (st == 3) {
-					sendToEnemy("EnemyDisconected", 0);
-					server.deleteRoom(playerIDString, this);
-					ArrayList<String> pack=new ArrayList<String>();
-					pack.add(playerIDString);
-					pack.add(enemyIDString);
-					pack.add("6");
-					server.makeGameRecord(pack, this);
-					server.disconePenaltyForResult(playerIDString);
-				}
+				if (playerIDString != null) {
+					int st = server.getStatus(playerIDString);
+					server.setStatus(playerIDString, 0);
+					System.out.println(playerIDString);
+					if (st == 1) {
+
+					} else if (st == 2) {
+						server.deleteMatch(playerIDString, this);
+						server.deleteRoom(playerIDString, this);
+					} else if (st == 3) {
+						sendToEnemy("EnemyDisconected", 0);
+						server.deleteRoom(playerIDString, this);
+						ArrayList<String> pack = new ArrayList<String>();
+						pack.add(playerIDString);
+						pack.add(enemyIDString);
+						pack.add("6");
+						server.makeGameRecord(pack, this);
+						server.disconePenaltyForResult(playerIDString);
+					}
 				}
 			} catch (SQLException e1) {
 				// TODO 自動生成された catch ブロック
@@ -62,7 +62,7 @@ public class ClientThread extends Thread {
 				// TODO 自動生成された catch ブロック
 				e1.printStackTrace();
 			}
-			
+
 		}
 	}
 
@@ -94,6 +94,9 @@ public class ClientThread extends Thread {
 
 		if (operation.equals("makeAccount")) {
 			server.makeAccount(data, this);
+			ArrayList<String> accountData = (ArrayList<String>) data;
+			String name = accountData.get(0);
+			playerIDString = name;
 			return;
 		}
 		if (operation.equals("logIn")) {
@@ -152,7 +155,7 @@ public class ClientThread extends Thread {
 			ArrayList<String> datasetArrayList = (ArrayList<String>) data;
 			String hostname = datasetArrayList.get(0);
 			String myname = datasetArrayList.get(1);
-			enemyIDString=hostname;
+			enemyIDString = hostname;
 			OutputStream os = this.socket1.getOutputStream();
 			ObjectOutputStream oos = new ObjectOutputStream(os);
 
@@ -179,13 +182,13 @@ public class ClientThread extends Thread {
 					}
 				}
 			}
-			
+
 			oos.writeObject(0);
 			return;
 		}
 		if (operation.equals("StartSet")) {
 			String nameString = (String) data;
-			enemyIDString=nameString;
+			enemyIDString = nameString;
 			for (OthelloRoom room : server.roomList) {
 				if (room.hostID.equals(nameString)) {
 					enemySocket1 = room.enterSocket1;
@@ -239,43 +242,66 @@ public class ClientThread extends Thread {
 			return;
 		}
 		if (operation.equals("setStatus")) {
-		int st=(int)data;
-			server.setStatus(playerIDString,st);
+			int st = (int) data;
+			server.setStatus(playerIDString, st);
 			return;
 		}
 
-		if(operation.equals("gamerecord")) {
-			server.gamerecord(data,this);
+		if (operation.equals("gamerecord")) {
+			server.gamerecord(data, this);
 
 			return;
 		}
-		if(operation.equals("geticon")) {
-			server.geticon(data,this);
+		if (operation.equals("geticon")) {
+			server.geticon(data, this);
 
 			return;
 		}
-		if(operation.equals("ApplyBattle")) {
-			
-			if(server.applyBattleSet(data,this)){
-			ArrayList<String> recievedata=(ArrayList<String>)data;
-			ArrayList<String> pack=new ArrayList<String>();
-			pack.add(playerIDString);
-			pack.add(recievedata.get(1));
-			sendToEnemy("ReceiveBattleApply",pack);
+		if (operation.equals("ApplyBattle")) {
+
+			if (server.applyBattleSet(data, this)) {
+				ArrayList<String> recievedata = (ArrayList<String>) data;
+				ArrayList<String> pack = new ArrayList<String>();
+				pack.add(playerIDString);
+				pack.add(recievedata.get(1));
+				sendToEnemy("ReceiveBattleApply", pack);
 			}
-		return;
+			return;
 		}
-		if(operation.equals("RefuseRequest")) {
-			server.getEnemyThread(data,this);
+		if (operation.equals("RefuseRequest")) {
+			server.getEnemyThread(data, this);
 			sendToEnemy("RefuseBattleApply", 0);
 			return;
 		}
-		if(operation.equals("OKRequest")) {
-			server.getEnemyThread(data,this);
-			String nameString=(String)data;
-			sendToEnemy("OKBattleApply", nameString);
+		if (operation.equals("OKRequest")) {
+			
+			ArrayList<String> packArrayList=(ArrayList<String>)data;
+			ArrayList<String>sendpack=new ArrayList<String>();
+			sendpack.add(playerIDString);
+			sendpack.add(packArrayList.get(1));
+			server.getEnemyThread(packArrayList.get(0),this);
+			sendToEnemy("OKBattleApply", sendpack);
 			return;
 		}
+		if (operation.equals("ApplyMSG")) {
+			ArrayList<String> pack = (ArrayList<String>) data;
+			String enemyid = pack.get(0);
+			int msg = Integer.parseInt(pack.get(1));
+			int i = 0;System.out.println(msg +"ai"+enemyid);
+			if (server.clientList.size() != 0) {
+				do {
+					if (server.clientList.get(i).playerIDString.equals(enemyid)) {
 
+						OutputStream os = server.clientList.get(i).socket1.getOutputStream();
+						ObjectOutputStream oos = new ObjectOutputStream(os);
+						oos.writeObject(msg);
+					
+					}
+					i++;
+				} while (i < server.clientList.size());
+
+			}
+
+		}
 	}
 }

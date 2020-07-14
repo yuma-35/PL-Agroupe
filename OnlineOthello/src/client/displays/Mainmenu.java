@@ -720,10 +720,10 @@ friendScroll.add(friendlistPanel);
 					ArrayList<String> pack=new ArrayList<String>();
 					pack.add(friendName);
 					if (nomal.isSelected()) {
-						Disp.battleApply.reloadBattleApply(0);
+						Disp.battleApply.reloadBattleApply(0,friendName);
 						pack.add("0");
 					}else {
-						Disp.battleApply.reloadBattleApply(1);
+						Disp.battleApply.reloadBattleApply(1,friendName);
 						pack.add("1");
 					}
 					OthelloClient.send("ApplyBattle",pack);

@@ -262,18 +262,18 @@ public class Othello extends JPanel implements MouseListener {
 
 	public void startOthello(int rule, int setBW, String enemyID) throws IOException, ClassNotFoundException {
 		enemyPlayer=OthelloClient.getEnemy(enemyID);
-		System.out.println("fsefegwgss");
+		
 		// a相手のアイコン表示
 //		//aアイコン要求
 		OthelloClient.send("geticon", enemyPlayer.getId());
-		System.out.println("fsefegwgss");
+		
 		//受け取り
 		SendIcon iconData ;
 		InputStream is2 = OthelloClient.socket1.getInputStream();
 		ObjectInputStream ois2 = new ObjectInputStream(is2);
 		//ois2.readObject();
 		iconData = (SendIcon) ois2.readObject();
-		System.out.println("fsefegwgss");
+		
 		File f = iconData.getImage();
 		BufferedImage img = ImageIO.read(f);
 		enemyIcon = new ImageIcon(img);

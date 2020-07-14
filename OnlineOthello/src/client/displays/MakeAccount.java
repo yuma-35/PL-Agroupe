@@ -151,6 +151,7 @@ public class MakeAccount extends JPanel {
 					return;
 				}
 				if(message.equals("success")) {
+					OthelloClient.send("setStatus", 1);
 					Disp.mainmenu.reloadMyPlayer(id.getText());
 					Disp.mainmenu.reloadMainmenu();
 					Disp.ChangeDisp(Disp.mainmenu);

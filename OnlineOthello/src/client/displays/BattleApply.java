@@ -14,11 +14,13 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import client.OthelloClient;
+
 public class BattleApply extends JPanel {
-	JLabel enemyIDlabel = new JLabel();
+
 	Timer timer = new Timer();
 	JButton deleteBoard = new JButton("キャンセル");
-	JLabel enemyID = new JLabel("taro1234");
+	public JLabel enemyID = new JLabel("taro1234");
 	JLabel rulelabel = new JLabel("Item Battle");
 	JLabel waitLabel = new JLabel("対戦相手を待っています");
 	int waitLabelcount = 0;
@@ -54,23 +56,24 @@ public int rule;
 		timer = null;
 	}
 
-	public void reloadBattleApply(int item) {
+	public void reloadBattleApply(int item,String name) {
 		//	enemyID.setText(Client.myPlayer.id);
 		rule=item;
+		enemyID.setText(name);
 		timer = new Timer();
 		timer.schedule(new TimerTask() {
 			public void run() {
 				if (waitLabelcount == 0) {
-					waitLabel.setText(enemyIDlabel.getText() + "に対戦を申し込んでいます");
+					waitLabel.setText( "に対戦を申し込んでいます");
 					waitLabelcount++;
 				} else if (waitLabelcount == 1) {
-					waitLabel.setText(enemyIDlabel.getText() + "に対戦を申し込んでいます・");
+					waitLabel.setText("に対戦を申し込んでいます・");
 					waitLabelcount++;
 				} else if (waitLabelcount == 2) {
-					waitLabel.setText(enemyIDlabel.getText() + "に対戦を申し込んでいます・・");
+					waitLabel.setText("に対戦を申し込んでいます・・");
 					waitLabelcount++;
 				} else if (waitLabelcount == 3) {
-					waitLabel.setText(enemyIDlabel.getText() + "に対戦を申し込んでいます・・・");
+					waitLabel.setText("に対戦を申し込んでいます・・・");
 					waitLabelcount = 0;
 				}
 			}
@@ -91,6 +94,8 @@ public int rule;
 
 	public class deleteB implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
+				enemyID.setText("");
+				rule=3;
 			timer.cancel();
 			timer = null;
 			try {
