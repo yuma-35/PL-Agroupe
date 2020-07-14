@@ -108,36 +108,97 @@ public class ChangeIcon extends JPanel {
 
 		//選択ボタン
 		radio1 = new JRadioButton("", true);
-		radio2 = new JRadioButton("", false);
-		radio3 = new JRadioButton("", false);
-		radio4 = new JRadioButton("", false);
+		//radio2 = new JRadioButton("", false);
+		//radio3 = new JRadioButton("", false);
+		//radio4 = new JRadioButton("", false);
 		radio1.setBackground(Color.LIGHT_GRAY);
-		radio2.setBackground(Color.LIGHT_GRAY);
-		radio3.setBackground(Color.LIGHT_GRAY);
-		radio4.setBackground(Color.LIGHT_GRAY);
+		//radio2.setBackground(Color.LIGHT_GRAY);
+		//radio3.setBackground(Color.LIGHT_GRAY);
+		//radio4.setBackground(Color.LIGHT_GRAY);
 		ButtonGroup group = new ButtonGroup();
 		group.add(radio1);
-		group.add(radio2);
-		group.add(radio3);
-		group.add(radio4);
+		//group.add(radio2);
+		//group.add(radio3);
+		//group.add(radio4);
 		radio1.setBounds(220, 230, 100, 25);
-		radio2.setBounds(350, 230, 100, 25);
-		radio3.setBounds(480, 230, 100, 25);
-		radio4.setBounds(610, 230, 100, 25);
+		//radio2.setBounds(350, 230, 100, 25);
+		//radio3.setBounds(480, 230, 100, 25);
+		//radio4.setBounds(610, 230, 100, 25);
 		this.add(radio1);
-		this.add(radio2);
-		this.add(radio3);
-		this.add(radio4);
+		//this.add(radio2);
+		//this.add(radio3);
+		//this.add(radio4);
 
 		//オリジナル
-		if (files.length == 5) {
+		switch (files.length) {
+		case 2:
+			radio2 = new JRadioButton("", false);
+			radio2.setBackground(Color.LIGHT_GRAY);
+			group.add(radio2);
+			radio2.setBounds(350, 230, 100, 25);
+			this.add(radio2);
+			break;
+		case 3:
+			radio2 = new JRadioButton("", false);
+			radio2.setBackground(Color.LIGHT_GRAY);
+			group.add(radio2);
+			radio2.setBounds(350, 230, 100, 25);
+			this.add(radio2);
+
+			radio3 = new JRadioButton("", false);
+			radio3.setBackground(Color.LIGHT_GRAY);
+			group.add(radio3);
+			radio3.setBounds(480, 230, 100, 25);
+			this.add(radio3);
+			break;
+		case 4:
+			radio2 = new JRadioButton("", false);
+			radio2.setBackground(Color.LIGHT_GRAY);
+			group.add(radio2);
+			radio2.setBounds(350, 230, 100, 25);
+			this.add(radio2);
+
+			radio3 = new JRadioButton("", false);
+			radio3.setBackground(Color.LIGHT_GRAY);
+			group.add(radio3);
+			radio3.setBounds(480, 230, 100, 25);
+			this.add(radio3);
+
+			radio4 = new JRadioButton("", false);
+			radio4.setBackground(Color.LIGHT_GRAY);
+			group.add(radio4);
+			radio4.setBounds(610, 230, 100, 25);
+			this.add(radio4);
+			break;
+		case 5:
+			radio2 = new JRadioButton("", false);
+			radio2.setBackground(Color.LIGHT_GRAY);
+			group.add(radio2);
+			radio2.setBounds(350, 230, 100, 25);
+			this.add(radio2);
+
+			radio3 = new JRadioButton("", false);
+			radio3.setBackground(Color.LIGHT_GRAY);
+			group.add(radio3);
+			radio3.setBounds(480, 230, 100, 25);
+			this.add(radio3);
+
+			radio4 = new JRadioButton("", false);
+			radio4.setBackground(Color.LIGHT_GRAY);
+			group.add(radio4);
+			radio4.setBounds(610, 230, 100, 25);
+			this.add(radio4);
+
 			radio5 = new JRadioButton("", false);
 			radio5.setBackground(Color.LIGHT_GRAY);
 			group.add(radio5);
 
 			radio5.setBounds(740, 230, 100, 25);
 			this.add(radio5);
+			break;
+
 		}
+
 	}
 
 	//画像
@@ -174,35 +235,82 @@ public class ChangeIcon extends JPanel {
 			String str2 = null;
 
 			boolean status1 = radio1.isSelected();
-			boolean status2 = radio2.isSelected();
-			boolean status3 = radio3.isSelected();
-			boolean status4 = radio4.isSelected();
+			boolean status2 = false;
+			boolean status3 = false;
+			boolean status4 = false;
+			boolean status5 = false;
 
-			if(file.length() == 5) {
-				boolean status5 = radio5.isSelected();
-				 if (status5 == true) {
-						str = files[4].getPath();
-						str2 = files[4].getName();
+			switch (files.length) {
+			case 2:
+				status2 = radio2.isSelected();
+
+				if (status1 == true) {
+					str = files[0].getPath();
+					str2 = files[0].getName();
+				} else if (status2 == true) {
+					str = files[1].getPath();
+					str2 = files[1].getName();
 				}
+				break;
+			case 3:
+				status2 = radio2.isSelected();
+				status3 = radio3.isSelected();
+
+				if (status1 == true) {
+					str = files[0].getPath();
+					str2 = files[0].getName();
+				} else if (status2 == true) {
+					str = files[1].getPath();
+					str2 = files[1].getName();
+				} else if (status3 == true) {
+					str = files[2].getPath();
+					str2 = files[2].getName();
+				}
+				break;
+			case 4:
+				status2 = radio2.isSelected();
+				status3 = radio3.isSelected();
+				status4 = radio4.isSelected();
+
+				if (status1 == true) {
+					str = files[0].getPath();
+					str2 = files[0].getName();
+				} else if (status2 == true) {
+					str = files[1].getPath();
+					str2 = files[1].getName();
+				} else if (status3 == true) {
+					str = files[2].getPath();
+					str2 = files[2].getName();
+				} else if (status4 == true) {
+					str = files[3].getPath();
+					str2 = files[3].getName();
+				}
+				break;
+			case 5:
+				status2 = radio2.isSelected();
+				status3 = radio3.isSelected();
+				status4 = radio4.isSelected();
+				status5 = radio5.isSelected();
+
+				if (status1 == true) {
+					str = files[0].getPath();
+					str2 = files[0].getName();
+				} else if (status2 == true) {
+					str = files[1].getPath();
+					str2 = files[1].getName();
+				} else if (status3 == true) {
+					str = files[2].getPath();
+					str2 = files[2].getName();
+				} else if (status4 == true) {
+					str = files[3].getPath();
+					str2 = files[3].getName();
+				} else if (status5 == true) {
+					str = files[4].getPath();
+					str2 = files[4].getName();
+				}
+				break;
+
 			}
-
-			if (status1 == true) {
-				str = files[0].getPath();
-				str2 = files[0].getName();
-			} else if (status2 == true) {
-				str = files[1].getPath();
-				str2 = files[1].getName();
-			} else if (status3 == true) {
-				str = files[2].getPath();
-				str2 = files[2].getName();
-			} else if (status4 == true) {
-				str = files[3].getPath();
-				str2 = files[3].getName();
-			} /*else if (status5 == true) {
-				str = files[4].getPath();
-				str2 = files[4].getName();
-			}*/
-
 
 			//ファイルに書き込む
 			try {
@@ -219,18 +327,18 @@ public class ChangeIcon extends JPanel {
 			//サーバへデータ送信
 			try {
 				//Client.myPlayer.id = "peach";  //実験用
-				SendIcon send = new SendIcon(Client.myPlayer.id,str2,new File(str));
+				SendIcon send = new SendIcon(Client.myPlayer.id, str2, new File(str));
 				ArrayList<SendIcon> data = new ArrayList<SendIcon>();
 				data.add(send);
 				OthelloClient.send("addIIcon", data);
 				InputStream is = OthelloClient.socket1.getInputStream();
 				ObjectInputStream ois = new ObjectInputStream(is);
 				String message = (String) ois.readObject();
-				if(message.equals("failed")) {
+				if (message.equals("failed")) {
 					error.setText("エラーが発生しました");
 					return;
 				}
-				if(message.equals("success")) {
+				if (message.equals("success")) {
 					Disp.ChangeDisp(Disp.mainmenu);
 				}
 			} catch (IOException | ClassNotFoundException e1) {

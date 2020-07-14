@@ -333,8 +333,13 @@ class OthelloServer {
 		String otherId = request.get(1);
 		OutputStream os = client.socket1.getOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(os);
-		db.insertFriendrequest(playerId, otherId);
-		oos.writeObject("success");
+		boolean q = db.insertFriendrequest(playerId, otherId);
+		if(q) {
+			oos.writeObject("success");
+		}else{
+			oos.writeObject("failed");
+		}
+
 	}
 
 	// フレンド解除
@@ -410,6 +415,7 @@ class OthelloServer {
 						}
 						z++;
 					} while (z < matchList.size());
+
 
 				}
 				i++;
