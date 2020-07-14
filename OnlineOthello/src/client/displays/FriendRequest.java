@@ -7,15 +7,19 @@ import java.awt.Dialog.ModalityType;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -24,6 +28,7 @@ import javax.swing.JPanel;
 
 import client.OthelloClient;
 import model.Player;
+import model.SendIcon;
 
 public class FriendRequest extends JPanel implements MouseListener{
 
@@ -32,8 +37,8 @@ public class FriendRequest extends JPanel implements MouseListener{
 	JLabel label;
 
 //
-	ImageIcon enemyIcon = new ImageIcon();
-	JLabel eIcon = new JLabel();
+	//ImageIcon enemyIcon = new ImageIcon();
+	//JLabel eIcon = new JLabel();
 //
 
 	String playerId;	//自分のID
@@ -355,11 +360,12 @@ no.setEnabled(false);
 				this.add(f1);
 
 
-
-
 				//アイコン
 //				//アイコン要求
-		/*		try {
+				try {
+					ImageIcon enemyIcon = new ImageIcon();
+					JLabel eIcon = new JLabel();
+
 					OthelloClient.send("geticon", requestData.get(i));
 					//受け取り
 					SendIcon iconData ;
@@ -375,12 +381,12 @@ no.setEnabled(false);
 				    ImageIcon smallIcon = new ImageIcon(smallImg);
 					eIcon.setIcon(smallIcon);
 
-					eIcon.setBounds(250, 220 + (i * 25)-30, 25, 25);
+					eIcon.setBounds(260, 220 + (i * 25), 25, 25);
 					this.add(eIcon);
 				} catch (IOException | ClassNotFoundException e) {
 					// TODO 自動生成された catch ブロック
 					e.printStackTrace();
-				}*/
+				}
 	//
 
 			}
@@ -411,7 +417,9 @@ class GetProfile extends JDialog{
 	String playerId;
 	String otherId;
 
-
+//
+	ImageIcon eIcon = new ImageIcon();
+//
 
 	public GetProfile(Disp disp, ModalityType mt) {
 		super(disp,mt);
@@ -432,8 +440,10 @@ class GetProfile extends JDialog{
 		label2 = new JLabel();
 		label2.setFont(new Font("MS ゴシック", Font.BOLD, 12));
 		label2.setForeground(Color.WHITE);
+
 		label2.setBounds(170, 10, 250, 25);
 		label2.setHorizontalAlignment(JLabel.CENTER);
+
 
 		label3 = new JLabel();
 		label3.setFont(new Font("MS ゴシック", Font.BOLD, 12));
@@ -495,7 +505,32 @@ class GetProfile extends JDialog{
 
 	public void reloadProfile(String id, int rank, int win, int lose, int draw, int conceed, String comment, String icon, int flag) {
 		label1.setText(id);
-		label2.setText(icon);
+//
+		//アイコン要求
+		try {
+			OthelloClient.send("geticon", id);
+			//受け取り
+			SendIcon iconData;
+			InputStream is2 = OthelloClient.socket1.getInputStream();
+			ObjectInputStream ois2 = new ObjectInputStream(is2);
+			iconData = (SendIcon) ois2.readObject();
+
+			File f = iconData.getImage();
+			BufferedImage img = ImageIO.read(f);
+			eIcon = new ImageIcon(img);
+			Image smallImg = eIcon.getImage().getScaledInstance((int) (eIcon.getIconWidth() * 0.7), -1,
+					Image.SCALE_SMOOTH);
+			ImageIcon smallIcon = new ImageIcon(smallImg);
+			label2.setIcon(smallIcon);
+			//label2.setIcon(eIcon);
+
+
+		} catch (IOException | ClassNotFoundException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+//
+		//label2.setText(icon);
 		label3.setText("ランク "+ rank);
 		label4.setText("対戦成績: "+win+"勝 "+lose+"敗 "+draw+"引き分け "+conceed+"投了");
 		label5.setText(comment);
