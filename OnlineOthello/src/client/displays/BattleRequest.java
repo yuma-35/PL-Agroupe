@@ -25,10 +25,6 @@ public class BattleRequest extends JDialog {
 		this.setLayout(null);
 		this.getContentPane().setBackground(Color.LIGHT_GRAY);
 
-		//タイトルバーを消す
-		dispose();
-		setUndecorated(!isUndecorated());
-		setVisible(true);
 
 		JLabel label = new JLabel("フレンドから対戦申し込みが届きました");
 		label.setFont(new Font("MS ゴシック", Font.BOLD, 15));
@@ -50,7 +46,7 @@ public class BattleRequest extends JDialog {
 	public class toRelease implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 
-			setVisible(false); //サブモータルを消す
+		dispose();
 		}
 	}
 

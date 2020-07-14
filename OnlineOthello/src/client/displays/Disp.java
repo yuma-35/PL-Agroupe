@@ -1,20 +1,24 @@
 package client.displays;
 
+import java.awt.Dialog.ModalityType;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
 import javax.swing.ImageIcon;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
+import client.RecieveThread.FriendBattleRequestDialog;
 
 public class Disp extends JFrame {
 	public static Disp disp;
 	public static StartDisp start = new StartDisp();
 	public static Mainmenu mainmenu = new Mainmenu();
-	static BattleApply battleApply = new BattleApply();
+	public static BattleApply battleApply = new BattleApply();
 	static OthelloWait othellowait = new OthelloWait();
 	public static Othello othello = new Othello();
 	static MakeAccount makeaccount = new MakeAccount(); //4:アカウント作成
@@ -34,7 +38,7 @@ public class Disp extends JFrame {
 	static JLabel background = new JLabel();
 	//
 
-	static JPanel nowPanel = start;
+	public static JPanel nowPanel = start;
 
 	static File f = new File("save-data/back.txt");
 	static String path;
@@ -114,6 +118,8 @@ public class Disp extends JFrame {
 		change.setVisible(true);
 		nowPanel = change;
 	}
+	
+	
 
 	//BGMを鳴らす
 	/*	public static void bgm(){

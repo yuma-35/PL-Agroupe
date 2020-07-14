@@ -31,6 +31,7 @@ import javax.swing.JTextArea;
 import javax.swing.border.LineBorder;
 
 import client.OthelloClient;
+import client.displays.Othello.sendchat;
 import model.Client;
 import model.Match;
 import model.Player;
@@ -681,10 +682,10 @@ friendScroll.add(friendlistPanel);
 		ButtonGroup bgroup = new ButtonGroup();
 		JRadioButton nomal = new JRadioButton("通常戦");
 		JRadioButton item = new JRadioButton("アイテム戦");
-
+		String friendName;
 		public FriendBattleRequest(Disp disp, ModalityType mt, String name) {
 			super(disp, mt);
-
+			friendName=name;
 			this.disp = disp;
 			this.setSize(500, 300);
 			this.setTitle("対戦申込");
@@ -715,14 +716,38 @@ friendScroll.add(friendlistPanel);
 
 		class RequestB implements ActionListener {
 			public void actionPerformed(ActionEvent e) {
-
-				Disp.ChangeDisp(Disp.battleApply);
-				if (nomal.isSelected())
-					Disp.battleApply.reloadBattleApply(0);
-				else
-					Disp.battleApply.reloadBattleApply(1);
-
-				dispose();
+				try {
+					ArrayList<String> pack=new ArrayList<String>();
+					pack.add(friendName);
+					if (nomal.isSelected()) {
+						Disp.battleApply.reloadBattleApply(0);
+						pack.add("0");
+					}else {
+						Disp.battleApply.reloadBattleApply(1);
+						pack.add("1");
+					}
+					OthelloClient.send("ApplyBattle",pack);
+					InputStream is = OthelloClient.socket1.getInputStream();
+					ObjectInputStream ois = new ObjectInputStream(is);
+					int a=(int)ois.readObject();
+					if(a==0) {
+					Disp.ChangeDisp(Disp.battleApply);
+					
+					}else if(a==1) {
+						JOptionPane.showMessageDialog(Disp.disp, "そのフレンドは現在取り込み中です");
+					reloadMainmenu();
+					repaint();
+					}
+					dispose();
+					
+				} catch (IOException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					// TODO 自動生成された catch ブロック
+					e1.printStackTrace();
+				}
+			
 			}
 		}
 
