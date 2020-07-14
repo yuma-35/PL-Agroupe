@@ -12,7 +12,6 @@ import enums.LogInStatus;
 import model.GameRecordToPlayer;
 import model.Match;
 import model.Player;
-
 import model.SendIcon;
 
 
@@ -387,12 +386,36 @@ public class DatabaseManager {
 	}
 
 	// friend_requestsに追加
-	public void insertFriendrequest(String playerId, String otherId) throws SQLException {
-		String sql = "INSERT INTO friend_requests(recieve_player_id,send_player_id) values(?, ?)";
-		PreparedStatement pstmt = connection.prepareStatement(sql);
-		pstmt.setString(1, otherId);
-		pstmt.setString(2, playerId);
-		pstmt.executeUpdate();
+	public boolean insertFriendrequest(String playerId, String otherId) throws SQLException {
+		//フレンド申請しようとしてる相手からフレンド申請が来てるか確認
+		String sql_2 = "select recieve_player_id, send_player_id from friend_requests where recieve_player_id = ? AND send_player_id = ?";
+		PreparedStatement pstmt_2 = connection.prepareStatement(sql_2);
+		pstmt_2.setString(1, playerId);
+		pstmt_2.setString(2, otherId);
+		ResultSet rs = pstmt_2.executeQuery();
+		if(rs.next() == true) {
+			//フレンド申請一覧から削除
+			String sql_3 = "DELETE FROM friend_requests where recieve_player_id = ? AND send_player_id = ?";
+			PreparedStatement pstmt_3 = connection.prepareStatement(sql_3);
+			pstmt_3.setString(1, playerId);
+			pstmt_3.setString(2, otherId);
+			pstmt_3.executeUpdate();
+			//フレンドリストに追加
+			String sql_4 = "INSERT INTO friends(player_id, opponent_id) values(?, ?)";
+			PreparedStatement pstmt_4 = connection.prepareStatement(sql_4);
+			pstmt_4.setString(1, playerId);
+			pstmt_4.setString(2, otherId);
+			pstmt_4.executeUpdate();
+			return false;
+
+		}else {
+			String sql = "INSERT INTO friend_requests(recieve_player_id,send_player_id) values(?, ?)";
+			PreparedStatement pstmt = connection.prepareStatement(sql);
+			pstmt.setString(1, otherId);
+			pstmt.setString(2, playerId);
+			pstmt.executeUpdate();
+			return true;
+		}
 
 	}
 
@@ -472,7 +495,7 @@ public class DatabaseManager {
 		ResultSet rs = pstmt.executeQuery();
 		rs.next();
 		int st= rs.getInt("status");
-		
+
 		return st;
 	}
 
