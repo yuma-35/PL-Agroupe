@@ -73,7 +73,8 @@ public class RecieveThread extends Thread {
 				Disp.othello.flip(xy.x, xy.y);
 				Disp.disp.othello.passEndListenner = false;
 			} else if (action.x == 11) {
-				
+				Point xy=pack.get(1);
+				Disp.disp.othello.receiveItem1(xy);
 				Disp.disp.othello.enemyItem1Button.setEnabled(false);
 				Disp.disp.othello.passEndListenner = false;
 				Disp.disp.othello.pasLabel.setText("相手がBombを使用しました");
@@ -117,10 +118,12 @@ public class RecieveThread extends Thread {
 			}
 
 			Disp.othello.myTurn = true;
-			if (Disp.othello.boardRepaint()&&!(!Disp.disp.othello.fullFlag&&!Disp.disp.othello.myItem2Button.isEnabled())
-					&&!(!Disp.disp.othello.fullFlag&&Disp.disp.othello.myItem5Button.isEnabled())&&!Disp.disp.othello.myItem4Button.isEnabled()) {
+			if (Disp.othello.boardRepaint()) {
+				if(!(!Disp.disp.othello.fullFlag&&Disp.disp.othello.myItem2Button.isEnabled())
+					&&!(!Disp.disp.othello.fullFlag&&Disp.disp.othello.myItem5Button.isEnabled())&&!Disp.disp.othello.myItem4Button.isEnabled()&&!Disp.disp.othello.myItem1Button.isEnabled()) {
 				ArrayList<Point> p=new ArrayList<Point>();
 				p.add(new Point(9, 9));
+				Disp.disp.othello.turnLabel.setText("相手のターンです");
 				OthelloClient.send("SendAction", p);
 				if (Disp.disp.othello.passEndListenner) {
 					if (Disp.disp.othello.bw == 0) {// hostならroomを消す
@@ -132,7 +135,10 @@ public class RecieveThread extends Thread {
 
 				Disp.othello.myTurn = false;
 				return;
+			}else {
+				Disp.othello.pasLabel.setText("アイテムを使ってください");
 			}
+				}
 		}
 		if (operation.equals("chat")) {
 			String newChat = (String) data;
