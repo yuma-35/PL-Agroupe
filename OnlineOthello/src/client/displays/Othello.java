@@ -34,8 +34,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.LineBorder;
 
-import com.sun.org.apache.bcel.internal.generic.NEW;
-import com.sun.org.apache.xml.internal.security.utils.UnsyncBufferedOutputStream;
+//import com.sun.org.apache.bcel.internal.generic.NEW;
+//import com.sun.org.apache.xml.internal.security.utils.UnsyncBufferedOutputStream;
 
 import client.OthelloClient;
 import model.Client;

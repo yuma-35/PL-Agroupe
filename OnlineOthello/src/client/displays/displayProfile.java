@@ -65,7 +65,7 @@ class displayProfile extends JDialog {
 		label2.setFont(new Font("MS ゴシック", Font.BOLD, 12));
 		label2.setForeground(Color.WHITE);
 
-		label2.setBounds(170, 10, 250, 25);
+		label2.setBounds(280, 10, 35, 35);
 		label2.setHorizontalAlignment(JLabel.CENTER);
 
 

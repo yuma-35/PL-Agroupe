@@ -212,7 +212,7 @@ public class ChangeIcon extends JPanel {
 		//JLabelにアイコンを設定
 		JLabel l = new JLabel(icon);
 
-		l.setBounds(10 + j, 50, 100, 100);
+		l.setBounds(35 + j, 70, 50, 50);
 		p.add(l);
 		j = j + 130;
 	}
@@ -241,6 +241,12 @@ public class ChangeIcon extends JPanel {
 			boolean status5 = false;
 
 			switch (files.length) {
+			case 1:
+				if (status1 == true) {
+					str = files[0].getPath();
+					str2 = files[0].getName();
+				}
+				break;
 			case 2:
 				status2 = radio2.isSelected();
 
