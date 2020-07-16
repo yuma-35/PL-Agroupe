@@ -1,5 +1,11 @@
 package client;
 
+import java.awt.Font;
+import java.awt.Dialog.ModalityType;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -8,14 +14,24 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.UIManager;
 
 import model.Client;
 import model.Match;
 import model.Player;
 import client.displays.Disp;
+import client.displays.Mainmenu.FriendBattleRequest;
+import client.displays.Mainmenu.RemoveCheck;
 
 public class OthelloClient {
+	IPin ipbox;
+boolean conection=false;
 	static public Socket socket1;
 	static public Socket socket2;
 	public String server = "localhost";
@@ -26,7 +42,11 @@ public class OthelloClient {
 	}
 
 	public OthelloClient() {
-
+	
+		do {
+			ipbox = new IPin(Disp.disp, ModalityType.APPLICATION_MODAL);
+			ipbox.setLocation(440, 220);
+			ipbox.setVisible(true);
 		try {
 			// ソケットを2つ作成
 			// サーバ受信用のソケット
@@ -36,15 +56,16 @@ public class OthelloClient {
 
 			RecieveThread recieveThread = new RecieveThread();
 			recieveThread.start();
-
+			conection=true;
 			// Macで表示が崩れないようにする設定
 			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-
+			
 			Disp.disp = new Disp("オセロ");
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(Disp.disp, "サーバーに接続できません。アドレスを確認してください。");	
 		}
+		}while(!conection);
 	}
 
 	static public void send(String operation, Object object) throws IOException {
@@ -80,6 +101,78 @@ public class OthelloClient {
 		enePlayer=(Player) ois2.readObject();
 		return enePlayer;
 	}
+	
+	class IPin extends JDialog implements WindowListener {
+		Disp disp;
+		JLabel nameLabel=new JLabel();
+		JButton setButton=new JButton("決定");		
+		JTextField ipField=new JTextField("localhost");
+		public IPin(Disp disp, ModalityType mt) {
+			// TODO 自動生成されたコンストラクター・スタブ
+			super(disp, mt);
+			this.disp = disp;
+			this.setSize(400, 250);
+			this.addWindowListener(this);
+			this.setTitle("IPアドレス指定");
+			this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			this.setLayout(null);
+			nameLabel.setText("IPアドレスを入力");
+			nameLabel.setHorizontalAlignment(JLabel.CENTER);
+			nameLabel.setBounds(0, 30, 400, 50);
+			nameLabel.setFont(new Font("MS ゴシック", Font.BOLD, 20));
+			this.add(nameLabel);
+			ipField.setBounds(100,100, 200, 30);
+			this.add(ipField);
+		
+			setButton.addActionListener(new Set());
+		setButton.setBounds(160, 150, 80, 40);
+		this.add(setButton);
+		}
+		class Set implements ActionListener {
+			public void actionPerformed(ActionEvent e) {
+			server=ipField.getText();
+			setVisible(false);
+			}
+			}
+		@Override
+		public void windowActivated(WindowEvent arg0) {
+			// TODO 自動生成されたメソッド・スタブ
+			
+		}
+		@Override
+		public void windowClosed(WindowEvent arg0) {
+			// TODO 自動生成されたメソッド・スタブ
+			System.exit(0);
+		}
+		@Override
+		public void windowClosing(WindowEvent arg0) {
+			// TODO 自動生成されたメソッド・スタブ
+			
+		}
+		@Override
+		public void windowDeactivated(WindowEvent arg0) {
+			// TODO 自動生成されたメソッド・スタブ
+			
+		}
+		@Override
+		public void windowDeiconified(WindowEvent arg0) {
+			// TODO 自動生成されたメソッド・スタブ
+			
+		}
+		@Override
+		public void windowIconified(WindowEvent arg0) {
+			// TODO 自動生成されたメソッド・スタブ
+			
+		}
+		@Override
+		public void windowOpened(WindowEvent arg0) {
+			// TODO 自動生成されたメソッド・スタブ
+			
+		}
+	
+	}
+	
+	
 }
 
 
