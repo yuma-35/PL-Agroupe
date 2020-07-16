@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -63,27 +64,44 @@ public class RecieveThread extends Thread {
 			Disp.othello.startOthello(rule, 0, enemyID);
 		}
 		if (operation.equals("action")) {
-			Point actionPoint = (Point) data;
-			if (actionPoint.x < 9) {
-				Disp.othello.flip(actionPoint.x, actionPoint.y);
+			Disp.disp.othello.pasLabel.setText("");
+			ArrayList<Point> pack=(ArrayList<Point>)data;
+			Point action = pack.get(0);
+			
+			if (action.x == 0) {
+				Point xy=pack.get(1);
+				Disp.othello.flip(xy.x, xy.y);
 				Disp.disp.othello.passEndListenner = false;
-			} else if (actionPoint.x == 11) {
-				Disp.othello.Item1();
+			} else if (action.x == 11) {
+				Point xy=pack.get(1);
+				Disp.disp.othello.receiveItem1(xy);
+				Disp.disp.othello.enemyItem1Button.setEnabled(false);
 				Disp.disp.othello.passEndListenner = false;
-			} else if (actionPoint.x == 12) {
-				Disp.othello.Item2();
+				Disp.disp.othello.pasLabel.setText("相手がBombを使用しました");
+			} else if (action.x == 12) {
+				Point xy=pack.get(1);
+				Disp.disp.othello.receiveItem2(xy);
+				Disp.disp.othello.enemyItem2Button.setEnabled(false);
 				Disp.disp.othello.passEndListenner = false;
-			} else if (actionPoint.x == 13) {
-				Disp.othello.Item3();
+				Disp.disp.othello.pasLabel.setText("相手がDiceを使用しました");
+			} else if (action.x == 13) {
+				Disp.disp.othello.enemyItem3Button.setEnabled(false);
 				Disp.disp.othello.passEndListenner = false;
-			} else if (actionPoint.x == 14) {
-				Disp.othello.Item4();
+				Disp.disp.othello.pasLabel.setText("相手がSkipを使用しました");
+			} else if (action.x == 14) {
+				Point xy=pack.get(1);
+				Disp.disp.othello.receiveItem4(xy);
+				Disp.disp.othello.enemyItem4Button.setEnabled(false);
 				Disp.disp.othello.passEndListenner = false;
-			} else if (actionPoint.x == 15) {
-				Disp.othello.Item5();
+				Disp.disp.othello.pasLabel.setText("相手がStealを使用しました");
+			} else if (action.x == 15) {
+				Point xy=pack.get(1);
+				Disp.disp.othello.receiveItem5(xy);
+				Disp.disp.othello.enemyItem5Button.setEnabled(false);
 				Disp.disp.othello.passEndListenner = false;
-			} else if (actionPoint.x == 9) {
-				// aパスなのでスル-
+				Disp.disp.othello.pasLabel.setText("相手がSpyを使用しました");
+			} else if (action.x == 9) {
+				
 				if (Disp.disp.othello.passEndListenner) {
 					if (Disp.disp.othello.bw == 0) {// hostならroomを消す
 						OthelloClient.send("deleteRoom", Client.myPlayer.id);
@@ -92,14 +110,21 @@ public class RecieveThread extends Thread {
 					return;
 				}
 				Disp.disp.othello.passEndListenner = true;
-			} else if (actionPoint.x == 10) {
+				Disp.disp.othello.pasLabel.setText("相手がパスしました");
+			} else if (action.x == 10) {
 				Disp.disp.othello.gameEnd(2);
+				Disp.disp.othello.pasLabel.setText("相手が投了しました");
 				return;
 			}
 
 			Disp.othello.myTurn = true;
 			if (Disp.othello.boardRepaint()) {
-				OthelloClient.send("SendAction", new Point(9, 9));
+				if(!(!Disp.disp.othello.fullFlag&&Disp.disp.othello.myItem2Button.isEnabled())
+					&&!(!Disp.disp.othello.fullFlag&&Disp.disp.othello.myItem5Button.isEnabled())&&!Disp.disp.othello.myItem4Button.isEnabled()&&!Disp.disp.othello.myItem1Button.isEnabled()) {
+				ArrayList<Point> p=new ArrayList<Point>();
+				p.add(new Point(9, 9));
+				Disp.disp.othello.turnLabel.setText("相手のターンです");
+				OthelloClient.send("SendAction", p);
 				if (Disp.disp.othello.passEndListenner) {
 					if (Disp.disp.othello.bw == 0) {// hostならroomを消す
 						OthelloClient.send("deleteRoom", Client.myPlayer.id);
@@ -110,7 +135,10 @@ public class RecieveThread extends Thread {
 
 				Disp.othello.myTurn = false;
 				return;
+			}else {
+				Disp.othello.pasLabel.setText("アイテムを使ってください");
 			}
+				}
 		}
 		if (operation.equals("chat")) {
 			String newChat = (String) data;
@@ -141,7 +169,8 @@ public class RecieveThread extends Thread {
 				int getrule=Integer.parseInt(packa.get(1));
 				packag.add(enemyID);
 				if (Disp.disp.battleApply.enemyID.getText().equals(enemyID)&&Disp.disp.battleApply.rule==getrule) {
-				Disp.othello.startOthello(Disp.disp.battleApply.rule, 0, enemyID);
+				OthelloClient.send("setStatus", 3);
+					Disp.othello.startOthello(Disp.disp.battleApply.rule, 0, enemyID);
 				Disp.disp.ChangeDisp(Disp.othello);
 				packag.add("0");
 				OthelloClient.send("ApplyMSG", packag);
