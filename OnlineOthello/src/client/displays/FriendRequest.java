@@ -381,7 +381,7 @@ no.setEnabled(false);
 				    ImageIcon smallIcon = new ImageIcon(smallImg);
 					eIcon.setIcon(smallIcon);
 
-					eIcon.setBounds(260, 220 + (i * 25), 25, 25);
+					eIcon.setBounds(260, 222 + (i * 25), 20, 20);
 					this.add(eIcon);
 				} catch (IOException | ClassNotFoundException e) {
 					// TODO 自動生成された catch ブロック
@@ -441,7 +441,7 @@ class GetProfile extends JDialog{
 		label2.setFont(new Font("MS ゴシック", Font.BOLD, 12));
 		label2.setForeground(Color.WHITE);
 
-		label2.setBounds(170, 10, 250, 25);
+		label2.setBounds(280, 10, 35, 35);
 		label2.setHorizontalAlignment(JLabel.CENTER);
 
 
