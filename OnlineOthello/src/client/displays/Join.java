@@ -94,7 +94,6 @@ public class Join extends JDialog {
 		//参加ボタン
 		public class toStart implements ActionListener{
 		    public  void actionPerformed(ActionEvent e) {
-		    	System.out.println(password.getText());
 		    if(password.getText().equals(amatch.password)) {
 		    	try {
 		    		ArrayList<String> sendPack =new ArrayList<String>();

@@ -38,7 +38,7 @@ public class ClientThread extends Thread {
 				if (playerIDString != null) {
 					int st = server.getStatus(playerIDString);
 					server.setStatus(playerIDString, 0);
-					System.out.println(playerIDString);
+					
 					if (st == 1) {
 
 					} else if (st == 2) {
@@ -288,7 +288,7 @@ ArrayList<Point> send=(ArrayList<Point>)data;
 			String enemyid = pack.get(0);
 			int msg = Integer.parseInt(pack.get(1));
 			int i = 0;
-			System.out.println(msg + "ai" + enemyid);
+			
 			if (server.clientList.size() != 0) {
 				do {
 					if (server.clientList.get(i).playerIDString.equals(enemyid)) {

@@ -602,7 +602,7 @@ friendScroll.add(friendlistPanel);
 				friendbattleButton.setText("参加");
 				statusLabel.setForeground(Color.ORANGE);
 				if (friendPlayer.frMatch.rule == 0) {
-					statusLabel.setText("対戦待ち(アイテム戦)");
+					statusLabel.setText("対戦待ち(通常戦)");
 				} else if (friendPlayer.frMatch.rule == 1) {
 					statusLabel.setText("対戦待ち(アイテム戦)");
 				}
@@ -687,6 +687,7 @@ friendScroll.add(friendlistPanel);
 			super(disp, mt);
 			friendName=name;
 			this.disp = disp;
+			this.setResizable(false);
 			this.setSize(500, 300);
 			this.setTitle("対戦申込");
 			this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -764,6 +765,7 @@ friendScroll.add(friendlistPanel);
 			this.disp = disp;
 			this.setSize(500, 300);
 			this.setTitle("フレンド解除");
+			this.setResizable(false);
 			this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			this.setLayout(null);
 			checkJLabel.setText("本当に" + name + "をフレンド解除しますか？");

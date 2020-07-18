@@ -57,7 +57,7 @@ public class DatabaseManager {
 		pstmt.setInt(11, 0);
 		pstmt.setString(12, "初心者です");
 		pstmt.setInt(13, LogInStatus.ONLINE.code);
-		System.out.println(pstmt);
+	
 		pstmt.executeUpdate();
 	}
 
@@ -197,11 +197,7 @@ public class DatabaseManager {
 		gameRecordToPlayers.add(gameRecordToPlayer);
 
 		for (GameRecordToPlayer record : gameRecordToPlayers) {
-			System.out.println("opponentId = " + record.opponentId);
-			System.out.println("win = " + record.win);
-			System.out.println("lose = " + record.lose);
-			System.out.println("draw = " + record.draw);
-			System.out.println("conceed = " + record.conceed);
+			
 		}
 		return gameRecordToPlayers;
 	}
@@ -480,7 +476,7 @@ public class DatabaseManager {
 		PreparedStatement pstmt2 = connection.prepareStatement(sql2);
 		pstmt2.setString(1, name);
 		ResultSet rs2 = pstmt2.executeQuery();
-		System.out.println(friendNameList.size());
+		
 		while (rs2.next()) {
 			friendNameList.add(rs2.getString("player_id"));
 		}
