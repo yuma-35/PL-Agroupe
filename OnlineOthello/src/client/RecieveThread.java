@@ -1,33 +1,27 @@
 package client;
 
 import java.awt.Color;
+import java.awt.Dialog.ModalityType;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.awt.Dialog.ModalityType;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
-import client.RecieveThread.FriendBattleRequestDialog;
-import client.displays.BattleApply;
-
 //import com.sun.org.glassfish.external.probe.provider.PluginPoint;
 
 import client.displays.Disp;
-import client.displays.BattleRequest.toRelease;
-import client.displays.Mainmenu.FriendBattleRequest;
 import model.Client;
 
 public class RecieveThread extends Thread {
@@ -102,11 +96,15 @@ public class RecieveThread extends Thread {
 				Disp.disp.othello.pasLabel.setText("相手がSpyを使用しました");
 			} else if (action.x == 9) {
 				
-				if (Disp.disp.othello.passEndListenner) {
+				if (Disp.disp.othello.passEndListenner&&!Disp.disp.othello.end) {
 					if (Disp.disp.othello.bw == 0) {// hostならroomを消す
 						OthelloClient.send("deleteRoom", Client.myPlayer.id);
 					}
+					ArrayList<Point> p=new ArrayList<Point>();
+					p.add(new Point(9, 9));
+					OthelloClient.send("SendAction", p);
 					Disp.disp.othello.gameEnd(Disp.disp.othello.countEnd());
+					Disp.disp.othello.end=true;
 					return;
 				}
 				Disp.disp.othello.passEndListenner = true;
@@ -120,16 +118,18 @@ public class RecieveThread extends Thread {
 			Disp.othello.myTurn = true;
 			if (Disp.othello.boardRepaint()) {
 				if(!(!Disp.disp.othello.fullFlag&&Disp.disp.othello.myItem2Button.isEnabled())
-					&&!(!Disp.disp.othello.fullFlag&&Disp.disp.othello.myItem5Button.isEnabled())&&!Disp.disp.othello.myItem4Button.isEnabled()&&!Disp.disp.othello.myItem1Button.isEnabled()) {
+					&&!(!Disp.disp.othello.fullFlag&&Disp.disp.othello.myItem5Button.isEnabled())&&!(Disp.disp.othello.myItem4Button.isEnabled()&&Disp.disp.othello.stealFlag)&&!Disp.disp.othello.myItem1Button.isEnabled()) {
 				ArrayList<Point> p=new ArrayList<Point>();
 				p.add(new Point(9, 9));
 				Disp.disp.othello.turnLabel.setText("相手のターンです");
+				Disp.disp.othello.pasLabel.setText("できる行動がありませんでした");
 				OthelloClient.send("SendAction", p);
-				if (Disp.disp.othello.passEndListenner) {
+				if (Disp.disp.othello.passEndListenner&&!Disp.disp.othello.end) {
 					if (Disp.disp.othello.bw == 0) {// hostならroomを消す
 						OthelloClient.send("deleteRoom", Client.myPlayer.id);
 					}
 					Disp.disp.othello.gameEnd(Disp.disp.othello.countEnd());
+					Disp.disp.othello.end=true;
 				}
 				Disp.disp.othello.passEndListenner = true;
 
@@ -146,7 +146,7 @@ public class RecieveThread extends Thread {
 			Disp.disp.othello.chatArea.setText(Disp.disp.othello.chatBuild.toString());
 		}
 		if (operation.equals("EnemyDisconected")) {
-			System.out.println("終わった");
+			
 			if (Disp.disp.othello.bw == 0) {// hostならroomを消す
 				OthelloClient.send("deleteRoom", Client.myPlayer.id);
 			}

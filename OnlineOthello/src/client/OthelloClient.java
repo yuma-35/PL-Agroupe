@@ -60,7 +60,7 @@ public class OthelloClient {
 		InputStream is = OthelloClient.socket1.getInputStream();
 		ObjectInputStream ois = new ObjectInputStream(is);
 		i=(int)ois.readObject();
-		System.out.println(i);
+	
 		return i;
 	}
 	static public Player getEnemy(String iDString) throws IOException, ClassNotFoundException {
@@ -69,14 +69,11 @@ public class OthelloClient {
 		pk.add(Client.myPlayer.id);
 		pk.add(iDString);
 		OthelloClient.send("getProfile", pk);
-		System.out.println("fsefegwg1ss");
 		InputStream is2 = OthelloClient.socket1.getInputStream();
-		System.out.println("fsefegwg2s");
 		ObjectInputStream ois2 = new ObjectInputStream(is2);
-		System.out.println("fsefegwg3ss");
 		String message=(String) ois2.readObject();
 		
-		System.out.println(message);
+	
 		enePlayer=(Player) ois2.readObject();
 		return enePlayer;
 	}

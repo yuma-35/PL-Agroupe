@@ -46,6 +46,8 @@ import model.SendIcon;
 //aラベルに条件付けして自動で変わるようにする
 
 public class Othello extends JPanel implements MouseListener {
+	public  boolean end= false;
+	public boolean stealFlag=true;
 	Result rsbox;
 	public boolean fullFlag = false;
 	public boolean myTurn = true;
@@ -131,7 +133,7 @@ public class Othello extends JPanel implements MouseListener {
 		toSounds.setForeground(Color.WHITE);
 		toSounds.setBackground(new Color(51, 102, 255));
 		toSounds.setBounds(870, 5, 90, 25);
-		toSounds.addActionListener(new Client.toSoundB());
+		toSounds.addActionListener(new toStartS());
 		this.add(toSounds);
 
 		conceedButton.setForeground(Color.WHITE);
@@ -208,15 +210,15 @@ public class Othello extends JPanel implements MouseListener {
 		myItem5Button.setToolTipText("Spy:好きなところに相手のコマを一つ置く（この時、他のコマはひっくり返らない）");
 
 		enemyItem1Button.setBounds(80, 370, 50, 50);
-		enemyItem1Button.setToolTipText("アイテムの説明");
+		enemyItem1Button.setToolTipText("Bomb:角以外の好きなコマを一つ消す");
 		enemyItem2Button.setBounds(140, 370, 50, 50);
-		enemyItem2Button.setToolTipText("アイテムの説明");
+		enemyItem2Button.setToolTipText("Dice:置けない場所にランダムに1つコマを置く");
 		enemyItem3Button.setBounds(50, 430, 50, 50);
-		enemyItem3Button.setToolTipText("アイテムの説明");
+		enemyItem3Button.setToolTipText("Skip:自分の番をとばす");
 		enemyItem4Button.setBounds(110, 430, 50, 50);
-		enemyItem4Button.setToolTipText("アイテムの説明");
+		enemyItem4Button.setToolTipText("Steal:相手のコマをランダムに1つひっくり返す");
 		enemyItem5Button.setBounds(170, 430, 50, 50);
-		enemyItem5Button.setToolTipText("アイテムの説明");
+		enemyItem5Button.setToolTipText("Spy:好きなところに相手のコマを一つ置く（この時、他のコマはひっくり返らない）");
 
 		conceedButton.setBounds(160, 60, 70, 30);
 		conceedButton.setFont(new Font("MS ゴシック", Font.BOLD, 16));
@@ -365,6 +367,7 @@ public class Othello extends JPanel implements MouseListener {
 
 	public boolean boardRepaint() {
 		boolean fullListenner = true;
+		boolean stealListennner=false;
 		if (myTurn) {
 			conceedButton.setEnabled(true);
 		} else {
@@ -372,14 +375,21 @@ public class Othello extends JPanel implements MouseListener {
 		}
 		getEnable();
 		boolean pasFlag = true;
+		 stealFlag = false;
 		for (int s = 1; s < 9; s++) {// a初期盤面セット
 			for (int t = 1; t < 9; t++) {
 				BoardLabels[s - 1][t - 1].setBorder(Boarderblack);
 				if (BoardInformation[s][t] == 0) {
+					if(bwE==0) {
+						stealListennner=true;
+					}
 					BoardLabels[s - 1][t - 1].setIcon(blackIcon);
 
 				} else if (BoardInformation[s][t] == 1) {
 					BoardLabels[s - 1][t - 1].setIcon(whiteIcon);
+					if(bwE==1) {
+						stealListennner=true;
+					}
 
 				} else if (BoardInformation[s][t] == 3) {
 					pasFlag = false;
@@ -395,6 +405,9 @@ public class Othello extends JPanel implements MouseListener {
 					fullListenner = false;
 				}
 			}
+		}
+		if(stealListennner) {
+			stealFlag=true;
 		}
 		if (myTurn) {
 
@@ -476,7 +489,7 @@ public class Othello extends JPanel implements MouseListener {
 				}
 			}
 		}
-		System.out.println(black + " " + white + " " + bw);
+
 		if (black == white) {
 			return 5;
 		} else if (black > white) {
@@ -604,13 +617,14 @@ public class Othello extends JPanel implements MouseListener {
 		} else {
 
 			if (myTurn) {
-				Music.se();
+
 				int x = 1 + (int) e.getPoint().x / 50;
 				int y = 1 + (int) e.getPoint().y / 50;
 
 				try {
 					if (spyFlag) {
 						if (BoardInformation[x][y] == 3 || BoardInformation[x][y] == 2) {
+							Music.se();
 							spyXY.x = x;
 							spyXY.y = y;
 							action(15, 15);
@@ -620,6 +634,7 @@ public class Othello extends JPanel implements MouseListener {
 						if (BoardInformation[x][y] == 0 || BoardInformation[x][y] == 1) {
 							if (!(x == 1 && y == 1) && !(x == 1 && y == 8) && !(x == 8 && y == 1)
 									&& !(x == 8 && y == 8)) {
+								Music.se();
 								BombXY.x = x;
 								BombXY.y = y;
 								action(11, 11);
@@ -628,6 +643,7 @@ public class Othello extends JPanel implements MouseListener {
 						}
 					} else {
 						if (BoardInformation[x][y] == 3) {
+							Music.se();
 							action(x, y);
 						}
 					}
@@ -649,8 +665,9 @@ public class Othello extends JPanel implements MouseListener {
 		for (int s = -1; s <= 1; s++) {// getenable用の処理
 			for (int t = -1; t <= 1; t++) {
 				if (s != 0 || t != 0) {
-					poteflag=false;
-					if (BoardInformation[point.x + s][point.y + t] == 0 || BoardInformation[point.x + s][point.y + t] == 1) {
+					poteflag = false;
+					if (BoardInformation[point.x + s][point.y + t] == 0
+							|| BoardInformation[point.x + s][point.y + t] == 1) {
 						addORnot = true;
 					} else if (BoardInformation[point.x + s][point.y + t] == 2) {
 						for (int ss = -1; ss <= 1; ss++) {// getenable用の処理
@@ -658,15 +675,15 @@ public class Othello extends JPanel implements MouseListener {
 								if (ss != 0 || tt != 0) {
 									if (BoardInformation[point.x + s + ss][point.y + t + tt] == 0
 											|| BoardInformation[point.x + s + ss][point.y + t + tt] == 1) {
-												poteflag=true;
+										poteflag = true;
 
 									}
 								}
 							}
 						}
-					if(!poteflag) {
-						potential.remove(new Point(point.x+s,point.y+t));
-					}
+						if (!poteflag) {
+							potential.remove(new Point(point.x + s, point.y + t));
+						}
 					}
 				}
 			}
@@ -745,7 +762,6 @@ public class Othello extends JPanel implements MouseListener {
 			BombFlag = false;
 			Item1(BombXY);
 			sendPack.add(new Point(BombXY.x, BombXY.y));
-			OthelloClient.send("SendAction", sendPack);
 			OthelloClient.send("SendAction", sendPack);
 			pasLabel.setText("Bombを使用しました");
 		} else if (x == 12 && y == 12) {
@@ -873,7 +889,7 @@ public class Othello extends JPanel implements MouseListener {
 
 	public class Item4 implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			if (myTurn && !spyFlag && !BombFlag) {
+			if (myTurn && !spyFlag && !BombFlag&&stealFlag) {
 				myItem4Button.setEnabled(false);
 				try {
 					action(14, 14);
@@ -1023,6 +1039,7 @@ public class Othello extends JPanel implements MouseListener {
 			this.setTitle("対局結果");
 			this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			this.setLayout(null);
+			this.setResizable(false);
 			friendRequestButton.setBounds(250, 300, 200, 50);
 			friendRequestButton.setHorizontalAlignment(JLabel.CENTER);
 			friendRequestButton.setFont(new Font("MS　ゴシック", Font.BOLD, 20));
@@ -1136,13 +1153,20 @@ public class Othello extends JPanel implements MouseListener {
 				}
 			}, 0, 10);
 			Client.myPlayer.rankPoint = Client.myPlayer.rankPoint + getpoint(endcase);
-			if (Client.myPlayer.rankPoint > 100) {
+			if (Client.myPlayer.rankPoint >= 100) {
 				Client.myPlayer.rankPoint = Client.myPlayer.rankPoint - 100;
 				Client.myPlayer.playerRank++;
-
+				if (Client.myPlayer.playerRank > 10) {
+					Client.myPlayer.playerRank = 10;
+					Client.myPlayer.rankPoint = 100;
+				}
 			} else if (Client.myPlayer.rankPoint < 0) {
 				Client.myPlayer.rankPoint = Client.myPlayer.rankPoint + 100;
 				Client.myPlayer.playerRank--;
+				if (Client.myPlayer.playerRank < 0) {
+					Client.myPlayer.playerRank = 0;
+					Client.myPlayer.rankPoint = 0;
+				}
 			}
 
 			try {
@@ -1180,7 +1204,7 @@ public class Othello extends JPanel implements MouseListener {
 		for (int s = -1; s <= 1; s++) {// getenable用の処理
 			for (int t = -1; t <= 1; t++) {
 				if (s != 0 || t != 0) {
-					poteflag=false;
+					poteflag = false;
 					if (BoardInformation[xy.x + s][xy.y + t] == 0 || BoardInformation[xy.x + s][xy.y + t] == 1) {
 						addORnot = true;
 					} else if (BoardInformation[xy.x + s][xy.y + t] == 2) {
@@ -1189,15 +1213,15 @@ public class Othello extends JPanel implements MouseListener {
 								if (ss != 0 || tt != 0) {
 									if (BoardInformation[xy.x + s + ss][xy.y + t + tt] == 0
 											|| BoardInformation[xy.x + s + ss][xy.y + t + tt] == 1) {
-												poteflag=true;
+										poteflag = true;
 
 									}
 								}
 							}
 						}
-					if(!poteflag) {
-						potential.remove(new Point(xy.x,xy.y));
-					}
+						if (!poteflag) {
+							potential.remove(new Point(xy.x, xy.y));
+						}
 					}
 				}
 			}
