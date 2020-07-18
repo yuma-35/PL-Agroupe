@@ -11,6 +11,7 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import model.Match;
+import model.OthelloRoom;
 
 public class ClientThread extends Thread {
 	private OthelloServer server = OthelloServer.getInstance();

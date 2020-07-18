@@ -15,6 +15,7 @@ import javax.imageio.ImageIO;
 import database.DatabaseManager;
 import model.GameRecordToPlayer;
 import model.Match;
+import model.OthelloRoom;
 import model.Player;
 import model.SendIcon;
 
