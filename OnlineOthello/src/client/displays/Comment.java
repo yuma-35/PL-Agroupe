@@ -135,7 +135,7 @@ public class Comment extends JPanel {
 					return;
 				}
 				if(message.equals("success")) {
-					Disp.ChangeDisp(Disp.mainmenu);
+					Disp.ChangeDisp(Disp.account);
 				}
 			} catch (IOException | ClassNotFoundException e1) {
 				// TODO 自動生成された catch ブロック

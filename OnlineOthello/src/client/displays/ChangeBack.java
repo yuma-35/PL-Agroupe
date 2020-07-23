@@ -159,14 +159,14 @@ public class ChangeBack extends JPanel {
 		this.add(radio0);
 
 		//オリジナル
-	/*	if (files.length == 5) {
-			radio5 = new JRadioButton("", false);
-			radio5.setBackground(Color.LIGHT_GRAY);
-			group.add(radio5);
+		/*	if (files.length == 5) {
+				radio5 = new JRadioButton("", false);
+				radio5.setBackground(Color.LIGHT_GRAY);
+				group.add(radio5);
 
-			radio5.setBounds(740, 230, 100, 25);
-			this.add(radio5);
-		}*/
+				radio5.setBounds(740, 230, 100, 25);
+				this.add(radio5);
+			}*/
 
 	}
 
@@ -186,6 +186,7 @@ public class ChangeBack extends JPanel {
 		p.add(l);
 		j = j + 130;
 	}
+
 	public void ImageTest2(String str) {
 		ImageIcon icon = new ImageIcon(str);
 
@@ -238,15 +239,15 @@ public class ChangeBack extends JPanel {
 				str = files[3].getPath();
 			} else if (status5 == true) {
 				str = files[4].getPath();
-			}else if (status6 == true) {
+			} else if (status6 == true) {
 				str = files[5].getPath();
-			}else if (status7 == true) {
+			} else if (status7 == true) {
 				str = files[6].getPath();
-			}else if (status8 == true) {
+			} else if (status8 == true) {
 				str = files[7].getPath();
-			}else if (status9 == true) {
+			} else if (status9 == true) {
 				str = files[8].getPath();
-			}else if (status0 == true) {
+			} else if (status0 == true) {
 				str = files[9].getPath();
 			}
 
@@ -286,6 +287,27 @@ public class ChangeBack extends JPanel {
 			return str2;
 
 		}
+	}
+
+	//テキストエリアの中身を返す
+	public String getBack() {
+		String str2 = null;
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(f));
+
+			String str;
+			while ((str = br.readLine()) != null) {
+				str2 = str;
+			}
+
+			br.close();
+
+		} catch (IOException e1) {
+			System.out.println(e1);
+			JOptionPane.showMessageDialog(Disp.disp, "エラーが発生しました");
+		}
+		return str2;
+
 	}
 
 }

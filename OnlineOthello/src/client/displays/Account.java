@@ -103,6 +103,7 @@ public class Account extends JPanel {
 	//音量調整ボタン
 	public class toStartS implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
+			Music.se();
 			subWindow = new Music(Disp.disp, ModalityType.MODELESS);
 			subWindow.setLocation(440, 220);
 			//	this.addLogMessage("サブダイアログのモーダル表示処理を開始");
