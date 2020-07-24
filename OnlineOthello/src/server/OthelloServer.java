@@ -20,6 +20,7 @@ import model.Player;
 import model.SendIcon;
 
 class OthelloServer {
+
 	private static OthelloServer instance;
 	public ServerSocket ss;
 	public ArrayList<ClientThread> clientList;
@@ -433,7 +434,7 @@ class OthelloServer {
 	}
 
 	public void setStatus(String playerID, int i) throws SQLException {
-	
+
 		db.setStatusDB(playerID, i);
 		return;
 	}
@@ -458,13 +459,13 @@ class OthelloServer {
 		// TODO 自動生成されたメソッド・スタブ
 		ArrayList<String> pack = (ArrayList<String>) data;
 		String enemyid=pack.get(0);
-		
+
 		int i = 0;
 		int st;
 		st=db.getStatusDB(enemyid);
 		OutputStream os = clientThread.socket1.getOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(os);
-		
+
 		if (clientList.size() != 0&&st!=3&&st!=2&&st!=0) {
 			do {
 				if (clientList.get(i).playerIDString.equals(enemyid)) {
@@ -475,7 +476,7 @@ class OthelloServer {
 				}
 				i++;
 			} while (i < clientList.size());
-		
+
 		}
 		oos.writeObject(1);
 		return false;
@@ -495,9 +496,9 @@ class OthelloServer {
 				}
 				i++;
 			} while (i < clientList.size());
-		
+
 		}
-		
+
 	}
 
 }

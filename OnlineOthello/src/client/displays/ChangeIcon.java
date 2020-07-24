@@ -19,6 +19,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
@@ -131,6 +132,8 @@ public class ChangeIcon extends JPanel {
 
 		//オリジナル
 		switch (files.length) {
+		case 1:
+			break;
 		case 2:
 			radio2 = new JRadioButton("", false);
 			radio2.setBackground(Color.LIGHT_GRAY);
@@ -195,6 +198,33 @@ public class ChangeIcon extends JPanel {
 
 			radio5.setBounds(740, 230, 100, 25);
 			this.add(radio5);
+			break;
+		default:
+			radio2 = new JRadioButton("", false);
+			radio2.setBackground(Color.LIGHT_GRAY);
+			group.add(radio2);
+			radio2.setBounds(350, 230, 100, 25);
+			this.add(radio2);
+
+			radio3 = new JRadioButton("", false);
+			radio3.setBackground(Color.LIGHT_GRAY);
+			group.add(radio3);
+			radio3.setBounds(480, 230, 100, 25);
+			this.add(radio3);
+
+			radio4 = new JRadioButton("", false);
+			radio4.setBackground(Color.LIGHT_GRAY);
+			group.add(radio4);
+			radio4.setBounds(610, 230, 100, 25);
+			this.add(radio4);
+
+			radio5 = new JRadioButton("", false);
+			radio5.setBackground(Color.LIGHT_GRAY);
+			group.add(radio5);
+
+			radio5.setBounds(740, 230, 100, 25);
+			this.add(radio5);
+			JOptionPane.showMessageDialog(Disp.disp, "アカウント編集画面でファイルは計5つまで表示できます。\n選択したいファイルが表示されない可能性があります。");
 			break;
 
 		}
@@ -292,7 +322,7 @@ public class ChangeIcon extends JPanel {
 					str2 = files[3].getName();
 				}
 				break;
-			case 5:
+			default:
 				status2 = radio2.isSelected();
 				status3 = radio3.isSelected();
 				status4 = radio4.isSelected();
@@ -325,7 +355,7 @@ public class ChangeIcon extends JPanel {
 				bw.write(str);
 				bw.close();
 
-				Disp.ChangeDisp(Disp.mainmenu);
+				//Disp.ChangeDisp(Disp.mainmenu);
 			} catch (IOException e1) {
 				System.out.println(e1);
 			}
@@ -345,7 +375,7 @@ public class ChangeIcon extends JPanel {
 					return;
 				}
 				if (message.equals("success")) {
-					Disp.ChangeDisp(Disp.mainmenu);
+					Disp.ChangeDisp(Disp.account);
 				}
 			} catch (IOException | ClassNotFoundException e1) {
 				// TODO 自動生成された catch ブロック

@@ -221,7 +221,7 @@ public class Music extends JDialog {
 
 	//テキストエリアの中身を返す
 	public static float getVol(File f) {
-		float vol = -37;
+		float vol = 50;
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(f));
 
