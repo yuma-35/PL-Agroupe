@@ -1,7 +1,7 @@
 package client;
 
-import java.awt.Font;
 import java.awt.Dialog.ModalityType;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -21,13 +21,11 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
-import model.Client;
-import model.Match;
-import model.Player;
 import client.displays.Disp;
-import client.displays.Mainmenu.FriendBattleRequest;
-import client.displays.Mainmenu.RemoveCheck;
+import model.Client;
+import model.Player;
 
 public class OthelloClient {
 	IPin ipbox;
@@ -38,6 +36,14 @@ boolean conection=false;
 	public int port = 4231;
 
 	public static void main(String args[]) {
+		// Macで表示が崩れないようにする設定
+		try {
+			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+				| UnsupportedLookAndFeelException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
 		new OthelloClient();
 	}
 
@@ -57,8 +63,6 @@ boolean conection=false;
 			RecieveThread recieveThread = new RecieveThread();
 			recieveThread.start();
 			conection=true;
-			// Macで表示が崩れないようにする設定
-			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
 			
 			Disp.disp = new Disp("オセロ");
 

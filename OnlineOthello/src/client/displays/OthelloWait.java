@@ -85,9 +85,9 @@ public class OthelloWait extends JPanel {
 				}
 			}
 		}, 0, 1000);
-		if (item == 0) {
+		if (item == 1) {
 			rule.setText("アイテム戦");
-		} else {
+		} else if (item == 0) {
 			rule.setText("通常戦");
 		}
 	}
