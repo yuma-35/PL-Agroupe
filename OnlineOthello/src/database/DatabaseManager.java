@@ -151,10 +151,11 @@ public class DatabaseManager {
 
 	//対局記録取得
 	public ArrayList<GameRecordToPlayer> getGameRecords(String playerId) throws SQLException {
-		String sql = "select opponent_id, result, count(*) from game_records where player_id = ? group by opponent_id, result";
+		String sql = "select opponent_id as c1, result, count(*), ( select count(*) FROM game_records where player_id = ? group by opponent_id having opponent_id = c1 ) AS game_records_to_player_count from game_records where player_id = ? group by opponent_id, result order by game_records_to_player_count DESC, opponent_id";
 		PreparedStatement pstmt = connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
 				ResultSet.CONCUR_READ_ONLY);
 		pstmt.setString(1, playerId);
+		pstmt.setString(2, playerId);
 		ResultSet rs = pstmt.executeQuery();
 
 		// 人ごとの対局記録のリスト
@@ -168,20 +169,20 @@ public class DatabaseManager {
 		if (!rs.next()) {
 			return null;
 		}
-		previousRawOpponentId = rs.getString("opponent_id");
-		gameRecordToPlayer.opponentId = rs.getString("opponent_id");
+		previousRawOpponentId = rs.getString("c1");
+		gameRecordToPlayer.opponentId = rs.getString("c1");
 		rs.previous();
 
 		while (rs.next()) {
 			// opponentIdの境目だった場合
-			if (!previousRawOpponentId.equals(rs.getString("opponent_id"))) {
+			if (!previousRawOpponentId.equals(rs.getString("c1"))) {
 				// 前の人の対局記録をリストに追加
 				gameRecordToPlayers.add(gameRecordToPlayer);
 				// 次の人の対局記録を新たに作成
 				gameRecordToPlayer = new GameRecordToPlayer();
-				gameRecordToPlayer.opponentId = rs.getString("opponent_id");
+				gameRecordToPlayer.opponentId = rs.getString("c1");
 				//次の人へ
-				previousRawOpponentId = rs.getString("opponent_id");
+				previousRawOpponentId = rs.getString("c1");
 			}
 			if (rs.getInt("result") == 1) {
 				gameRecordToPlayer.win = rs.getInt("count(*)");
