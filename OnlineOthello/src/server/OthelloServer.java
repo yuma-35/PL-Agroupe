@@ -113,6 +113,11 @@ class OthelloServer {
 			oos.writeObject("failed");
 			return;
 		}
+		if (0!=db.getStatusDB(id)) {
+			oos.writeObject("failed");
+			return;
+		}
+		
 		db.setStatusToLogIn(id);
 		oos.writeObject("success");
 		return;
