@@ -57,7 +57,7 @@ public class DatabaseManager {
 		pstmt.setInt(11, 0);
 		pstmt.setString(12, "初心者です");
 		pstmt.setInt(13, LogInStatus.ONLINE.code);
-	
+
 		pstmt.executeUpdate();
 	}
 
@@ -131,7 +131,7 @@ public class DatabaseManager {
 
 
 	//アイコン情報送信
-	public SendIcon sendIcon(String playerId) throws SQLException {
+	public File sendIcon(String playerId) throws SQLException {
 		//アイコン名取得
 		String sql =  "SELECT icon_image  FROM players WHERE id = ?";
 		PreparedStatement pstmt = connection.prepareStatement(sql);
@@ -146,7 +146,7 @@ public class DatabaseManager {
 		SendIcon send = new SendIcon(playerId,name0,f);
 
 
-		return send;
+		return f;
 	}
 
 	//対局記録取得
@@ -198,7 +198,7 @@ public class DatabaseManager {
 		gameRecordToPlayers.add(gameRecordToPlayer);
 
 		for (GameRecordToPlayer record : gameRecordToPlayers) {
-			
+
 		}
 		return gameRecordToPlayers;
 	}
@@ -477,7 +477,7 @@ public class DatabaseManager {
 		PreparedStatement pstmt2 = connection.prepareStatement(sql2);
 		pstmt2.setString(1, name);
 		ResultSet rs2 = pstmt2.executeQuery();
-		
+
 		while (rs2.next()) {
 			friendNameList.add(rs2.getString("player_id"));
 		}
@@ -506,7 +506,7 @@ public class DatabaseManager {
 	}
 
 
-	
-	
-	
+
+
+
 }

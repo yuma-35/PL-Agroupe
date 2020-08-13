@@ -7,6 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -19,7 +20,6 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 
 import client.OthelloClient;
-import model.SendIcon;
 
 class displayProfile extends JDialog {
 
@@ -43,7 +43,6 @@ class displayProfile extends JDialog {
 
 	//
 
-
 	public displayProfile(Disp disp, ModalityType mt) {
 		super(disp, mt);
 
@@ -53,7 +52,6 @@ class displayProfile extends JDialog {
 		this.setLayout(null);
 		this.getContentPane().setBackground(Color.LIGHT_GRAY);
 		this.setResizable(false);
-
 
 		label1 = new JLabel();
 		label1.setFont(new Font("MS ゴシック", Font.BOLD, 22));
@@ -67,7 +65,6 @@ class displayProfile extends JDialog {
 
 		label2.setBounds(280, 10, 35, 35);
 		label2.setHorizontalAlignment(JLabel.CENTER);
-
 
 		label3 = new JLabel();
 		label3.setFont(new Font("MS ゴシック", Font.BOLD, 12));
@@ -129,10 +126,10 @@ class displayProfile extends JDialog {
 				InputStream is = OthelloClient.socket1.getInputStream();
 				ObjectInputStream ois = new ObjectInputStream(is);
 				String message = (String) ois.readObject();
-				if(message.equals("success")) {
+				if (message.equals("success")) {
 					label.setText("フレンド申請しました");
 					ok.setEnabled(false);
-				}else if(message.equals("failed")){
+				} else if (message.equals("failed")) {
 					label.setText("申請が来ていたためフレンドに追加されました");
 					ok.setEnabled(false);
 				}
@@ -154,40 +151,71 @@ class displayProfile extends JDialog {
 		}
 	}
 
-	public void reloadProfile(String id, int rank, int win, int lose, int draw, int conceed, String comment, String icon, int flag) {
+	public void reloadProfile(String id, int rank, int win, int lose, int draw, int conceed, String comment,
+			String icon, int flag) {
 		label1.setText(id);
-//
+		//
 		//アイコン要求
 		try {
 			OthelloClient.send("geticon", id);
 			//受け取り
-			SendIcon iconData;
 			InputStream is2 = OthelloClient.socket1.getInputStream();
-			ObjectInputStream ois2 = new ObjectInputStream(is2);
-			iconData = (SendIcon) ois2.readObject();
 
-			File f = iconData.getImage();
-			BufferedImage img = ImageIO.read(f);
+			File f  = new File("f.out");
+			FileOutputStream fileOutStream = new FileOutputStream( f);
+			int waitCount = 0;
+			int recvFileSize;       //InputStreamから受け取ったファイルのサイズ
+		    byte[] fileBuff = new byte[512];      //サーバからのファイル出力を受け取る
+
+
+			 while( true )
+          {
+            //ストリームから読み込める時
+            if( is2.available() > 0 )
+            {
+              //受け取ったbyteをファイルに書き込み
+              recvFileSize = is2.read(fileBuff);
+              fileOutStream.write( fileBuff , 0 , recvFileSize );
+            }
+
+            //タイムアウト処理
+            else
+            {
+              waitCount++;
+              Thread.sleep(100);
+              if (waitCount > 10)break;
+            }
+          }
+
+          //ファイルの書き込みを閉じる
+          fileOutStream.close();
+
+          //ここから読み込んで、表示
+          BufferedImage img = ImageIO.read(f);
+
 			eIcon = new ImageIcon(img);
 			Image smallImg = eIcon.getImage().getScaledInstance((int) (eIcon.getIconWidth() * 0.7), -1,
 					Image.SCALE_SMOOTH);
 			ImageIcon smallIcon = new ImageIcon(smallImg);
 			label2.setIcon(smallIcon);
-			//label2.setIcon(eIcon);
 
+			//ファイル削除
+				f.delete();
 
-		} catch (IOException | ClassNotFoundException e) {
+		} catch (IOException /*| ClassNotFoundException*/ e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		} catch (InterruptedException e) {
 			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
 		}
-//
+		//
 		//label2.setText(icon);
-		label3.setText("ランク "+ rank);
-		label4.setText("対戦成績: "+win+"勝 "+lose+"敗 "+draw+"引き分け "+conceed+"投了");
+		label3.setText("ランク " + rank);
+		label4.setText("対戦成績: " + win + "勝 " + lose + "敗 " + draw + "引き分け " + conceed + "投了");
 		label5.setText(comment);
 
-
-		if(flag == 1) {
+		if (flag == 1) {
 			ok.setEnabled(false);
 		}
 	}
@@ -198,4 +226,3 @@ class displayProfile extends JDialog {
 	}
 
 }
-
