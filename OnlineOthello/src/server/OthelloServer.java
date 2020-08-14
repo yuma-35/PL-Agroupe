@@ -1,16 +1,16 @@
 package server;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
-import javax.imageio.ImageIO;
 
 import database.DatabaseManager;
 import model.GameRecordToPlayer;
@@ -113,11 +113,11 @@ class OthelloServer {
 			oos.writeObject("failed");
 			return;
 		}
-		if (0!=db.getStatusDB(id)) {
+		if (0 != db.getStatusDB(id)) {
 			oos.writeObject("failed");
 			return;
 		}
-		
+
 		db.setStatusToLogIn(id);
 		oos.writeObject("success");
 		return;
@@ -142,24 +142,63 @@ class OthelloServer {
 	}
 
 	// アイコン編集
-	public void addIIcon(Object data, ClientThread client) throws IOException, SQLException {
-		ArrayList<SendIcon> iconData = (ArrayList<SendIcon>) data;
+	public void addIIcon(SendIcon iconData, ClientThread client) throws IOException, SQLException {
+		//ArrayList<SendIcon> iconData = (ArrayList<SendIcon>) data;
 
-		SendIcon sendIcon = iconData.get(0);
-		BufferedImage img = ImageIO.read(sendIcon.image);
+		InputStream is = client.socket2.getInputStream();
+
+		//受け取り
+
+		File f = new File("サーバ画像/" + iconData.iconName);
+		FileOutputStream fileOutStream = new FileOutputStream( f);
+		int waitCount = 0;
+		int recvFileSize;       //InputStreamから受け取ったファイルのサイズ
+	    byte[] fileBuff = new byte[512];      //サーバからのファイル出力を受け取る
+
+
+		 while( true )
+      {
+        //ストリームから読み込める時
+        if( is.available() > 0 )
+        {
+          //受け取ったbyteをファイルに書き込み
+          recvFileSize = is.read(fileBuff);
+          fileOutStream.write( fileBuff , 0 , recvFileSize );
+        }
+
+        //タイムアウト処理
+        else
+        {
+          waitCount++;
+          try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+          if (waitCount > 10)break;
+        }
+      }
+
+      //ファイルの書き込みを閉じる
+      fileOutStream.close();
+
+
+//ここまで
+		/*BufferedImage img = ImageIO.read(is);
 
 		// イメージ保存
 		try {
-			File f = new File("サーバ画像/" + sendIcon.iconName);
+			File f = new File("サーバ画像/" + iconData.iconName);
 			ImageIO.write(img, "PNG", f);
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}*/
 
 		OutputStream os = client.socket1.getOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(os);
 
-		if (db.addIcon(sendIcon.id, sendIcon.iconName)) {
+		if (db.addIcon(iconData.id, iconData.iconName)) {
 			oos.writeObject("success");
 		} else {
 			// db.insertPlayer(player);
@@ -192,13 +231,30 @@ class OthelloServer {
 	public void geticon(Object data, ClientThread client) throws IOException, SQLException {
 		String Id = (String) data;
 		OutputStream os = client.socket1.getOutputStream();
-		ObjectOutputStream oos = new ObjectOutputStream(os);
+		//ObjectOutputStream oos = new ObjectOutputStream(os);
+
+		byte[] buffer = new byte[512]; // ファイル送信時のバッファ
 
 		// 送信用
-		SendIcon iconData;
+				File iconData;
 
 		iconData = db.sendIcon(Id);
-		oos.writeObject(iconData);
+
+		// ファイルをストリームで送信
+
+		int fileLength;
+		InputStream inputStream = new FileInputStream(iconData);
+
+		while ((fileLength = inputStream.read(buffer)) > 0) {
+
+			os.write(buffer, 0, fileLength);
+
+		}
+		// 終了処理
+
+		os.flush();
+
+		inputStream.close();
 	}
 
 	public void forget(Object i, ClientThread client) throws IOException, SQLException {
@@ -341,9 +397,9 @@ class OthelloServer {
 		OutputStream os = client.socket1.getOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(os);
 		boolean q = db.insertFriendrequest(playerId, otherId);
-		if(q) {
+		if (q) {
 			oos.writeObject("success");
-		}else{
+		} else {
 			oos.writeObject("failed");
 		}
 
@@ -423,7 +479,6 @@ class OthelloServer {
 						z++;
 					} while (z < matchList.size());
 
-
 				}
 				i++;
 			} while (i < friendList.size());
@@ -463,15 +518,15 @@ class OthelloServer {
 	public boolean applyBattleSet(Object data, ClientThread clientThread) throws SQLException, IOException {
 		// TODO 自動生成されたメソッド・スタブ
 		ArrayList<String> pack = (ArrayList<String>) data;
-		String enemyid=pack.get(0);
+		String enemyid = pack.get(0);
 
 		int i = 0;
 		int st;
-		st=db.getStatusDB(enemyid);
+		st = db.getStatusDB(enemyid);
 		OutputStream os = clientThread.socket1.getOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(os);
 
-		if (clientList.size() != 0&&st!=3&&st!=2&&st!=0) {
+		if (clientList.size() != 0 && st != 3 && st != 2 && st != 0) {
 			do {
 				if (clientList.get(i).playerIDString.equals(enemyid)) {
 					clientThread.enemySocket1 = clientList.get(i).socket1;
@@ -488,11 +543,11 @@ class OthelloServer {
 	}
 
 	public void getEnemyThread(Object data, ClientThread clientThread) throws SQLException {
-		String enemyID=(String)data;
+		String enemyID = (String) data;
 		int st;
-		st=db.getStatusDB(enemyID);
-		int i=0;
-		if (clientList.size() != 0&&st!=0) {
+		st = db.getStatusDB(enemyID);
+		int i = 0;
+		if (clientList.size() != 0 && st != 0) {
 			do {
 				if (clientList.get(i).playerIDString.equals(enemyID)) {
 					clientThread.enemySocket1 = clientList.get(i).socket1;

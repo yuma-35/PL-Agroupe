@@ -8,12 +8,13 @@ import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.util.ArrayList;
+import java.io.OutputStream;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
@@ -364,9 +365,32 @@ public class ChangeIcon extends JPanel {
 			try {
 				//Client.myPlayer.id = "peach";  //実験用
 				SendIcon send = new SendIcon(Client.myPlayer.id, str2, new File(str));
-				ArrayList<SendIcon> data = new ArrayList<SendIcon>();
-				data.add(send);
-				OthelloClient.send("addIIcon", data);
+				OthelloClient.send("addIIcon", send);
+
+				OutputStream os = OthelloClient.socket2.getOutputStream();
+
+				byte[] buffer = new byte[512]; // ファイル送信時のバッファ
+
+				// 送信用
+				File iconData;
+
+				iconData = new File(str);
+				// ファイルをストリームで送信
+
+				int fileLength;
+				InputStream inputStream = new FileInputStream(iconData);
+
+				while ((fileLength = inputStream.read(buffer)) > 0) {
+
+					os.write(buffer, 0, fileLength);
+
+				}
+				// 終了処理
+
+				os.flush();
+
+				inputStream.close();
+
 				InputStream is = OthelloClient.socket1.getInputStream();
 				ObjectInputStream ois = new ObjectInputStream(is);
 				String message = (String) ois.readObject();

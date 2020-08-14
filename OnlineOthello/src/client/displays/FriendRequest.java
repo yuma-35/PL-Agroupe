@@ -14,6 +14,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -28,7 +29,6 @@ import javax.swing.JPanel;
 
 import client.OthelloClient;
 import model.Player;
-import model.SendIcon;
 
 public class FriendRequest extends JPanel implements MouseListener{
 
@@ -361,8 +361,68 @@ no.setEnabled(false);
 
 
 				//アイコン
-//				//アイコン要求
+				//アイコン要求
 				try {
+					ImageIcon enemyIcon = new ImageIcon();
+					JLabel eIcon = new JLabel();
+
+					OthelloClient.send("geticon", requestData.get(i));
+					//受け取り
+					InputStream is2 = OthelloClient.socket1.getInputStream();
+
+					File f  = new File("f.out");
+					FileOutputStream fileOutStream = new FileOutputStream( f);
+					int waitCount = 0;
+					int recvFileSize;       //InputStreamから受け取ったファイルのサイズ
+				    byte[] fileBuff = new byte[512];      //サーバからのファイル出力を受け取る
+
+
+					 while( true )
+		          {
+		            //ストリームから読み込める時
+		            if( is2.available() > 0 )
+		            {
+		              //受け取ったbyteをファイルに書き込み
+		              recvFileSize = is2.read(fileBuff);
+		              fileOutStream.write( fileBuff , 0 , recvFileSize );
+		            }
+
+		            //タイムアウト処理
+		            else
+		            {
+		              waitCount++;
+		              Thread.sleep(100);
+		              if (waitCount > 10)break;
+		            }
+		          }
+
+		          //ファイルの書き込みを閉じる
+		          fileOutStream.close();
+
+		          //ここから読み込んで、表示
+		          BufferedImage img = ImageIO.read(f);
+
+		          enemyIcon = new ImageIcon(img);
+					Image smallImg = enemyIcon.getImage().getScaledInstance((int) (enemyIcon.getIconWidth() * 0.4), -1,
+							Image.SCALE_SMOOTH);
+					ImageIcon smallIcon = new ImageIcon(smallImg);
+					eIcon.setIcon(smallIcon);
+
+					eIcon.setBounds(260, 222 + (i * 25), 20, 20);
+					this.add(eIcon);
+
+					//ファイル削除
+						f.delete();
+
+				} catch (IOException /*| ClassNotFoundException*/ e) {
+					// TODO 自動生成された catch ブロック
+					e.printStackTrace();
+				} catch (InterruptedException e) {
+					// TODO 自動生成された catch ブロック
+					e.printStackTrace();
+				}
+//				//旧アイコン要求
+				/*try {
 					ImageIcon enemyIcon = new ImageIcon();
 					JLabel eIcon = new JLabel();
 
@@ -386,7 +446,7 @@ no.setEnabled(false);
 				} catch (IOException | ClassNotFoundException e) {
 					// TODO 自動生成された catch ブロック
 					e.printStackTrace();
-				}
+				}*/
 	//
 
 			}
@@ -507,7 +567,61 @@ class GetProfile extends JDialog{
 		label1.setText(id);
 //
 		//アイコン要求
-		try {
+				try {
+					OthelloClient.send("geticon", id);
+					//受け取り
+					InputStream is2 = OthelloClient.socket1.getInputStream();
+
+					File f  = new File("f.out");
+					FileOutputStream fileOutStream = new FileOutputStream( f);
+					int waitCount = 0;
+					int recvFileSize;       //InputStreamから受け取ったファイルのサイズ
+				    byte[] fileBuff = new byte[512];      //サーバからのファイル出力を受け取る
+
+
+					 while( true )
+		          {
+		            //ストリームから読み込める時
+		            if( is2.available() > 0 )
+		            {
+		              //受け取ったbyteをファイルに書き込み
+		              recvFileSize = is2.read(fileBuff);
+		              fileOutStream.write( fileBuff , 0 , recvFileSize );
+		            }
+
+		            //タイムアウト処理
+		            else
+		            {
+		              waitCount++;
+		              Thread.sleep(100);
+		              if (waitCount > 10)break;
+		            }
+		          }
+
+		          //ファイルの書き込みを閉じる
+		          fileOutStream.close();
+
+		          //ここから読み込んで、表示
+		          BufferedImage img = ImageIO.read(f);
+
+					eIcon = new ImageIcon(img);
+					Image smallImg = eIcon.getImage().getScaledInstance((int) (eIcon.getIconWidth() * 0.7), -1,
+							Image.SCALE_SMOOTH);
+					ImageIcon smallIcon = new ImageIcon(smallImg);
+					label2.setIcon(smallIcon);
+
+					//ファイル削除
+						f.delete();
+
+				} catch (IOException /*| ClassNotFoundException*/ e) {
+					// TODO 自動生成された catch ブロック
+					e.printStackTrace();
+				} catch (InterruptedException e) {
+					// TODO 自動生成された catch ブロック
+					e.printStackTrace();
+				}
+		//旧アイコン要求
+		/*try {
 			OthelloClient.send("geticon", id);
 			//受け取り
 			SendIcon iconData;
@@ -528,7 +642,7 @@ class GetProfile extends JDialog{
 		} catch (IOException | ClassNotFoundException e) {
 			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
-		}
+		}*/
 //
 		//label2.setText(icon);
 		label3.setText("ランク "+ rank);
